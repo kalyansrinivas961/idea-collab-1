@@ -1,0 +1,11 @@
+{
+  "name": "ideacollab",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "backend": "cd backend && npm run dev",
+    "backend:seed": "cd backend && node seed.js",
+    "frontend": "cd frontend && npm run dev"
+  }
+}
+

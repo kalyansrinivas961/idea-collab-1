@@ -1,0 +1,136 @@
+import React from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext.jsx";
+import { Toaster } from "react-hot-toast";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import RegisterPage from "./pages/RegisterPage.jsx";
+import DashboardPage from "./pages/DashboardPage.jsx";
+import AddIdeaPage from "./pages/AddIdeaPage.jsx";
+import IdeasListPage from "./pages/IdeasListPage.jsx";
+import IdeaDetailsPage from "./pages/IdeaDetailsPage.jsx";
+import CollaborationRequestsPage from "./pages/CollaborationRequestsPage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
+import UserProfilePage from "./pages/UserProfilePage.jsx";
+import SavedIdeasPage from "./pages/SavedIdeasPage.jsx";
+import UsersPage from "./pages/UsersPage.jsx";
+import ChatPage from "./pages/ChatPage.jsx";
+import NotificationHistoryPage from "./pages/NotificationHistoryPage.jsx";
+import ChangePasswordPage from "./pages/ChangePasswordPage.jsx";
+import TermsPage from "./pages/TermsPage.jsx";
+import PrivacyPage from "./pages/PrivacyPage.jsx";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
+
+const App = () => {
+  return (
+    <AuthProvider>
+      <Toaster position="top-right" reverseOrder={false} />
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/saved-ideas"
+          element={
+            <ProtectedRoute>
+              <SavedIdeasPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <UsersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ideas"
+          element={
+            <ProtectedRoute>
+              <IdeasListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ideas/new"
+          element={
+            <ProtectedRoute>
+              <AddIdeaPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ideas/:id"
+          element={
+            <ProtectedRoute>
+              <IdeaDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/collaborations"
+          element={
+            <ProtectedRoute>
+              <CollaborationRequestsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/change-password"
+          element={
+            <ProtectedRoute>
+              <ChangePasswordPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <NotificationHistoryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users/:id"
+          element={
+            <ProtectedRoute>
+              <UserProfilePage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </AuthProvider>
+  );
+};
+
+export default App;

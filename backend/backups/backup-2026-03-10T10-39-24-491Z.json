@@ -1,0 +1,808 @@
+{
+  "users": [
+    {
+      "socialLinks": {
+        "github": "",
+        "linkedin": "",
+        "twitter": "",
+        "portfolio": ""
+      },
+      "avatarUrl": "",
+      "headline": "",
+      "location": "",
+      "savedIdeas": [],
+      "followers": [],
+      "following": [],
+      "_id": "6970e5f57e52d944c9ddefd8",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "password": "$2b$10$YsHftfVRh49Qgfsf1gsMjeVu3xL0OpMLeFfwFmK8EGtuAk0URsvJu",
+      "role": "Developer",
+      "skills": [
+        "JavaScript",
+        "Node.js",
+        "React"
+      ],
+      "bio": "Full stack developer with 5 years experience.",
+      "createdAt": "2026-01-21T14:43:01.328Z",
+      "updatedAt": "2026-01-21T14:43:01.328Z",
+      "__v": 0
+    },
+    {
+      "socialLinks": {
+        "github": "",
+        "linkedin": "",
+        "twitter": "",
+        "portfolio": ""
+      },
+      "avatarUrl": "",
+      "headline": "",
+      "location": "",
+      "savedIdeas": [],
+      "followers": [],
+      "following": [],
+      "_id": "6970e5f57e52d944c9ddefd9",
+      "name": "Jane Smith",
+      "email": "jane@example.com",
+      "password": "$2b$10$YsHftfVRh49Qgfsf1gsMjeVu3xL0OpMLeFfwFmK8EGtuAk0URsvJu",
+      "role": "Product Manager",
+      "skills": [
+        "Agile",
+        "Product Strategy",
+        "JIRA"
+      ],
+      "bio": "Passionate about building great products.",
+      "createdAt": "2026-01-21T14:43:01.329Z",
+      "updatedAt": "2026-01-21T14:43:01.329Z",
+      "__v": 0
+    },
+    {
+      "socialLinks": {
+        "github": "",
+        "linkedin": "",
+        "twitter": "",
+        "portfolio": ""
+      },
+      "avatarUrl": "",
+      "headline": "",
+      "location": "",
+      "savedIdeas": [],
+      "followers": [],
+      "following": [],
+      "_id": "6970e5f57e52d944c9ddefda",
+      "name": "Bob Johnson",
+      "email": "bob@example.com",
+      "password": "$2b$10$YsHftfVRh49Qgfsf1gsMjeVu3xL0OpMLeFfwFmK8EGtuAk0URsvJu",
+      "role": "Investor",
+      "skills": [
+        "Finance",
+        "Startups"
+      ],
+      "bio": "Looking for the next unicorn.",
+      "createdAt": "2026-01-21T14:43:01.330Z",
+      "updatedAt": "2026-01-21T14:43:01.330Z",
+      "__v": 0
+    },
+    {
+      "socialLinks": {
+        "github": "",
+        "linkedin": "",
+        "twitter": "",
+        "portfolio": ""
+      },
+      "_id": "6970e6cec2be8aece9412f37",
+      "name": "Kalyan Srinivas Ammisetty",
+      "email": "ak.srinivas961@gmail.com",
+      "password": "$2b$10$t5BTEC12MK0S9p.HBKk5a.mf9qQy38gMCeziNpqGD.lXw/MuTvtjW",
+      "role": "Student",
+      "skills": [],
+      "bio": "I am Kalyan Srinivas, a passionate and motivated Computer Science and Engineering student with a strong interest in software development, data science, and emerging technologies. I enjoy learning new programming concepts and applying them through practical projects that solve real-world problems.\r\n\r\nI have hands-on experience with Python, full-stack web development technologies such as Node.js, Express, Angular, and MongoDB, and I am continuously expanding my knowledge in machine learning and data structures. I believe in consistent learning, teamwork, and building efficient, user-friendly applications.\r\n\r\nMy goal is to become a skilled software engineer who contributes to innovative projects, enhances user experiences, and makes a positive impact through technology.",
+      "createdAt": "2026-01-21T14:46:38.273Z",
+      "updatedAt": "2026-03-09T04:28:56.311Z",
+      "__v": 22,
+      "avatarUrl": "http://localhost:5002/uploads/6970e6cec2be8aece9412f37-1769085297299.jpg",
+      "headline": "",
+      "savedIdeas": [
+        "697cb9fd0bae59527c8a3807"
+      ],
+      "location": "Bapatla",
+      "followers": [
+        "6971acc93f882f03a8cdf01a",
+        "69782d1b005c3b85941dbac1",
+        "698d49ff035dea16a6f9b2d1"
+      ],
+      "following": [
+        "69782d1b005c3b85941dbac1",
+        "6971acc93f882f03a8cdf01a"
+      ],
+      "countryCode": "IN",
+      "isBlacklisted": false
+    },
+    {
+      "socialLinks": {
+        "github": "",
+        "linkedin": "",
+        "twitter": "",
+        "portfolio": ""
+      },
+      "avatarUrl": "",
+      "headline": "",
+      "location": "",
+      "savedIdeas": [],
+      "followers": [],
+      "following": [],
+      "_id": "6970e781c2be8aece9412fa4",
+      "name": "suvarchala ",
+      "email": "suvarchala@gmail.com",
+      "password": "$2b$10$lcjW1X1TldF7ClnjVb9WhusnCIN1.Ykx31uUpi4HA5KNB683iiR1i",
+      "role": "Developer",
+      "skills": [],
+      "bio": "",
+      "createdAt": "2026-01-21T14:49:37.914Z",
+      "updatedAt": "2026-01-21T14:49:37.914Z",
+      "__v": 0
+    },
+    {
+      "socialLinks": {
+        "github": "",
+        "linkedin": "",
+        "twitter": "",
+        "portfolio": ""
+      },
+      "_id": "6971acc93f882f03a8cdf01a",
+      "name": "Mallika",
+      "email": "mallika@gmail.com",
+      "password": "$2b$10$WZ0TomrSqmE.jEnOrCNJSuxoOrTOWFDRyn5f6KeDX5AGnEDhd5qKS",
+      "role": "Data  Analyst",
+      "skills": [],
+      "bio": "",
+      "createdAt": "2026-01-22T04:51:21.483Z",
+      "updatedAt": "2026-03-09T04:28:56.321Z",
+      "__v": 7,
+      "avatarUrl": "http://10.216.24.95:5002/uploads/6971acc93f882f03a8cdf01a-1770704993631.jpg",
+      "followers": [
+        "6970e6cec2be8aece9412f37"
+      ],
+      "following": [
+        "6970e6cec2be8aece9412f37"
+      ],
+      "headline": "",
+      "location": "Kanas City",
+      "savedIdeas": [
+        "698024a6187ce09797756cea"
+      ],
+      "countryCode": "",
+      "isBlacklisted": false
+    },
+    {
+      "socialLinks": {
+        "github": "",
+        "linkedin": "",
+        "twitter": "",
+        "portfolio": ""
+      },
+      "_id": "69782d1b005c3b85941dbac1",
+      "name": "Guduri Dileep",
+      "email": "dileep@gmail.com",
+      "password": "$2a$10$RWYGLzgApKy6WwtZZGkxQONtx3cT5KwUuTkzNtDXm443bv.CUiAQG",
+      "role": "Student",
+      "avatarUrl": "http://localhost:5002/uploads/69782d1b005c3b85941dbac1-1769483669574.jpeg",
+      "headline": "",
+      "skills": [],
+      "location": "",
+      "bio": "",
+      "savedIdeas": [],
+      "followers": [
+        "6970e6cec2be8aece9412f37"
+      ],
+      "following": [
+        "6970e6cec2be8aece9412f37"
+      ],
+      "createdAt": "2026-01-27T03:12:27.841Z",
+      "updatedAt": "2026-02-01T06:14:13.154Z",
+      "__v": 2
+    },
+    {
+      "socialLinks": {
+        "github": "",
+        "linkedin": "",
+        "twitter": "",
+        "portfolio": ""
+      },
+      "_id": "698d49ff035dea16a6f9b2d1",
+      "name": "brahmaiah bandaru",
+      "email": "bandarubrahmaiah66@gmail.com",
+      "password": "$2a$10$CG.bY8IODe3/LnrpZ/cF8uEgitvoReioMy/yq4qOhf.i.a.Jcd2lK",
+      "role": "Student",
+      "avatarUrl": "",
+      "headline": "",
+      "skills": [],
+      "location": "",
+      "bio": "",
+      "savedIdeas": [],
+      "followers": [],
+      "following": [
+        "6970e6cec2be8aece9412f37"
+      ],
+      "createdAt": "2026-02-12T03:33:19.393Z",
+      "updatedAt": "2026-02-12T03:34:05.956Z",
+      "__v": 3
+    },
+    {
+      "socialLinks": {
+        "github": "",
+        "linkedin": "",
+        "twitter": "",
+        "portfolio": ""
+      },
+      "_id": "69ac495b649e9dda87c4b2d9",
+      "name": "Mahesh Babu",
+      "email": "maahi@gmail.com",
+      "password": "$2a$10$0lEywleBF5RoV1cqYzgLMupcpBYXVmXzaeDfcRks6rexhpeKII35W",
+      "phone": "+916301377530",
+      "isBlacklisted": false,
+      "role": "Founder",
+      "avatarUrl": "",
+      "headline": "",
+      "skills": [
+        "python"
+      ],
+      "location": "",
+      "countryCode": "",
+      "bio": "",
+      "savedIdeas": [],
+      "followers": [],
+      "following": [],
+      "createdAt": "2026-03-07T15:50:51.139Z",
+      "updatedAt": "2026-03-07T15:50:51.139Z",
+      "__v": 0
+    }
+  ],
+  "ideas": [
+    {
+      "_id": "6970e5f57e52d944c9ddefde",
+      "title": "AI-Powered Recruitment",
+      "description": "A platform that uses AI to screen resumes and conduct initial interviews.",
+      "domain": "HR Tech",
+      "tags": [
+        "AI",
+        "Recruitment",
+        "SaaS"
+      ],
+      "author": "6970e5f57e52d944c9ddefd8",
+      "likesCount": 5,
+      "commentsCount": 2,
+      "createdAt": "2026-01-21T14:43:01.353Z",
+      "updatedAt": "2026-01-31T15:13:01.678Z",
+      "__v": 1,
+      "category": "General",
+      "collaborators": [],
+      "likes": [],
+      "owner": "6970e5f57e52d944c9ddefd8",
+      "allowedCommenters": "anyone",
+      "visibility": "public",
+      "attachments": [],
+      "comments": []
+    },
+    {
+      "_id": "6970e5f57e52d944c9ddefe0",
+      "title": "Decentralized Social Network",
+      "description": "A social network built on blockchain where users own their data.",
+      "domain": "Blockchain",
+      "tags": [
+        "Web3",
+        "Crypto",
+        "Social"
+      ],
+      "author": "6970e5f57e52d944c9ddefd8",
+      "likesCount": 8,
+      "commentsCount": 1,
+      "createdAt": "2026-01-21T14:43:01.353Z",
+      "updatedAt": "2026-01-31T15:13:01.678Z",
+      "__v": 1,
+      "category": "General",
+      "collaborators": [],
+      "likes": [],
+      "owner": "6970e5f57e52d944c9ddefd8",
+      "allowedCommenters": "anyone",
+      "visibility": "public",
+      "attachments": [],
+      "comments": []
+    },
+    {
+      "_id": "6970e754c2be8aece9412f96",
+      "title": "Ai based internship",
+      "description": "sample desc",
+      "domain": "Data Analytics",
+      "tags": [
+        "#project"
+      ],
+      "author": "6970e6cec2be8aece9412f37",
+      "likesCount": 0,
+      "commentsCount": 0,
+      "createdAt": "2026-01-21T14:48:52.873Z",
+      "updatedAt": "2026-01-31T15:13:01.678Z",
+      "__v": 2,
+      "category": "General",
+      "collaborators": [],
+      "likes": [
+        "6970e6cec2be8aece9412f37"
+      ],
+      "owner": "6970e5f57e52d944c9ddefd8",
+      "allowedCommenters": "anyone",
+      "visibility": "public",
+      "attachments": [],
+      "comments": []
+    },
+    {
+      "_id": "6970ea8d306ab1a56a7d25fc",
+      "title": "ai based job",
+      "description": "sample desc\n",
+      "domain": "Fin tech",
+      "tags": [
+        "idea"
+      ],
+      "author": "6970e6cec2be8aece9412f37",
+      "likesCount": 1,
+      "commentsCount": 1,
+      "createdAt": "2026-01-21T15:02:37.147Z",
+      "updatedAt": "2026-01-31T15:13:01.678Z",
+      "__v": 7,
+      "category": "General",
+      "collaborators": [],
+      "likes": [
+        "6970e6cec2be8aece9412f37"
+      ],
+      "owner": "6970e5f57e52d944c9ddefd8",
+      "comments": [
+        {
+          "user": "6970e6cec2be8aece9412f37",
+          "text": "good idea",
+          "_id": "6971f9c7ce9f753efac4354c",
+          "createdAt": "2026-01-22T10:19:51.491Z"
+        }
+      ],
+      "allowedCommenters": "anyone",
+      "visibility": "public",
+      "attachments": []
+    },
+    {
+      "_id": "69801cf8bb090e0189e717c2",
+      "title": "New idea",
+      "description": "Test",
+      "category": "Fantacy",
+      "tags": [],
+      "visibility": "public",
+      "allowedCommenters": "anyone",
+      "owner": "6970e6cec2be8aece9412f37",
+      "collaborators": [],
+      "likes": [],
+      "attachments": [],
+      "comments": [],
+      "createdAt": "2026-02-02T03:41:44.802Z",
+      "updatedAt": "2026-02-02T03:41:44.802Z",
+      "__v": 0
+    },
+    {
+      "_id": "69801eec4c6a614599852b65",
+      "title": "idea ",
+      "description": "test",
+      "category": "Fantacy",
+      "tags": [],
+      "visibility": "public",
+      "allowedCommenters": "anyone",
+      "owner": "6970e6cec2be8aece9412f37",
+      "collaborators": [
+        "698d49ff035dea16a6f9b2d1"
+      ],
+      "likes": [],
+      "attachments": [],
+      "comments": [],
+      "createdAt": "2026-02-02T03:50:04.098Z",
+      "updatedAt": "2026-02-12T03:36:55.588Z",
+      "__v": 1
+    },
+    {
+      "_id": "698024a6187ce09797756cea",
+      "title": "Myntra Relove",
+      "description": "This project, Myntra Relove, aims to address these barriers by \r\nanalyzing user behavior, motivations, and pain points, and \r\ndesigning actionable solutions that encourage users to participate \r\nin sustainable fashion practices while enhancing their shopping \r\nexperience.",
+      "category": "Tech",
+      "tags": [
+        "Myntra"
+      ],
+      "visibility": "connections",
+      "allowedCommenters": "anyone",
+      "owner": "6971acc93f882f03a8cdf01a",
+      "collaborators": [],
+      "likes": [
+        "6971acc93f882f03a8cdf01a"
+      ],
+      "attachments": [
+        {
+          "url": "/uploads/idea-1770005668712.pdf",
+          "fileType": "document",
+          "originalName": "MyntraReLoveNLGradProject.pdf",
+          "_id": "698024a6187ce09797756ceb"
+        }
+      ],
+      "comments": [
+        {
+          "user": "6971acc93f882f03a8cdf01a",
+          "text": "ui/ux implementation only needed",
+          "_id": "698ad090a3a34b529f3cb3f0",
+          "createdAt": "2026-02-10T06:30:40.611Z"
+        }
+      ],
+      "createdAt": "2026-02-02T04:14:30.348Z",
+      "updatedAt": "2026-02-10T06:30:40.617Z",
+      "__v": 2
+    }
+  ],
+  "collaborationRequests": [
+    {
+      "_id": "6972166c8ec6d0f6f3a9f2b9",
+      "sender": "6971acc93f882f03a8cdf01a",
+      "receiver": "6970e6cec2be8aece9412f37",
+      "idea": "6971cf6b22c4298f807210d6",
+      "message": "",
+      "status": "accepted",
+      "createdAt": "2026-01-22T12:22:04.927Z",
+      "updatedAt": "2026-01-24T13:37:10.611Z",
+      "__v": 0
+    },
+    {
+      "_id": "698d4a71035dea16a6f9b381",
+      "sender": "698d49ff035dea16a6f9b2d1",
+      "receiver": "6970e6cec2be8aece9412f37",
+      "idea": "69801eec4c6a614599852b65",
+      "message": "i want to collaborate",
+      "status": "accepted",
+      "createdAt": "2026-02-12T03:35:13.687Z",
+      "updatedAt": "2026-02-12T03:36:55.572Z",
+      "__v": 0
+    }
+  ],
+  "conversations": [],
+  "messages": [
+    {
+      "_id": "6974f322531c39aff0cdd1e1",
+      "sender": "6970e6cec2be8aece9412f37",
+      "receiver": "6971acc93f882f03a8cdf01a",
+      "content": "Hi",
+      "read": true,
+      "createdAt": "2026-01-24T16:28:18.937Z",
+      "updatedAt": "2026-01-25T11:14:07.909Z",
+      "__v": 0,
+      "deletedBy": [
+        "6970e6cec2be8aece9412f37",
+        "6971acc93f882f03a8cdf01a"
+      ]
+    },
+    {
+      "_id": "6974f3f7b68bdd7918f43556",
+      "sender": "6971acc93f882f03a8cdf01a",
+      "receiver": "6970e6cec2be8aece9412f37",
+      "content": "Hello",
+      "read": true,
+      "createdAt": "2026-01-24T16:31:51.782Z",
+      "updatedAt": "2026-01-25T11:14:07.909Z",
+      "__v": 0,
+      "deletedBy": [
+        "6970e6cec2be8aece9412f37",
+        "6971acc93f882f03a8cdf01a"
+      ]
+    },
+    {
+      "attachment": {
+        "url": "/uploads/chat-1769306134142.jpg",
+        "fileType": "image",
+        "originalName": "WhatsApp Image 2025-07-23 at 20.53.35_b861dcdc.jpg"
+      },
+      "_id": "6975781613db4fed90774c41",
+      "sender": "6970e6cec2be8aece9412f37",
+      "receiver": "6971acc93f882f03a8cdf01a",
+      "content": "",
+      "read": true,
+      "createdAt": "2026-01-25T01:55:34.175Z",
+      "updatedAt": "2026-01-25T11:14:07.909Z",
+      "__v": 0,
+      "deletedBy": [
+        "6970e6cec2be8aece9412f37",
+        "6971acc93f882f03a8cdf01a"
+      ]
+    },
+    {
+      "_id": "69757923c29caf865a53846a",
+      "sender": "6971acc93f882f03a8cdf01a",
+      "receiver": "6970e6cec2be8aece9412f37",
+      "content": "😀",
+      "read": true,
+      "deletedBy": [
+        "6970e6cec2be8aece9412f37",
+        "6971acc93f882f03a8cdf01a"
+      ],
+      "createdAt": "2026-01-25T02:00:03.249Z",
+      "updatedAt": "2026-01-25T11:14:07.909Z",
+      "__v": 0
+    },
+    {
+      "_id": "69757c6313f3070e60f5019a",
+      "sender": "6970e6cec2be8aece9412f37",
+      "receiver": "6971acc93f882f03a8cdf01a",
+      "content": "Hello",
+      "read": true,
+      "deletedBy": [
+        "6971acc93f882f03a8cdf01a",
+        "6970e6cec2be8aece9412f37"
+      ],
+      "createdAt": "2026-01-25T02:13:55.191Z",
+      "updatedAt": "2026-01-25T11:14:07.909Z",
+      "__v": 0
+    },
+    {
+      "_id": "6975859d13f3070e60f505db",
+      "sender": "6971acc93f882f03a8cdf01a",
+      "receiver": "6970e6cec2be8aece9412f37",
+      "content": "Hello",
+      "read": true,
+      "deletedBy": [
+        "6970e6cec2be8aece9412f37",
+        "6971acc93f882f03a8cdf01a"
+      ],
+      "createdAt": "2026-01-25T02:53:17.848Z",
+      "updatedAt": "2026-01-25T11:14:07.909Z",
+      "__v": 0
+    },
+    {
+      "_id": "6975f917f72586b9703cd0a1",
+      "sender": "6970e6cec2be8aece9412f37",
+      "receiver": "6971acc93f882f03a8cdf01a",
+      "content": "hello",
+      "read": true,
+      "deletedBy": [
+        "6970e6cec2be8aece9412f37",
+        "6971acc93f882f03a8cdf01a"
+      ],
+      "createdAt": "2026-01-25T11:05:59.608Z",
+      "updatedAt": "2026-01-25T11:14:07.909Z",
+      "__v": 0
+    },
+    {
+      "_id": "69782db5005c3b85941dbc1c",
+      "sender": "69782d1b005c3b85941dbac1",
+      "receiver": "6970e6cec2be8aece9412f37",
+      "content": "Hello hero",
+      "read": true,
+      "deletedBy": [],
+      "createdAt": "2026-01-27T03:15:01.541Z",
+      "updatedAt": "2026-01-27T03:15:20.112Z",
+      "__v": 0
+    },
+    {
+      "_id": "69782e2a005c3b85941dbc76",
+      "sender": "6970e6cec2be8aece9412f37",
+      "receiver": "69782d1b005c3b85941dbac1",
+      "content": "Hey flash man",
+      "read": true,
+      "deletedBy": [],
+      "createdAt": "2026-01-27T03:16:58.563Z",
+      "updatedAt": "2026-02-01T06:14:46.746Z",
+      "__v": 0
+    },
+    {
+      "_id": "69782e2d005c3b85941dbc7a",
+      "sender": "6970e6cec2be8aece9412f37",
+      "receiver": "69782d1b005c3b85941dbac1",
+      "content": "oh my god",
+      "read": true,
+      "deletedBy": [],
+      "createdAt": "2026-01-27T03:17:01.428Z",
+      "updatedAt": "2026-02-01T06:14:46.746Z",
+      "__v": 0
+    },
+    {
+      "_id": "697838a0005c3b85941dc0a8",
+      "sender": "6971acc93f882f03a8cdf01a",
+      "receiver": "6970e6cec2be8aece9412f37",
+      "content": "Hello",
+      "read": true,
+      "deletedBy": [],
+      "createdAt": "2026-01-27T04:01:36.372Z",
+      "updatedAt": "2026-01-27T04:01:41.417Z",
+      "__v": 0
+    },
+    {
+      "_id": "697838a9005c3b85941dc0cf",
+      "sender": "6970e6cec2be8aece9412f37",
+      "receiver": "6971acc93f882f03a8cdf01a",
+      "content": "hello",
+      "read": true,
+      "deletedBy": [],
+      "createdAt": "2026-01-27T04:01:45.824Z",
+      "updatedAt": "2026-01-27T04:01:46.226Z",
+      "__v": 0
+    },
+    {
+      "_id": "697838cd005c3b85941dc0ec",
+      "sender": "6970e6cec2be8aece9412f37",
+      "receiver": "6971acc93f882f03a8cdf01a",
+      "content": "hii",
+      "read": true,
+      "deletedBy": [],
+      "createdAt": "2026-01-27T04:02:21.456Z",
+      "updatedAt": "2026-01-27T04:02:26.819Z",
+      "__v": 0
+    },
+    {
+      "_id": "697838d9005c3b85941dc113",
+      "sender": "6971acc93f882f03a8cdf01a",
+      "receiver": "6970e6cec2be8aece9412f37",
+      "content": "hello",
+      "read": true,
+      "deletedBy": [],
+      "createdAt": "2026-01-27T04:02:33.920Z",
+      "updatedAt": "2026-01-27T04:02:33.951Z",
+      "__v": 0
+    },
+    {
+      "_id": "698014b10db54de57f1bb9d9",
+      "sender": "6970e6cec2be8aece9412f37",
+      "receiver": "6971acc93f882f03a8cdf01a",
+      "content": "Hello\r\n",
+      "read": true,
+      "deletedBy": [],
+      "createdAt": "2026-02-02T03:06:25.291Z",
+      "updatedAt": "2026-02-02T04:09:42.942Z",
+      "__v": 0
+    },
+    {
+      "_id": "6980238c187ce09797756c13",
+      "sender": "6971acc93f882f03a8cdf01a",
+      "receiver": "6970e6cec2be8aece9412f37",
+      "content": "hi",
+      "read": true,
+      "deletedBy": [],
+      "createdAt": "2026-02-02T04:09:48.498Z",
+      "updatedAt": "2026-02-02T04:10:51.303Z",
+      "__v": 0
+    },
+    {
+      "_id": "698ad0bba3a34b529f3cb448",
+      "sender": "6971acc93f882f03a8cdf01a",
+      "receiver": "6970e6cec2be8aece9412f37",
+      "content": "hey i want to collabrate",
+      "read": true,
+      "deletedBy": [],
+      "createdAt": "2026-02-10T06:31:23.323Z",
+      "updatedAt": "2026-02-10T06:32:01.541Z",
+      "__v": 0
+    },
+    {
+      "_id": "698ad0e6a3a34b529f3cb4ae",
+      "sender": "6970e6cec2be8aece9412f37",
+      "receiver": "6971acc93f882f03a8cdf01a",
+      "content": "ok",
+      "read": true,
+      "deletedBy": [],
+      "createdAt": "2026-02-10T06:32:06.374Z",
+      "updatedAt": "2026-03-09T04:29:36.367Z",
+      "__v": 0
+    },
+    {
+      "_id": "698ad0f4a3a34b529f3cb4b7",
+      "sender": "6970e6cec2be8aece9412f37",
+      "receiver": "6971acc93f882f03a8cdf01a",
+      "content": "mail me kalyansrinivas@19",
+      "read": true,
+      "deletedBy": [],
+      "createdAt": "2026-02-10T06:32:20.437Z",
+      "updatedAt": "2026-03-09T04:29:36.367Z",
+      "__v": 0
+    },
+    {
+      "_id": "698d4aaf035dea16a6f9b3e0",
+      "sender": "698d49ff035dea16a6f9b2d1",
+      "receiver": "6970e6cec2be8aece9412f37",
+      "content": "hi",
+      "read": true,
+      "deletedBy": [],
+      "createdAt": "2026-02-12T03:36:15.418Z",
+      "updatedAt": "2026-02-12T03:37:33.824Z",
+      "__v": 0
+    }
+  ],
+  "notifications": [
+    {
+      "_id": "697eef3563948dbaab384db0",
+      "recipient": "69782d1b005c3b85941dbac1",
+      "type": "info",
+      "title": "New Follower",
+      "message": "Kalyan Srinivas Ammisetty started following you",
+      "relatedId": "6970e6cec2be8aece9412f37",
+      "relatedModel": "User",
+      "isRead": true,
+      "createdAt": "2026-02-01T06:14:13.114Z",
+      "updatedAt": "2026-02-01T06:15:02.581Z",
+      "__v": 0
+    },
+    {
+      "_id": "6980253f187ce09797756f1f",
+      "recipient": "6971acc93f882f03a8cdf01a",
+      "type": "info",
+      "title": "New Follower",
+      "message": "Kalyan Srinivas Ammisetty started following you",
+      "relatedId": "6970e6cec2be8aece9412f37",
+      "relatedModel": "User",
+      "isRead": true,
+      "createdAt": "2026-02-02T04:17:03.178Z",
+      "updatedAt": "2026-02-02T04:17:10.970Z",
+      "__v": 0
+    },
+    {
+      "_id": "698d4a25035dea16a6f9b328",
+      "recipient": "6970e6cec2be8aece9412f37",
+      "type": "info",
+      "title": "New Follower",
+      "message": "brahmaiah bandaru started following you",
+      "relatedId": "698d49ff035dea16a6f9b2d1",
+      "relatedModel": "User",
+      "isRead": true,
+      "createdAt": "2026-02-12T03:33:57.781Z",
+      "updatedAt": "2026-03-05T05:29:36.833Z",
+      "__v": 0
+    },
+    {
+      "_id": "698d4a2d035dea16a6f9b340",
+      "recipient": "6970e6cec2be8aece9412f37",
+      "type": "info",
+      "title": "New Follower",
+      "message": "brahmaiah bandaru started following you",
+      "relatedId": "698d49ff035dea16a6f9b2d1",
+      "relatedModel": "User",
+      "isRead": true,
+      "createdAt": "2026-02-12T03:34:05.948Z",
+      "updatedAt": "2026-03-05T05:29:36.833Z",
+      "__v": 0
+    },
+    {
+      "_id": "698d4a71035dea16a6f9b385",
+      "recipient": "6970e6cec2be8aece9412f37",
+      "type": "info",
+      "title": "Collaboration Request",
+      "message": "brahmaiah bandaru requested to collaborate on \"idea \"",
+      "relatedId": "698d4a71035dea16a6f9b381",
+      "relatedModel": "CollaborationRequest",
+      "isRead": true,
+      "createdAt": "2026-02-12T03:35:13.704Z",
+      "updatedAt": "2026-03-05T05:29:36.833Z",
+      "__v": 0
+    },
+    {
+      "_id": "698d4ad7035dea16a6f9b431",
+      "recipient": "698d49ff035dea16a6f9b2d1",
+      "type": "success",
+      "title": "Request Accepted",
+      "message": "Your request to collaborate on \"undefined\" was accepted",
+      "relatedId": "69801eec4c6a614599852b65",
+      "relatedModel": "Idea",
+      "isRead": false,
+      "createdAt": "2026-02-12T03:36:55.594Z",
+      "updatedAt": "2026-02-12T03:36:55.594Z",
+      "__v": 0
+    },
+    {
+      "_id": "69ae4c88954e8bcc34dbaeb6",
+      "recipient": "6971acc93f882f03a8cdf01a",
+      "type": "info",
+      "title": "New Follower",
+      "message": "Kalyan Srinivas Ammisetty started following you",
+      "relatedId": "6970e6cec2be8aece9412f37",
+      "relatedModel": "User",
+      "isRead": false,
+      "createdAt": "2026-03-09T04:28:56.297Z",
+      "updatedAt": "2026-03-09T04:28:56.297Z",
+      "__v": 0
+    }
+  ],
+  "phoneOtps": []
+}

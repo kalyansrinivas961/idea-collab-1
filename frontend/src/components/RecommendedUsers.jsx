@@ -1,0 +1,59 @@
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import api from "../api/client";
+
+const RecommendedUsers = () => {
+  const { user } = useAuth();
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get("/users/search") // Empty query returns all/some users
+      .then(res => {
+        // Filter out current user and take top 3
+        const others = res.data.filter(u => u._id !== user?._id).slice(0, 3);
+        setUsers(others);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to fetch recommended users", err);
+        setLoading(false);
+      });
+  }, [user]);
+
+  if (loading || users.length === 0) return null;
+
+  return (
+    <div className="bg-white rounded-xl p-4 shadow-sm border">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-semibold text-slate-800">Who to follow</h2>
+        <Link to="/users" className="text-xs text-indigo-600 font-medium hover:underline">
+          View all
+        </Link>
+      </div>
+      <div className="space-y-4">
+        {users.map((u) => (
+          <div key={u._id} className="flex items-center gap-3">
+            <Link to={`/users/${u._id}`}>
+              <img
+                src={u.avatarUrl || "https://via.placeholder.com/150"}
+                alt={u.name}
+                className="w-10 h-10 rounded-full object-cover border border-slate-100"
+              />
+            </Link>
+            <div className="flex-1 min-w-0">
+              <Link to={`/users/${u._id}`} className="block truncate font-medium text-slate-800 hover:text-indigo-600 text-sm">
+                {u.name}
+              </Link>
+              <p className="truncate text-xs text-slate-500">{u.headline || u.role || "Member"}</p>
+            </div>
+            {/* Could add a follow button here later */}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default RecommendedUsers;
