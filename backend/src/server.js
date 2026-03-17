@@ -96,7 +96,7 @@ app.get("/api/health", (req, res) => {
 if (require.main === module) {
   connectDB();
 
-  const PORT = process.env.PORT || 10000;
+  const PORT = process.env.PORT || 5002;
 
   server.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
