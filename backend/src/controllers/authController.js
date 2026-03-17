@@ -73,6 +73,20 @@ exports.sendOtp = async (req, res) => {
   const { email } = req.body;
 
   try {
+    if (!email || !emailValidator.validate(email)) {
+      return res.status(400).json({ message: "A valid email address is required" });
+    }
+
+    // Rate limiting check (e.g., max 3 requests per 10 mins) - simplified for now
+    const recentOtp = await EmailOtp.findOne({ 
+      email, 
+      createdAt: { $gt: new Date(Date.now() - 60000) } // 1 minute cooldown
+    });
+
+    if (recentOtp) {
+      return res.status(429).json({ message: "Please wait at least 60 seconds before requesting another code." });
+    }
+
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -83,18 +97,30 @@ exports.sendOtp = async (req, res) => {
       { upsert: true, new: true }
     );
 
-    // Send email
-    await sendEmail({
-      email,
-      subject: "Verification Code - Idea Collab",
-      message: `Your verification code is: ${otp}. It will expire in 10 minutes.`,
-    });
-
-    res.json({ message: "Verification code sent to your email" });
+    // Send email with fallback logging
+    try {
+      await sendEmail({
+        email,
+        subject: "Verification Code - Idea Collab",
+        message: `Your verification code is: ${otp}. It will expire in 10 minutes.`,
+      });
+      
+      console.log(`[OTP GENERATED] Success for ${email}`);
+      res.json({ message: "Verification code sent to your email" });
+    } catch (emailError) {
+      console.error(`[OTP FAILURE] Delivery failed for ${email}:`, emailError.message);
+      
+      // If email fails, we still keep the OTP in DB for 10 mins, 
+      // but inform the user about the delivery failure.
+      res.status(503).json({ 
+        message: "We're having trouble delivering the code. Please try again later or contact support.",
+        technical: emailError.message 
+      });
+    }
   } catch (error) {
-    console.error("Send OTP Error:", error);
+    console.error(`[OTP CRITICAL] Error in sendOtp for ${email}:`, error);
     res.status(500).json({ 
-      message: error.message || "Failed to send verification code" 
+      message: "An internal error occurred. Please try again later."
     });
   }
 };
@@ -273,10 +299,24 @@ exports.googleLogin = async (req, res) => {
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
+    if (!email || !emailValidator.validate(email)) {
+      return res.status(400).json({ message: "A valid email address is required" });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
       // For security, don't reveal if user exists
       return res.status(200).json({ message: "If an account exists with that email, we've sent instructions to reset your password." });
+    }
+
+    // Rate limiting check
+    const recentOtp = await EmailOtp.findOne({ 
+      email, 
+      createdAt: { $gt: new Date(Date.now() - 60000) } 
+    });
+
+    if (recentOtp) {
+      return res.status(429).json({ message: "Please wait at least 60 seconds before requesting another code." });
     }
 
     // Generate 6-digit OTP for password reset
@@ -289,16 +329,26 @@ exports.forgotPassword = async (req, res) => {
       { upsert: true, new: true }
     );
 
-    // Send email
-    await sendEmail({
-      email,
-      subject: "Password Reset Verification Code - Idea Collab",
-      message: `Your verification code for password reset is: ${otp}. It will expire in 10 minutes.`,
-    });
-
-    res.json({ message: "Verification code sent to your email." });
+    // Send email with fallback logging
+    try {
+      await sendEmail({
+        email,
+        subject: "Password Reset Verification Code - Idea Collab",
+        message: `Your verification code for password reset is: ${otp}. It will expire in 10 minutes.`,
+      });
+      
+      console.log(`[PASSWORD RESET OTP] Success for ${email}`);
+      res.json({ message: "Verification code sent to your email." });
+    } catch (emailError) {
+      console.error(`[PASSWORD RESET OTP FAILURE] Delivery failed for ${email}:`, emailError.message);
+      res.status(503).json({ 
+        message: "We're having trouble delivering the reset code. Please try again later or contact support.",
+        technical: emailError.message 
+      });
+    }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(`[PASSWORD RESET CRITICAL] Error in forgotPassword for ${email}:`, error);
+    res.status(500).json({ message: "An internal error occurred." });
   }
 };
 
