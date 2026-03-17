@@ -1,34 +1,9 @@
 const request = require("supertest");
+const app = require("../server");
 const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-
-// Mock Groq SDK
-jest.mock("groq-sdk", () => {
-  return jest.fn().mockImplementation(() => ({
-    chat: {
-      completions: {
-        create: jest.fn().mockImplementation(({ messages }) => {
-          const userMessage = messages[messages.length - 1].content.toLowerCase();
-          let response = "I am the IdeaCollab assistant. How can I help you?";
-          
-          if (userMessage.includes("password")) {
-            response = "To change your password, go to settings.";
-          } else if (userMessage.includes("meaning of life")) {
-            response = "In simulation mode, the meaning of life is 42.";
-          }
-          
-          return Promise.resolve({
-            choices: [{ message: { content: response } }]
-          });
-        })
-      }
-    }
-  }));
-});
-
-const app = require("../server");
 
 // Mock auth middleware
 jest.mock("../middleware/authMiddleware", () => ({
@@ -51,7 +26,6 @@ describe("AI Chat API", () => {
   it("should return password help", async () => {
     const res = await request(app)
       .post("/api/ai/chat")
-      .set("Authorization", "Bearer dummy-token")
       .send({ message: "How do I change my password?" });
 
     expect(res.statusCode).toEqual(200);

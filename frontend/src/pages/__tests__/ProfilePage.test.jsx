@@ -163,15 +163,27 @@ describe('ProfilePage', () => {
     });
   });
 
-  it('handles logout correctly', async () => {
+  it('handles logout correctly from header button', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
     renderWithAuth(<ProfilePage />);
     
-    // Go to settings tab where logout is located
+    const headerLogoutBtn = screen.getByLabelText('Logout Account');
+    fireEvent.click(headerLogoutBtn);
+    
+    expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to log out?');
+    expect(mockLogout).toHaveBeenCalled();
+  });
+
+  it('handles logout correctly from settings tab', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    renderWithAuth(<ProfilePage />);
+    
+    // Go to settings tab where the other logout is located
     const settingsTab = screen.getByText('Privacy & Security');
     fireEvent.click(settingsTab);
     
-    const logoutButton = screen.getByText('Logout Account');
-    fireEvent.click(logoutButton);
+    const dangerLogoutBtn = screen.getByText('Logout Account');
+    fireEvent.click(dangerLogoutBtn);
     
     expect(mockLogout).toHaveBeenCalled();
   });

@@ -1,11 +1,6 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
-// Global mocks for testing
-jest.mock('../utils/sendEmail', () => {
-  return jest.fn().mockImplementation(() => Promise.resolve());
-});
-
 let mongoServer;
 
 beforeAll(async () => {

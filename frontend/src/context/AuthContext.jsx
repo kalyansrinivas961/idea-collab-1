@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import api from "../api/client.js";
 import { normalizeUser } from "../utils/user.js";
+import { toast } from "react-hot-toast";
 
 export const AuthContext = createContext(null);
 
@@ -31,8 +32,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
+    try {
+      localStorage.removeItem("token");
+      setUser(null);
+      toast.success("Successfully logged out");
+    } catch (error) {
+      console.error("Logout failed:", error);
+      toast.error("An error occurred during logout");
+    }
   };
 
   const updateUser = (updatedData) => {

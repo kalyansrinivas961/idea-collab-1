@@ -204,10 +204,9 @@ const RegisterPage = () => {
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={handleGoogleError}
-              useOneTap
               theme="outline"
               size="large"
-              width="100%"
+              shape="pill"
               text="signup_with"
             />
           </div>

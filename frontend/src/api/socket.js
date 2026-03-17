@@ -1,7 +1,5 @@
 import { io } from "socket.io-client";
 
-const socket = io("https://idea-collab-backend.onrender.com", {
-  transports: ["websocket"], // avoids polling issues
-});
+const socket = io(import.meta.env.VITE_API_URL || "http://localhost:5002");
 
 export default socket;

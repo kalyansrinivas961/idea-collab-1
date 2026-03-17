@@ -93,7 +93,7 @@ const LoginPage = () => {
               useOneTap
               theme="outline"
               size="large"
-              width="100%"
+              shape="pill"
             />
           </div>
 
