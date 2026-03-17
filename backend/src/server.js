@@ -70,9 +70,26 @@ app.use("/api/notifications", require("./routes/notificationRoutes"));
 app.use("/api/ai", require("./routes/aiRoutes"));
 app.use("/api/reports", require("./routes/reportRoutes"));
 
-// Health
+// Serve Static Frontend in Production
+if (process.env.NODE_ENV === "production") {
+  // Set static folder
+  app.use(express.static(path.join(__dirname, "../../frontend/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../../frontend", "dist", "index.html"));
+  });
+}
+
+// Unified Health Check (Always available)
 app.get("/api/health", (req, res) => {
-  res.json({ status: "OK" });
+  res.json({
+    status: "OK",
+    mode: process.env.NODE_ENV || "development",
+    database: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    version: require("../package.json").version
+  });
 });
 
 // Start server
