@@ -12,6 +12,7 @@ const Layout = ({ children }) => {
   const [pendingCount, setPendingCount] = useState(0);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
+  const [followRequestCount, setFollowRequestCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const fetchUnreadMessageCount = () => {
@@ -28,17 +29,29 @@ const Layout = ({ children }) => {
       .catch((err) => console.error("Failed to fetch unread notification count", err));
   };
 
+  const fetchPendingCount = () => {
+    api
+      .get("/collaborations/requests/pending-count")
+      .then((res) => setPendingCount(res.data.count))
+      .catch((err) => console.error("Failed to fetch notification count", err));
+  };
+
+  const fetchFollowRequestCount = async () => {
+    try {
+      const res = await api.get("/users/follow-requests/pending");
+      setFollowRequestCount(res.data.length);
+    } catch (err) {
+      console.error("Failed to fetch follow request count", err);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       socket.emit("join", user._id);
-
-      api
-        .get("/collaborations/requests/pending-count")
-        .then((res) => setPendingCount(res.data.count))
-        .catch((err) => console.error("Failed to fetch notification count", err));
-
       fetchUnreadMessageCount();
       fetchUnreadNotifCount();
+      fetchPendingCount();
+      fetchFollowRequestCount();
 
       const handleNewRequest = () => {
         setPendingCount((prev) => prev + 1);
@@ -168,20 +181,36 @@ const Layout = ({ children }) => {
         setUnreadNotifCount((prev) => prev + 1);
       };
       
+      const handleFollowRequest = () => {
+        setFollowRequestCount((prev) => prev + 1);
+        toast.info("New follow request received", {
+          icon: "👤",
+          duration: 4000
+        });
+      };
+
       const handleMessagesRead = () => {
         fetchUnreadMessageCount();
+      };
+
+      const handleFollowProcessed = () => {
+        fetchFollowRequestCount();
       };
 
       socket.on("collaboration:request", handleNewRequest);
       socket.on("chat:message", handleChatMessage);
       socket.on("notification:new", handleNewNotification);
+      socket.on("follow:request", handleFollowRequest);
       window.addEventListener("messages:read", handleMessagesRead);
+      window.addEventListener("follow:processed", handleFollowProcessed);
 
       return () => {
         socket.off("collaboration:request", handleNewRequest);
         socket.off("chat:message", handleChatMessage);
         socket.off("notification:new", handleNewNotification);
+        socket.off("follow:request", handleFollowRequest);
         window.removeEventListener("messages:read", handleMessagesRead);
+        window.removeEventListener("follow:processed", handleFollowProcessed);
       };
     }
   }, [user]);
@@ -224,6 +253,14 @@ const Layout = ({ children }) => {
                   {unreadNotifCount > 0 && (
                     <span className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
                       {unreadNotifCount}
+                    </span>
+                  )}
+                </NavLink>
+                <NavLink to="/follow-requests" className="text-slate-600 hover:text-indigo-600 flex items-center font-medium">
+                  Requests
+                  {followRequestCount > 0 && (
+                    <span className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                      {followRequestCount}
                     </span>
                   )}
                 </NavLink>
@@ -328,6 +365,43 @@ const Layout = ({ children }) => {
                 <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">{unreadNotifCount}</span>
               )}
             </NavLink>
+            <NavLink 
+              to="/profile" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+              My Profile
+            </NavLink>
+            <NavLink 
+              to="/followers" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+              Followers
+            </NavLink>
+            <NavLink 
+              to="/following" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+              Following
+            </NavLink>
+            <NavLink 
+              to="/follow-requests" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={({isActive}) => `flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                Follow Requests
+              </div>
+              {followRequestCount > 0 && (
+                <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">{followRequestCount}</span>
+              )}
+            </NavLink>
             <button 
               onClick={() => {
                 logout();
@@ -341,8 +415,8 @@ const Layout = ({ children }) => {
           </nav>
         </div>
       )}
-      <main className="flex-1 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-4 py-6">{children}</div>
+      <main className={`flex-1 bg-slate-50 ${window.location.pathname.startsWith('/messages') ? 'p-0' : ''}`}>
+        <div className={`${window.location.pathname.startsWith('/messages') ? 'max-w-full px-0 py-0 h-full' : 'max-w-6xl mx-auto px-4 py-6'}`}>{children}</div>
       </main>
       <Footer />
       <AIChatBox />

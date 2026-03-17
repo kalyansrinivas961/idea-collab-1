@@ -61,8 +61,10 @@ exports.createRequest = async (req, res) => {
     // The Layout.jsx uses 'collaboration:request' to increment pendingCount.
     // So we should keep emitting it OR update createNotification to support custom events.
     // Since createNotification emits 'notification:new', we might need both.
-    // Let's keep the specific event for now to not break existing badge logic, or update frontend later.
-    req.io.to(idea.owner.toString()).emit("collaboration:request", createdRequest);
+    // SECURITY FIX: Only emit to recipient if it's NOT the sender
+    if (idea.owner.toString() !== req.user._id.toString()) {
+      req.io.to(idea.owner.toString()).emit("collaboration:request", createdRequest);
+    }
 
     res.status(201).json(createdRequest);
   } catch (error) {

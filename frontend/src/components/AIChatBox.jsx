@@ -4,6 +4,10 @@ import api from "../api/client";
 
 const AIChatBox = () => {
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Hide AI Chatbox on messages page to avoid overlap with chat input
+  if (window.location.pathname.startsWith('/messages')) return null;
+
   const [messages, setMessages] = useState([
     {
       id: 1,

@@ -55,7 +55,7 @@ exports.createIdea = async (req, res) => {
     const createdIdea = await idea.save();
     
     // Populate owner for the socket event
-    await createdIdea.populate("owner", "name headline role avatarUrl");
+    await createdIdea.populate("owner", "name headline role avatarUrl status");
     
     // Emit real-time event
     req.io.emit("idea:created", createdIdea);
@@ -116,9 +116,9 @@ exports.addComment = async (req, res) => {
     // Emit updated idea
     // Note: We might want to emit just the comment, but idea:updated covers it
     const updatedIdea = await Idea.findById(idea._id)
-       .populate("owner", "name headline role avatarUrl")
-       .populate("collaborators", "name role avatarUrl")
-       .populate("comments.user", "name avatarUrl");
+       .populate("owner", "name headline role avatarUrl status")
+       .populate("collaborators", "name role avatarUrl status")
+       .populate("comments.user", "name avatarUrl status");
 
     req.io.emit("idea:updated", updatedIdea);
 
@@ -167,12 +167,15 @@ exports.getIdeas = async (req, res) => {
     let query = {};
 
     if (user) {
+      // Ensure user.following is an array
+      const following = user.following || [];
+      
       // Logged in: show public OR (connections AND following owner) OR own ideas
       query.$or = [
         { visibility: "public" },
         { 
           visibility: "connections", 
-          owner: { $in: user.following } 
+          owner: { $in: following } 
         },
         { owner: user._id }
       ];
@@ -212,10 +215,14 @@ exports.getIdeas = async (req, res) => {
       }
     }
 
+    console.log(`[GET IDEAS] User: ${user ? user.email : 'Guest'}, Query: ${JSON.stringify(query)}`);
+
     const ideas = await Idea.find(query)
-      .populate("owner", "name headline role avatarUrl")
-      .populate("collaborators", "name role avatarUrl")
+      .populate("owner", "name headline role avatarUrl status")
+      .populate("collaborators", "name role avatarUrl status")
       .sort({ createdAt: -1 });
+    
+    console.log(`[GET IDEAS] Found ${ideas.length} ideas.`);
     res.json(ideas);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -252,9 +259,9 @@ exports.getIdeasByUser = async (req, res) => {
 exports.getIdeaById = async (req, res) => {
   try {
     const idea = await Idea.findById(req.params.id)
-      .populate("owner", "name headline role avatarUrl")
-      .populate("collaborators", "name role avatarUrl")
-      .populate("comments.user", "name avatarUrl");
+      .populate("owner", "name headline role avatarUrl status")
+      .populate("collaborators", "name role avatarUrl status")
+      .populate("comments.user", "name avatarUrl status");
 
     if (!idea) {
       return res.status(404).json({ message: "Idea not found" });
@@ -331,8 +338,8 @@ exports.updateIdea = async (req, res) => {
 
     const updatedIdea = await idea.save();
 
-    await updatedIdea.populate("owner", "name headline role avatarUrl");
-    await updatedIdea.populate("collaborators", "name role avatarUrl");
+    await updatedIdea.populate("owner", "name headline role avatarUrl status");
+    await updatedIdea.populate("collaborators", "name role avatarUrl status");
 
     req.io.emit("idea:updated", updatedIdea);
 

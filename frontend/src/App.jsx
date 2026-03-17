@@ -12,6 +12,9 @@ import IdeaDetailsPage from "./pages/IdeaDetailsPage.jsx";
 import CollaborationRequestsPage from "./pages/CollaborationRequestsPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import UserProfilePage from "./pages/UserProfilePage.jsx";
+import FollowersPage from "./pages/FollowersPage.jsx";
+import FollowingPage from "./pages/FollowingPage.jsx";
+import FollowRequestsPage from "./pages/FollowRequestsPage.jsx";
 import SavedIdeasPage from "./pages/SavedIdeasPage.jsx";
 import UsersPage from "./pages/UsersPage.jsx";
 import ChatPage from "./pages/ChatPage.jsx";
@@ -53,6 +56,30 @@ const App = () => {
           element={
             <ProtectedRoute>
               <SavedIdeasPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/follow-requests"
+          element={
+            <ProtectedRoute>
+              <FollowRequestsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/followers"
+          element={
+            <ProtectedRoute>
+              <FollowersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/following"
+          element={
+            <ProtectedRoute>
+              <FollowingPage />
             </ProtectedRoute>
           }
         />

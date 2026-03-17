@@ -5,6 +5,10 @@ import { getLegalConfig } from "../config/legal.js";
 const Footer = ({ locale }) => {
   const year = new Date().getFullYear();
   const cfg = getLegalConfig(locale);
+  
+  // Hide footer on chat page to maximize space
+  if (window.location.pathname.startsWith('/messages')) return null;
+
   return (
     <footer role="contentinfo" aria-label="Legal and regulatory information" className="bg-white border-t">
       <div className="max-w-6xl mx-auto px-4 py-6">

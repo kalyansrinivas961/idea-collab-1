@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import api from "../api/client.js";
+import { normalizeUser } from "../utils/user.js";
 
 export const AuthContext = createContext(null);
 
@@ -16,7 +17,7 @@ export const AuthProvider = ({ children }) => {
     api
       .get("/users/me")
       .then((res) => {
-        setUser(res.data);
+        setUser(normalizeUser(res.data));
       })
       .catch(() => {
         localStorage.removeItem("token");
@@ -26,7 +27,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = (token, userData) => {
     localStorage.setItem("token", token);
-    setUser(userData);
+    setUser(normalizeUser(userData));
   };
 
   const logout = () => {
@@ -35,7 +36,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateUser = (updatedData) => {
-    setUser((prev) => ({ ...prev, ...updatedData }));
+    setUser((prev) => normalizeUser({ ...prev, ...updatedData }));
   };
 
   return (

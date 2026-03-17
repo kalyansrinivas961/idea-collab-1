@@ -6,6 +6,39 @@ import api from '../../api/client';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 
+// Mock Framer Motion to avoid animation issues in tests
+vi.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }) => <div {...props}>{children}</div>,
+    circle: ({ ...props }) => <circle {...props} />,
+  },
+  AnimatePresence: ({ children }) => <>{children}</>,
+}));
+
+// Mock Lucide Icons
+vi.mock('lucide-react', () => ({
+  User: () => <div data-testid="user-icon" />,
+  Mail: () => <div />,
+  MapPin: () => <div />,
+  Globe: () => <div />,
+  Github: () => <div />,
+  Linkedin: () => <div />,
+  Twitter: () => <div />,
+  Camera: () => <div />,
+  Shield: () => <div />,
+  Activity: () => <div />,
+  BarChart3: () => <div />,
+  Settings: () => <div />,
+  LogOut: () => <div />,
+  CheckCircle2: () => <div />,
+  AlertCircle: () => <div />,
+  Plus: () => <div />,
+  Trash2: () => <div />,
+  ExternalLink: () => <div />,
+  ChevronRight: () => <div />,
+  Briefcase: () => <div />,
+}));
+
 // Mock Layout
 vi.mock('../../components/Layout', () => ({
   default: ({ children }) => <div data-testid="layout">{children}</div>,
@@ -20,21 +53,43 @@ vi.mock('../../api/client', () => ({
   },
 }));
 
+// Mock react-hot-toast
+vi.mock('react-hot-toast', () => ({
+  toast: {
+    success: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
 // Mock AuthContext
 const mockLogout = vi.fn();
+const mockUpdateUser = vi.fn();
 const mockUser = {
   _id: 'user1',
   name: 'Test User',
   email: 'test@example.com',
   role: 'Developer',
+  headline: 'Senior Developer',
   skills: ['React', 'Node'],
-  followers: [],
-  following: [],
+  avatarUrl: 'https://example.com/avatar.jpg',
+  socialLinks: {
+    github: 'https://github.com/test',
+    linkedin: '',
+    twitter: '',
+    portfolio: ''
+  },
+  privacySettings: {
+    showEmail: false,
+    showLocation: true,
+    allowDirectMessages: true,
+    profileVisibility: 'public'
+  },
+  createdAt: '2023-01-01T00:00:00.000Z',
 };
 
 const renderWithAuth = (ui) => {
   return render(
-    <AuthContext.Provider value={{ user: mockUser, logout: mockLogout, updateUser: vi.fn() }}>
+    <AuthContext.Provider value={{ user: mockUser, logout: mockLogout, updateUser: mockUpdateUser }}>
       <BrowserRouter>
         {ui}
       </BrowserRouter>
@@ -45,52 +100,79 @@ const renderWithAuth = (ui) => {
 describe('ProfilePage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    api.get.mockResolvedValue({ data: [] }); // Default for user ideas
+    api.get.mockImplementation((url) => {
+      if (url === '/users/stats') {
+        return Promise.resolve({ data: { followersCount: 10, followingCount: 5, ideasCount: 3, totalLikes: 20, collaborationsCount: 7 } });
+      }
+      if (url === '/users/activity') {
+        return Promise.resolve({ data: [] });
+      }
+      return Promise.resolve({ data: [] });
+    });
   });
 
-  it('renders profile information', async () => {
+  it('renders profile header with user information', async () => {
     renderWithAuth(<ProfilePage />);
+    
     expect(screen.getByText('Test User')).toBeInTheDocument();
-    expect(screen.getByText('Developer')).toBeInTheDocument();
+    expect(screen.getByText('Senior Developer')).toBeInTheDocument();
+    expect(screen.getByText('test@example.com')).toBeInTheDocument();
   });
 
-  it('shows logout confirmation modal on logout click', () => {
+  it('renders account statistics', async () => {
     renderWithAuth(<ProfilePage />);
     
-    const logoutButton = screen.getByRole('button', { name: /logout/i });
-    fireEvent.click(logoutButton);
-    
-    expect(screen.getByText('Confirm Logout')).toBeInTheDocument();
-    expect(screen.getByText('Are you sure you want to log out of your account?')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('10')).toBeInTheDocument(); // Followers
+      expect(screen.getByText('5')).toBeInTheDocument();  // Following
+      expect(screen.getByText('3')).toBeInTheDocument();  // Ideas
+      expect(screen.getByText('7')).toBeInTheDocument();  // Collaborations
+    });
   });
 
-  it('hides modal when cancel is clicked', () => {
+  it('switches between tabs', async () => {
     renderWithAuth(<ProfilePage />);
     
-    const logoutButton = screen.getByRole('button', { name: /logout/i });
-    fireEvent.click(logoutButton);
+    const activityTab = screen.getByText('Activity Timeline');
+    fireEvent.click(activityTab);
     
-    const cancelButton = screen.getByRole('button', { name: /cancel/i });
-    fireEvent.click(cancelButton);
+    expect(screen.getByText('Recent Activity')).toBeInTheDocument();
     
-    expect(screen.queryByText('Confirm Logout')).not.toBeInTheDocument();
+    const statsTab = screen.getByText('Insights');
+    fireEvent.click(statsTab);
+    expect(screen.getByText('Performance Insights')).toBeInTheDocument();
+
+    const settingsTab = screen.getByText('Privacy & Security');
+    fireEvent.click(settingsTab);
+    expect(screen.getByText('Privacy Settings')).toBeInTheDocument();
   });
 
-  it('calls logout function when logout is confirmed', () => {
+  it('updates profile information', async () => {
+    api.put.mockResolvedValue({ data: { ...mockUser, name: 'Updated Name' } });
     renderWithAuth(<ProfilePage />);
     
-    const logoutButton = screen.getByRole('button', { name: /logout/i });
+    const nameInput = screen.getByPlaceholderText('Your Name');
+    fireEvent.change(nameInput, { target: { value: 'Updated Name', name: 'name' } });
+    
+    const saveButton = screen.getByText('Save Changes');
+    fireEvent.click(saveButton);
+    
+    await waitFor(() => {
+      expect(api.put).toHaveBeenCalled();
+      expect(mockUpdateUser).toHaveBeenCalledWith(expect.objectContaining({ name: 'Updated Name' }));
+    });
+  });
+
+  it('handles logout correctly', async () => {
+    renderWithAuth(<ProfilePage />);
+    
+    // Go to settings tab where logout is located
+    const settingsTab = screen.getByText('Privacy & Security');
+    fireEvent.click(settingsTab);
+    
+    const logoutButton = screen.getByText('Logout Account');
     fireEvent.click(logoutButton);
     
-    // There are two "Logout" buttons now (one in profile, one in modal). 
-    // The modal one is the last one usually, or we can look for it within the modal container if we had a testid.
-    // Or simpler: get all buttons with name Logout and click the second one (or the one in the modal).
-    // The modal text is "Logout", the profile button is "Logout" (with icon).
-    
-    // Let's use getByText for the modal button specifically if possible, or getAllByRole.
-    const confirmLogoutButton = screen.getAllByRole('button', { name: /logout/i })[1];
-    fireEvent.click(confirmLogoutButton);
-    
-    expect(mockLogout).toHaveBeenCalledTimes(1);
+    expect(mockLogout).toHaveBeenCalled();
   });
 });

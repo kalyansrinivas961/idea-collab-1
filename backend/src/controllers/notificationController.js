@@ -3,6 +3,12 @@ const Notification = require("../models/Notification");
 // Helper function to create notification (can be used by other controllers)
 exports.createNotification = async (req, { recipient, type, title, message, relatedId, relatedModel }) => {
   try {
+    // SECURITY FIX: Prevent self-notification
+    if (req.user && recipient.toString() === req.user._id.toString()) {
+      console.log(`[NOTIFICATION SKIP] Prevented self-notification for user: ${req.user.email}`);
+      return null;
+    }
+
     const notification = await Notification.create({
       recipient,
       type,

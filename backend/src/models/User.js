@@ -8,6 +8,11 @@ const userSchema = new mongoose.Schema(
     password: { type: String }, // Optional for Google users
     googleId: { type: String, unique: true, sparse: true },
     role: { type: String, default: "Developer" }, // Developer, Designer, etc.
+    status: { 
+      type: String, 
+      enum: ["Active", "Inactive", "Suspended"], 
+      default: "Active" 
+    },
     avatarUrl: { type: String, default: "" },
     headline: { type: String, default: "" }, // Professional headline
     skills: [{ type: String }],
@@ -18,6 +23,12 @@ const userSchema = new mongoose.Schema(
       linkedin: { type: String, default: "" },
       twitter: { type: String, default: "" },
       portfolio: { type: String, default: "" },
+    },
+    privacySettings: {
+      showEmail: { type: Boolean, default: false },
+      showLocation: { type: Boolean, default: true },
+      allowDirectMessages: { type: Boolean, default: true },
+      profileVisibility: { type: String, enum: ["public", "connections", "private"], default: "public" },
     },
     savedIdeas: [{ type: mongoose.Schema.Types.ObjectId, ref: "Idea" }],
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],

@@ -6,6 +6,7 @@ const emailValidator = require("email-validator");
 const dns = require("dns").promises;
 const sendEmail = require("../utils/sendEmail");
 const { createNotification } = require("./notificationController");
+const { formatUserResponse } = require("../utils/userUtils");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -155,19 +156,7 @@ exports.registerUser = async (req, res) => {
     if (user) {
       res.status(201).json({
         token: generateToken(user._id),
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          avatarUrl: user.avatarUrl,
-          headline: user.headline,
-          skills: user.skills,
-          location: user.location,
-          bio: user.bio,
-          socialLinks: user.socialLinks,
-          savedIdeas: user.savedIdeas || [],
-        },
+        user: formatUserResponse(user),
       });
     } else {
       res.status(400).json({ message: "Invalid user data" });
@@ -206,19 +195,7 @@ exports.googleVerify = async (req, res) => {
       return res.json({
         isNewUser: false,
         token: generateToken(user._id),
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          avatarUrl: user.avatarUrl,
-          headline: user.headline,
-          skills: user.skills,
-          location: user.location,
-          bio: user.bio,
-          socialLinks: user.socialLinks,
-          savedIdeas: user.savedIdeas || [],
-        },
+        user: formatUserResponse(user),
       });
     } else {
       // User doesn't exist, return profile info to autofill registration
@@ -277,19 +254,7 @@ exports.googleLogin = async (req, res) => {
 
     res.json({
       token: generateToken(user._id),
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        avatarUrl: user.avatarUrl,
-        headline: user.headline,
-        skills: user.skills,
-        location: user.location,
-        bio: user.bio,
-        socialLinks: user.socialLinks,
-        savedIdeas: user.savedIdeas || [],
-      },
+      user: formatUserResponse(user),
     });
   } catch (error) {
     console.error("Detailed Google Login Error:", {
