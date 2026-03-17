@@ -19,20 +19,31 @@ const reportRoutes = require("./routes/reportRoutes");
 const app = express();
 const server = http.createServer(app);
 
-const clientOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.CLIENT_ORIGIN,
+].filter(Boolean);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+};
 
 const io = new Server(server, {
-  cors: {
-    origin: clientOrigin,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true
-  },
+  cors: corsOptions,
 });
 
-app.use(cors({
-  origin: clientOrigin,
-  credentials: true
-}));
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
