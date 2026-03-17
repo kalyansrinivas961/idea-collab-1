@@ -1,12 +1,10 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5002";
-
 const api = axios.create({
-  baseURL: `${API_URL}/api`
+  baseURL: "https://idea-collab-backend.onrender.com/api"
 });
 
-// Attach token automatically
+// Attach token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
