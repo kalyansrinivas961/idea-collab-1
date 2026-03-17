@@ -5,16 +5,10 @@ const Idea = require("../models/Idea");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 
-// Mock nodemailer
-jest.mock("nodemailer", () => ({
-  createTransport: jest.fn().mockReturnValue({
-    sendMail: jest.fn().mockResolvedValue(true),
-  }),
-}));
-
 // Mock rate limiter
 jest.mock("../middleware/rateLimiter", () => ({
   passwordChangeLimiter: (req, res, next) => next(),
+  relationshipLimiter: (req, res, next) => next(),
 }));
 
 // Mock notification controller to avoid side effects

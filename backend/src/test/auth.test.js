@@ -4,16 +4,10 @@ const User = require("../models/User");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 
-// Mock nodemailer
-jest.mock("nodemailer", () => ({
-  createTransport: jest.fn().mockReturnValue({
-    sendMail: jest.fn().mockResolvedValue(true),
-  }),
-}));
-
 // Mock rate limiter to avoid hitting limits during tests
 jest.mock("../middleware/rateLimiter", () => ({
   passwordChangeLimiter: (req, res, next) => next(),
+  relationshipLimiter: (req, res, next) => next(),
 }));
 
 describe("Auth Endpoints", () => {

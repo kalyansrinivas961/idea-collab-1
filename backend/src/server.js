@@ -21,12 +21,14 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allow all origins for dev
+    origin: process.env.CLIENT_ORIGIN || "*", // Consistent with .env.sample
     methods: ["GET", "POST", "PUT", "DELETE"],
   },
 });
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_ORIGIN || "*",
+}));
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
@@ -70,6 +72,14 @@ io.on("connection", (socket) => {
 });
 
 // Routes
+app.get("/", (req, res) => {
+  res.json({
+    message: "Welcome to Idea Collab API",
+    healthCheck: "/api/health",
+    version: "1.0.0"
+  });
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/ideas", ideaRoutes);
 app.use("/api/users", userRoutes);
