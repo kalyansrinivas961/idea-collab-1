@@ -113,5 +113,8 @@ process.on("SIGTERM", async () => {
   await closeDB();
   process.exit(0);
 });
+app.get('/test', (req, res) => {
+  res.json({ message: "Backend working correctly 🚀" });
+});
 
 module.exports = app;
