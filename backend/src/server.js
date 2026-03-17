@@ -13,16 +13,22 @@ const server = http.createServer(app);
 // ✅ Allowed origins
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://idea-collab-1.vercel.app"
-];
+  "https://idea-collab-1.vercel.app",
+  "https://idea-collab-1-3x75f0zfj-aksrinivas961-4620s-projects.vercel.app",
+  process.env.CLIENT_ORIGIN
+].filter(Boolean);
 
 // ✅ CORS FIX
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
+    
+    const isAllowed = allowedOrigins.some(ao => origin === ao || origin.endsWith(".vercel.app"));
+    
+    if (isAllowed) {
       callback(null, true);
     } else {
+      console.error(`CORS blocked for origin: ${origin}`);
       callback(new Error("CORS not allowed"));
     }
   },
@@ -35,7 +41,15 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 // Socket.io
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      const isAllowed = allowedOrigins.some(ao => origin === ao || origin.endsWith(".vercel.app"));
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed for Socket.io"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE"]
   }
 });
