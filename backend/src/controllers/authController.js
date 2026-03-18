@@ -400,6 +400,20 @@ exports.resetPasswordWithOtp = async (req, res) => {
   }
 };
 
+// For diagnostics
+exports.testEmail = async (req, res) => {
+  try {
+    await sendEmail({
+      email: req.user.email,
+      subject: "Test Email from IdeaCollab",
+      message: "This is a test email to verify your SendGrid configuration. If you received this, it works!",
+    });
+    res.json({ message: `Test email sent to ${req.user.email}. Please check your inbox.` });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to send test email.", details: error.message });
+  }
+};
+
 exports.changePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 
