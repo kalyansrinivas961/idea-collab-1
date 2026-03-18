@@ -57,6 +57,25 @@ exports.sendMessage = async (req, res) => {
       const message = await Message.create(messageData);
       const populatedMessage = await message.populate("sender", "name avatarUrl");
 
+      // Find or Create 1-on-1 Conversation to track reordering
+      let conversation = await Conversation.findOne({
+        isGroup: false,
+        members: { $all: [req.user._id, receiverId] }
+      });
+
+      if (!conversation) {
+        conversation = await Conversation.create({
+          isGroup: false,
+          members: [req.user._id, receiverId],
+          lastMessage: message._id
+        });
+      } else {
+        conversation.lastMessage = message._id;
+        // Trigger updatedAt change for sorting
+        conversation.markModified('updatedAt');
+        await conversation.save();
+      }
+
       // Emit to receiver's room
       req.io.to(receiverId).emit("chat:message", populatedMessage);
       
@@ -105,37 +124,42 @@ exports.createGroup = async (req, res) => {
 
 exports.getConversations = async (req, res) => {
   try {
-    // 1. Get 1-on-1 Conversations (Users)
-    const sent = await Message.find({ sender: req.user._id, conversationId: { $exists: false } }).distinct("receiver");
-    const received = await Message.find({ receiver: req.user._id, conversationId: { $exists: false } }).distinct("sender");
-    
-    const userIds = [...new Set([...sent.map(id => id.toString()), ...received.map(id => id.toString())])];
-    const users = await User.find({ _id: { $in: userIds } }).select("name avatarUrl headline role");
-    
-    const userConversations = users.map(user => ({
-      _id: user._id,
-      name: user.name,
-      avatarUrl: user.avatarUrl,
-      headline: user.headline,
-      type: 'user'
-    }));
-
-    // 2. Get Group Conversations
     const groups = await Conversation.find({ members: req.user._id })
       .populate("lastMessage")
+      .populate({
+        path: "members",
+        select: "name avatarUrl headline role"
+      })
       .sort({ updatedAt: -1 });
 
-    const groupConversations = groups.map(group => ({
-      _id: group._id,
-      name: group.name,
-      avatarUrl: group.avatarUrl, // Placeholder or actual
-      isGroup: true,
-      type: 'group',
-      lastMessage: group.lastMessage
-    }));
+    const formattedConversations = groups.map(conv => {
+      if (conv.isGroup) {
+        return {
+          _id: conv._id,
+          name: conv.name,
+          avatarUrl: conv.avatarUrl,
+          isGroup: true,
+          type: 'group',
+          lastMessage: conv.lastMessage,
+          updatedAt: conv.updatedAt
+        };
+      } else {
+        const otherUser = conv.members.find(m => m._id.toString() !== req.user._id.toString());
+        return {
+          _id: otherUser?._id,
+          conversationId: conv._id,
+          name: otherUser?.name,
+          avatarUrl: otherUser?.avatarUrl,
+          headline: otherUser?.headline,
+          role: otherUser?.role,
+          type: 'user',
+          lastMessage: conv.lastMessage,
+          updatedAt: conv.updatedAt
+        };
+      }
+    });
 
-    // Combine and return
-    res.json([...groupConversations, ...userConversations]);
+    res.json(formattedConversations);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

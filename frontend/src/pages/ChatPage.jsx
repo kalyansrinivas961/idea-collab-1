@@ -49,6 +49,13 @@ const ChatPage = () => {
         fetchMessages(selectedUser._id);
       }
       setPartnerTyping(false);
+      
+      // Clear highlight and unread count for selected user
+      setConversations(prev => prev.map(c => 
+        (c._id === selectedUser._id || (c.isGroup && c._id === selectedUser._id))
+          ? { ...c, isNew: false, unreadCount: 0 }
+          : c
+      ));
     }
   }, [selectedUser]);
 
@@ -70,9 +77,42 @@ const ChatPage = () => {
         setMessages((prev) => [...prev, message]);
         if (!selectedUser.isGroup) markMessagesRead(selectedUser._id);
         setPartnerTyping(false); // Stop typing indicator if message received
-      } else {
-        fetchConversations();
       }
+
+      // Update conversations list for real-time reordering and highlighting
+      setConversations((prev) => {
+        const conversationId = message.conversationId || message.sender._id;
+        const existingConvIndex = prev.findIndex(c => c._id === conversationId || (c.isGroup && c._id === message.conversationId));
+        
+        let updatedConv;
+        let newConversations = [...prev];
+
+        if (existingConvIndex > -1) {
+          // Update existing conversation and move to top
+          const conv = newConversations[existingConvIndex];
+          updatedConv = { 
+            ...conv, 
+            lastMessage: message,
+            updatedAt: new Date().toISOString(),
+            unreadCount: isRelevant ? 0 : (conv.unreadCount || 0) + 1,
+            isNew: !isRelevant // Highlight if not currently open
+          };
+          newConversations.splice(existingConvIndex, 1);
+        } else {
+          // New conversation, add to top
+          updatedConv = {
+            _id: conversationId,
+            name: message.sender.name,
+            avatarUrl: message.sender.avatarUrl,
+            lastMessage: message,
+            updatedAt: new Date().toISOString(),
+            unreadCount: 1,
+            isNew: true
+          };
+        }
+        
+        return [updatedConv, ...newConversations];
+      });
     };
     
     const handleGroupCreated = (group) => {
@@ -305,22 +345,36 @@ const ChatPage = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // Replace optimistic message with real one
-      setMessages((prev) => 
-        prev.map(msg => msg._id === tempId ? { ...res.data, status: 'delivered' } : msg)
-      );
-      
-      // Stop typing
-      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-      setIsTyping(false);
-      if (!selectedUser.isGroup) {
-         socket.emit("stop_typing", { receiverId: selectedUser._id, senderId: user._id });
+    // Replace optimistic message with real one
+    setMessages((prev) => 
+      prev.map(msg => msg._id === tempId ? { ...res.data, status: 'delivered' } : msg)
+    );
+    
+    // Move current conversation to top
+    setConversations((prev) => {
+      const existingConvIndex = prev.findIndex(c => c._id === selectedUser._id);
+      const newConvs = [...prev];
+      if (existingConvIndex > -1) {
+        const updatedConv = { 
+          ...newConvs[existingConvIndex], 
+          lastMessage: res.data,
+          updatedAt: new Date().toISOString()
+        };
+        newConvs.splice(existingConvIndex, 1);
+        return [updatedConv, ...newConvs];
+      } else {
+        // If not found, it might be a new contact chat, so add to top
+        return [selectedUser, ...prev];
       }
+    });
 
-      if (!conversations.find(c => c._id === selectedUser._id)) {
-        setConversations(prev => [selectedUser, ...prev]);
-      }
-    } catch (err) {
+    // Stop typing
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    setIsTyping(false);
+    if (!selectedUser.isGroup) {
+       socket.emit("stop_typing", { receiverId: selectedUser._id, senderId: user._id });
+    }
+  } catch (err) {
       console.error("Failed to send message", err);
       // Mark as failed
       setMessages((prev) => 
@@ -464,20 +518,29 @@ const ChatPage = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-baseline mb-0.5">
-                        <h3 className="font-bold text-slate-800 text-sm md:text-base truncate pr-2">{conv.name}</h3>
-                        <span className="text-[10px] text-slate-400 font-medium whitespace-nowrap">12:45 PM</span>
+                        <h3 className={`text-sm md:text-base truncate pr-2 ${conv.unreadCount > 0 || conv.isNew ? 'font-black text-indigo-900' : 'font-bold text-slate-800'}`}>
+                          {conv.name}
+                        </h3>
+                        <span className={`text-[10px] whitespace-nowrap ${conv.unreadCount > 0 || conv.isNew ? 'text-indigo-600 font-bold' : 'text-slate-400 font-medium'}`}>
+                          {conv.lastMessage ? new Date(conv.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '12:45 PM'}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <p className="text-xs text-slate-500 truncate leading-relaxed">
-                          {conv.isGroup 
-                            ? `${conv.members?.length || 0} members` 
-                            : (conv.headline || "Active now")}
+                        <p className={`text-xs truncate leading-relaxed ${conv.unreadCount > 0 || conv.isNew ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}>
+                          {conv.lastMessage ? (
+                            <>
+                              {conv.lastMessage.sender._id === user._id ? 'You: ' : ''}
+                              {conv.lastMessage.content || (conv.lastMessage.attachment ? 'Sent an attachment' : '...')}
+                            </>
+                          ) : (
+                            conv.isGroup ? `${conv.members?.length || 0} members` : (conv.headline || "Active now")
+                          )}
                         </p>
                       </div>
                     </div>
-                    {conv.unreadCount > 0 && (
-                      <div className="absolute right-4 bottom-4 min-w-[20px] h-5 bg-indigo-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1.5 shadow-md shadow-indigo-100 animate-bounce">
-                        {conv.unreadCount}
+                    {(conv.unreadCount > 0 || conv.isNew) && (
+                      <div className="absolute right-4 bottom-4 min-w-[20px] h-5 bg-indigo-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1.5 shadow-md shadow-indigo-100 animate-pulse">
+                        {conv.unreadCount || 1}
                       </div>
                     )}
                   </div>
