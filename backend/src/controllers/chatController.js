@@ -264,12 +264,15 @@ exports.translateMessage = async (req, res) => {
     const message = await Message.findById(messageId);
     if (!message) return res.status(404).json({ message: "Message not found" });
 
-    // Check if translation already exists
+    // Check if translation already exists (Cache)
     if (message.translations && message.translations.get(targetLanguage)) {
-      return res.json({ translation: message.translations.get(targetLanguage) });
+      return res.json({ 
+        translation: message.translations.get(targetLanguage),
+        detectedLanguage: message.detectedLanguage 
+      });
     }
 
-    // Use Groq/AI to translate (as specified in previous task context, Groq is available)
+    // Use AI for detection and translation
     const Groq = require("groq-sdk");
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -277,7 +280,10 @@ exports.translateMessage = async (req, res) => {
       messages: [
         {
           role: "system",
-          content: `Translate the following text to ${targetLanguage}. Detect the source language automatically. Return ONLY the translated text.`
+          content: `You are a professional translation assistant. 
+          Task 1: Detect the language of the provided text.
+          Task 2: Translate the text to ${targetLanguage}. 
+          Return ONLY a JSON object in this format: {"detectedLanguage": "name", "translation": "text"}.`
         },
         {
           role: "user",
@@ -285,18 +291,41 @@ exports.translateMessage = async (req, res) => {
         }
       ],
       model: "llama3-8b-8192",
+      response_format: { type: "json_object" }
     });
 
-    const translatedText = completion.choices[0]?.message?.content?.trim();
+    const result = JSON.parse(completion.choices[0]?.message?.content);
+    const { detectedLanguage, translation } = result;
 
+    // Update message with detection and translation (Caching)
+    message.detectedLanguage = detectedLanguage;
     if (!message.translations) message.translations = new Map();
-    message.translations.set(targetLanguage, translatedText);
+    message.translations.set(targetLanguage, translation);
     await message.save();
 
-    res.json({ translation: translatedText });
+    res.json({ translation, detectedLanguage });
   } catch (error) {
     console.error("Translation Error:", error);
     res.status(500).json({ message: "Translation failed", details: error.message });
+  }
+};
+
+exports.updateTranslationPreferences = async (req, res) => {
+  const { autoTranslate, defaultLanguage } = req.body;
+  try {
+    const User = require("../models/User");
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.translationPreferences = {
+      autoTranslate: autoTranslate !== undefined ? autoTranslate : user.translationPreferences.autoTranslate,
+      defaultLanguage: defaultLanguage || user.translationPreferences.defaultLanguage,
+    };
+
+    await user.save();
+    res.json({ message: "Translation preferences updated", preferences: user.translationPreferences });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
