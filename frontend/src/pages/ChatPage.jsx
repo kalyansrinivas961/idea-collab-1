@@ -5,6 +5,7 @@ import api from "../api/client";
 import socket from "../api/socket";
 import EmojiPicker from "emoji-picker-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-hot-toast";
 
 const SERVER_URL = import.meta.env.VITE_API_URL || "http://localhost:5002";
 
@@ -48,7 +49,19 @@ const ChatPage = () => {
     fetchConversations();
     fetchUnreadCount();
     fetchTranslationPreferences();
+    fetchContacts();
   }, []);
+
+  const fetchUnreadCount = async () => {
+    try {
+      const res = await api.get("/messages/unread-count");
+      // You might want to store this in state or context if needed elsewhere
+      // For now we'll just log it or dispatch an event
+      console.log("Unread count:", res.data.count);
+    } catch (err) {
+      console.error("Failed to fetch unread count", err);
+    }
+  };
 
   const fetchTranslationPreferences = async () => {
     try {
@@ -545,36 +558,36 @@ const ChatPage = () => {
       // Clear replyingTo state after successful send
       setReplyingTo(null);
 
-    // Replace optimistic message with real one
-    setMessages((prev) => 
-      prev.map(msg => msg._id === tempId ? { ...res.data, status: 'delivered' } : msg)
-    );
-    
-    // Move current conversation to top
-    setConversations((prev) => {
-      const existingConvIndex = prev.findIndex(c => c._id === selectedUser._id);
-      const newConvs = [...prev];
-      if (existingConvIndex > -1) {
-        const updatedConv = { 
-          ...newConvs[existingConvIndex], 
-          lastMessage: res.data,
-          updatedAt: new Date().toISOString()
-        };
-        newConvs.splice(existingConvIndex, 1);
-        return [updatedConv, ...newConvs];
-      } else {
-        // If not found, it might be a new contact chat, so add to top
-        return [selectedUser, ...prev];
-      }
-    });
+      // Replace optimistic message with real one
+      setMessages((prev) => 
+        prev.map(msg => msg._id === tempId ? { ...res.data, status: 'delivered' } : msg)
+      );
+      
+      // Move current conversation to top
+      setConversations((prev) => {
+        const existingConvIndex = prev.findIndex(c => c._id === selectedUser._id);
+        const newConvs = [...prev];
+        if (existingConvIndex > -1) {
+          const updatedConv = { 
+            ...newConvs[existingConvIndex], 
+            lastMessage: res.data,
+            updatedAt: new Date().toISOString()
+          };
+          newConvs.splice(existingConvIndex, 1);
+          return [updatedConv, ...newConvs];
+        } else {
+          // If not found, it might be a new contact chat, so add to top
+          return [selectedUser, ...prev];
+        }
+      });
 
-    // Stop typing
-    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-    setIsTyping(false);
-    if (!selectedUser.isGroup) {
-       socket.emit("stop_typing", { receiverId: selectedUser._id, senderId: user._id });
-    }
-  } catch (err) {
+      // Stop typing
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      setIsTyping(false);
+      if (!selectedUser.isGroup) {
+         socket.emit("stop_typing", { receiverId: selectedUser._id, senderId: user._id });
+      }
+    } catch (err) {
       console.error("Failed to send message", err);
       // Mark as failed
       setMessages((prev) => 
