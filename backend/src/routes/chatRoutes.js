@@ -1,5 +1,17 @@
 const express = require("express");
-const { sendMessage, getMessages, getConversations, getUnreadCount, markMessagesAsRead, deleteMessage, clearChat, createGroup, getGroupMessages } = require("../controllers/chatController");
+const { 
+  sendMessage, 
+  getMessages, 
+  getConversations, 
+  getUnreadCount, 
+  markMessagesAsRead, 
+  deleteMessage, 
+  clearChat, 
+  createGroup, 
+  getGroupMessages,
+  editMessage,
+  translateMessage
+} = require("../controllers/chatController");
 const { protect } = require("../middleware/authMiddleware");
 const multer = require("multer");
 const path = require("path");
@@ -37,6 +49,8 @@ router.post("/clear", protect, clearChat);
 router.get("/conversations", protect, getConversations);
 router.get("/unread-count", protect, getUnreadCount);
 router.put("/read", protect, markMessagesAsRead);
+router.put("/:messageId", protect, editMessage);
+router.post("/:messageId/translate", protect, translateMessage);
 router.delete("/:messageId", protect, deleteMessage);
 router.get("/group/:groupId", protect, getGroupMessages);
 router.get("/:userId", protect, getMessages);

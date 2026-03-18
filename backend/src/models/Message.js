@@ -30,6 +30,20 @@ const messageSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isEdited: {
+      type: Boolean,
+      default: false,
+    },
+    replyTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
+      required: false,
+    },
+    translations: {
+      type: Map,
+      of: String,
+      default: {},
+    },
     deletedBy: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

@@ -3,7 +3,7 @@ const User = require("../models/User");
 const Conversation = require("../models/Conversation");
 
 exports.sendMessage = async (req, res) => {
-  const { receiverId, conversationId, content } = req.body;
+  const { receiverId, conversationId, content, replyTo } = req.body;
   const file = req.file;
 
   if (!content && !file) {
@@ -14,6 +14,7 @@ exports.sendMessage = async (req, res) => {
     const messageData = {
       sender: req.user._id,
       content: content || "",
+      replyTo: replyTo || undefined,
     };
 
     if (file) {
@@ -39,7 +40,12 @@ exports.sendMessage = async (req, res) => {
 
       messageData.conversationId = conversationId;
       const message = await Message.create(messageData);
-      const populatedMessage = await message.populate("sender", "name avatarUrl");
+      const populatedMessage = await Message.findById(message._id)
+        .populate("sender", "name avatarUrl")
+        .populate({
+          path: "replyTo",
+          populate: { path: "sender", select: "name" }
+        });
 
       // Update last message in conversation
       conversation.lastMessage = message._id;
@@ -55,7 +61,12 @@ exports.sendMessage = async (req, res) => {
     if (receiverId) {
       messageData.receiver = receiverId;
       const message = await Message.create(messageData);
-      const populatedMessage = await message.populate("sender", "name avatarUrl");
+      const populatedMessage = await Message.findById(message._id)
+        .populate("sender", "name avatarUrl")
+        .populate({
+          path: "replyTo",
+          populate: { path: "sender", select: "name" }
+        });
 
       // Find or Create 1-on-1 Conversation to track reordering
       let conversation = await Conversation.findOne({
@@ -174,7 +185,11 @@ exports.getGroupMessages = async (req, res) => {
       deletedBy: { $ne: req.user._id },
     })
       .sort({ createdAt: 1 })
-      .populate("sender", "name avatarUrl");
+      .populate("sender", "name avatarUrl")
+      .populate({
+        path: "replyTo",
+        populate: { path: "sender", select: "name" }
+      });
 
     res.json(messages);
   } catch (error) {
@@ -195,11 +210,93 @@ exports.getMessages = async (req, res) => {
       conversationId: { $exists: false } // Ensure only 1-on-1 messages
     })
       .sort({ createdAt: 1 })
-      .populate("sender", "name avatarUrl");
+      .populate("sender", "name avatarUrl")
+      .populate({
+        path: "replyTo",
+        populate: { path: "sender", select: "name" }
+      });
 
     res.json(messages);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+exports.editMessage = async (req, res) => {
+  const { messageId } = req.params;
+  const { content } = req.body;
+
+  try {
+    const message = await Message.findById(messageId);
+    if (!message) return res.status(404).json({ message: "Message not found" });
+    if (message.sender.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "You can only edit your own messages" });
+    }
+
+    message.content = content;
+    message.isEdited = true;
+    await message.save();
+
+    const populatedMessage = await Message.findById(message._id)
+      .populate("sender", "name avatarUrl")
+      .populate({
+        path: "replyTo",
+        populate: { path: "sender", select: "name" }
+      });
+
+    // Emit socket update
+    const room = message.conversationId ? `group:${message.conversationId}` : message.receiver.toString();
+    req.io.to(room).emit("chat:message_updated", populatedMessage);
+    // Also emit to sender (in case they are on multiple devices)
+    req.io.to(req.user._id.toString()).emit("chat:message_updated", populatedMessage);
+
+    res.json(populatedMessage);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.translateMessage = async (req, res) => {
+  const { messageId } = req.params;
+  const { targetLanguage } = req.body;
+
+  try {
+    const message = await Message.findById(messageId);
+    if (!message) return res.status(404).json({ message: "Message not found" });
+
+    // Check if translation already exists
+    if (message.translations && message.translations.get(targetLanguage)) {
+      return res.json({ translation: message.translations.get(targetLanguage) });
+    }
+
+    // Use Groq/AI to translate (as specified in previous task context, Groq is available)
+    const Groq = require("groq-sdk");
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: `Translate the following text to ${targetLanguage}. Detect the source language automatically. Return ONLY the translated text.`
+        },
+        {
+          role: "user",
+          content: message.content
+        }
+      ],
+      model: "llama3-8b-8192",
+    });
+
+    const translatedText = completion.choices[0]?.message?.content?.trim();
+
+    if (!message.translations) message.translations = new Map();
+    message.translations.set(targetLanguage, translatedText);
+    await message.save();
+
+    res.json({ translation: translatedText });
+  } catch (error) {
+    console.error("Translation Error:", error);
+    res.status(500).json({ message: "Translation failed", details: error.message });
   }
 };
 

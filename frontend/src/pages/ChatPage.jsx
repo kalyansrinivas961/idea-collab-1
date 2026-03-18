@@ -20,6 +20,10 @@ const ChatPage = () => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [deleteModal, setDeleteModal] = useState({ show: false, messageId: null, isSender: false });
+  const [editingMessage, setEditingMessage] = useState(null);
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [translationModal, setTranslationModal] = useState({ show: false, messageId: null, content: "" });
+  const [isTranslating, setIsTranslating] = useState(false);
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -147,12 +151,30 @@ const ChatPage = () => {
       setMessages((prev) => prev.filter((msg) => msg._id !== messageId));
     };
 
+    const handleMessageUpdated = (updatedMessage) => {
+      setMessages((prev) => 
+        prev.map(msg => msg._id === updatedMessage._id ? updatedMessage : msg)
+      );
+      
+      // Also update last message in conversations
+      setConversations((prev) => 
+        prev.map(conv => {
+          const convId = updatedMessage.conversationId || updatedMessage.sender._id;
+          if (conv._id === convId || (conv.isGroup && conv._id === updatedMessage.conversationId)) {
+            return { ...conv, lastMessage: updatedMessage };
+          }
+          return conv;
+        })
+      );
+    };
+
     socket.on("chat:message", handleMessage);
     socket.on("group:created", handleGroupCreated);
     socket.on("typing", handleTyping);
     socket.on("stop_typing", handleStopTyping);
     socket.on("chat:read", handleRead);
     socket.on("chat:message_deleted", handleMessageDeleted);
+    socket.on("chat:message_updated", handleMessageUpdated);
 
     return () => {
       socket.off("chat:message", handleMessage);
@@ -161,6 +183,7 @@ const ChatPage = () => {
       socket.off("stop_typing", handleStopTyping);
       socket.off("chat:read", handleRead);
       socket.off("chat:message_deleted", handleMessageDeleted);
+      socket.off("chat:message_updated", handleMessageUpdated);
     };
   }, [selectedUser]);
 
@@ -277,8 +300,53 @@ const ChatPage = () => {
     setDeleteModal({ show: true, messageId, isSender });
   };
 
+  const handleEditMessage = async (e) => {
+    e.preventDefault();
+    if (!editingMessage || !editingMessage.content.trim()) return;
+    
+    try {
+      const res = await api.put(`/messages/${editingMessage._id}`, {
+        content: editingMessage.content
+      });
+      setMessages(prev => prev.map(msg => msg._id === res.data._id ? res.data : msg));
+      setEditingMessage(null);
+      toast.success("Message updated");
+    } catch (err) {
+      console.error("Failed to edit message", err);
+      toast.error("Failed to update message");
+    }
+  };
+
+  const handleTranslateMessage = async (targetLanguage) => {
+    if (!translationModal.messageId) return;
+    setIsTranslating(true);
+    try {
+      const res = await api.post(`/messages/${translationModal.messageId}/translate`, {
+        targetLanguage
+      });
+      setTranslationModal(prev => ({ ...prev, translated: res.data.translation }));
+      toast.success("Translated successfully");
+    } catch (err) {
+      console.error("Translation failed", err);
+      toast.error("Translation failed");
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard", { icon: "📋" });
+  };
+
   const handleInputChange = (e) => {
     setNewMessage(e.target.value);
+
+    // Keyboard Shortcuts
+    if (e.key === 'Escape') {
+      setReplyingTo(null);
+      setEditingMessage(null);
+    }
 
     if (selectedUser) {
       if (!isTyping) {
@@ -340,10 +408,14 @@ const ChatPage = () => {
       
       if (currentMessage.trim()) formData.append("content", currentMessage);
       if (currentAttachment) formData.append("attachment", currentAttachment);
+      if (replyingTo) formData.append("replyTo", replyingTo._id);
 
       const res = await api.post("/messages", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
+      // Clear replyingTo state after successful send
+      setReplyingTo(null);
 
     // Replace optimistic message with real one
     setMessages((prev) => 
@@ -677,13 +749,30 @@ const ChatPage = () => {
                           <img src={msg.sender.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.sender.name)}&background=random`} alt="" className="w-6 h-6 rounded-full border border-white shadow-sm mb-1" />
                         )}
                         
-                        <div className={`relative flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
-                          {selectedUser.isGroup && !isMe && (
-                             <span className="text-[10px] font-bold text-slate-500 mb-1 ml-1 uppercase tracking-tight">{msg.sender.name}</span>
-                          )}
-                          
-                          <div className={`relative rounded-2xl px-4 py-3 text-sm shadow-sm transition-all hover:shadow-md ${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white text-slate-800 border border-slate-100 rounded-bl-none'}`}>
-                            {/* Attachment Display */}
+                          <div className={`relative flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
+                            {selectedUser.isGroup && !isMe && (
+                               <span className="text-[10px] font-bold text-slate-500 mb-1 ml-1 uppercase tracking-tight">{msg.sender.name}</span>
+                            )}
+                            
+                            {/* Reply Context */}
+                            {msg.replyTo && (
+                              <div className={`mb-1 px-3 py-1.5 rounded-xl text-[11px] border-l-4 ${isMe ? 'bg-indigo-700/50 border-indigo-300' : 'bg-slate-100 border-slate-300'} italic max-w-full truncate opacity-80 cursor-pointer`}
+                                onClick={() => {
+                                  const element = document.getElementById(`msg-${msg.replyTo._id}`);
+                                  if (element) {
+                                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    element.classList.add('ring-4', 'ring-indigo-400/50');
+                                    setTimeout(() => element.classList.remove('ring-4', 'ring-indigo-400/50'), 2000);
+                                  }
+                                }}
+                              >
+                                <span className="block font-bold text-[10px] uppercase opacity-60">Replying to {msg.replyTo.sender?.name || "User"}</span>
+                                {msg.replyTo.content}
+                              </div>
+                            )}
+                            
+                            <div id={`msg-${msg._id}`} className={`relative rounded-2xl px-4 py-3 text-sm shadow-sm transition-all hover:shadow-md ${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white text-slate-800 border border-slate-100 rounded-bl-none'}`}>
+                              {/* Attachment Display */}
                             {msg.attachment && (
                               <div className="mb-3 rounded-xl overflow-hidden bg-black/5 ring-1 ring-black/5">
                                 {msg.attachment.fileType === 'image' ? (
@@ -714,7 +803,28 @@ const ChatPage = () => {
                             )}
                             
                             {/* Text Content */}
-                            {msg.content && <p className="leading-relaxed whitespace-pre-wrap break-words font-medium">{msg.content}</p>}
+                            {editingMessage?._id === msg._id ? (
+                              <form onSubmit={handleEditMessage} className="min-w-[200px]">
+                                <textarea
+                                  autoFocus
+                                  value={editingMessage.content}
+                                  onChange={(e) => setEditingMessage({...editingMessage, content: e.target.value})}
+                                  className={`w-full bg-transparent border-none focus:ring-0 text-sm p-0 resize-none ${isMe ? 'text-white' : 'text-slate-800'}`}
+                                  rows={2}
+                                />
+                                <div className="flex justify-end gap-2 mt-2">
+                                  <button type="button" onClick={() => setEditingMessage(null)} className="text-[10px] uppercase font-bold opacity-70 hover:opacity-100">Cancel</button>
+                                  <button type="submit" className="text-[10px] uppercase font-bold bg-white/20 px-2 py-1 rounded hover:bg-white/30">Save</button>
+                                </div>
+                              </form>
+                            ) : (
+                              msg.content && (
+                                <div className="space-y-1">
+                                  <p className="leading-relaxed whitespace-pre-wrap break-words font-medium">{msg.content}</p>
+                                  {msg.isEdited && <span className="text-[9px] font-bold opacity-60 uppercase tracking-tighter">(Edited)</span>}
+                                </div>
+                              )
+                            )}
                             
                             <div className={`text-[10px] mt-1.5 flex justify-end items-center gap-1.5 ${isMe ? 'text-indigo-200' : 'text-slate-400'} font-bold tabular-nums`}>
                               {msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -739,7 +849,47 @@ const ChatPage = () => {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className={`flex flex-col gap-1 transition-all duration-200 ${isMe ? 'mr-1' : 'ml-1'} opacity-0 group-hover:opacity-100`}>
+                        <div className={`flex items-center gap-1 transition-all duration-200 ${isMe ? 'flex-row-reverse mr-1' : 'flex-row ml-1'} opacity-0 group-hover:opacity-100`}>
+                          {isMe && !msg.attachment && (
+                            <button
+                              onClick={() => setEditingMessage({ _id: msg._id, content: msg.content })}
+                              className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
+                              title="Edit"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setReplyingTo(msg)}
+                            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
+                            title="Reply"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l5 5m-5-5l5-5" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => copyToClipboard(msg.content)}
+                            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
+                            title="Copy"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                          </button>
+                          {msg.content && (
+                            <button
+                              onClick={() => setTranslationModal({ show: true, messageId: msg._id, content: msg.content })}
+                              className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
+                              title="Translate"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                              </svg>
+                            </button>
+                          )}
                           <button
                             onClick={() => confirmDelete(msg._id, isMe)}
                             className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
@@ -759,6 +909,31 @@ const ChatPage = () => {
 
               {/* Input Area */}
               <div className="p-4 bg-white border-t sticky bottom-0 z-20">
+                {/* Replying To Preview */}
+                {replyingTo && (
+                  <div className="mb-3 flex items-center justify-between bg-indigo-50/80 backdrop-blur-sm p-3 rounded-2xl border border-indigo-100 shadow-sm animate-fade-in-up">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="bg-indigo-600 p-2 rounded-xl shadow-md">
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l5 5m-5-5l5-5" />
+                        </svg>
+                      </div>
+                      <div className="min-w-0">
+                        <span className="block text-[10px] text-indigo-400 font-bold uppercase tracking-wider">Replying to {replyingTo.sender?.name || "User"}</span>
+                        <span className="block text-xs text-indigo-900 truncate max-w-[300px] font-medium italic">"{replyingTo.content}"</span>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => setReplyingTo(null)}
+                      className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-white rounded-full transition-colors"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+
                 {/* Attachment Preview */}
                 {attachment && (
                   <div className="mb-3 flex items-center gap-3 bg-indigo-50/80 backdrop-blur-sm p-2.5 rounded-2xl w-fit border border-indigo-100 shadow-sm animate-fade-in-up">
@@ -872,6 +1047,48 @@ const ChatPage = () => {
       </div>
 
       {/* Delete Confirmation Modal */}
+      {/* Modals and Overlays */}
+      {translationModal.show && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
+            <div className="p-6 border-b flex justify-between items-center bg-indigo-50/30">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
+                Translate Message
+              </h3>
+              <button onClick={() => setTranslationModal({ show: false, messageId: null, content: "" })} className="p-2 hover:bg-white rounded-full transition-colors">
+                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="bg-slate-50 p-4 rounded-2xl text-sm text-slate-600 italic border border-slate-100">
+                "{translationModal.content}"
+              </div>
+              
+              {translationModal.translated && (
+                <div className="bg-indigo-50 p-4 rounded-2xl text-sm text-indigo-900 font-medium border border-indigo-100 animate-fade-in">
+                  <span className="block text-[10px] uppercase font-bold text-indigo-400 mb-1">Translation:</span>
+                  {translationModal.translated}
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-2">
+                {['English', 'Spanish', 'French', 'German', 'Chinese', 'Hindi', 'Arabic'].map(lang => (
+                  <button
+                    key={lang}
+                    onClick={() => handleTranslateMessage(lang)}
+                    disabled={isTranslating}
+                    className="px-4 py-2.5 rounded-xl text-sm font-bold bg-white border border-slate-200 text-slate-700 hover:border-indigo-600 hover:text-indigo-600 transition-all active:scale-95 disabled:opacity-50"
+                  >
+                    {isTranslating ? 'Translating...' : lang}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {deleteModal.show && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-sm w-full overflow-hidden">
