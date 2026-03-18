@@ -30,10 +30,6 @@ const userSchema = new mongoose.Schema(
       allowDirectMessages: { type: Boolean, default: true },
       profileVisibility: { type: String, enum: ["public", "connections", "private"], default: "public" },
     },
-    translationPreferences: {
-      autoTranslate: { type: Boolean, default: false },
-      defaultLanguage: { type: String, default: "English" },
-    },
     savedIdeas: [{ type: mongoose.Schema.Types.ObjectId, ref: "Idea" }],
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],

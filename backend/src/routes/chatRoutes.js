@@ -10,8 +10,7 @@ const {
   createGroup, 
   getGroupMessages,
   editMessage,
-  translateMessage,
-  updateTranslationPreferences
+  translateMessage
 } = require("../controllers/chatController");
 const { protect } = require("../middleware/authMiddleware");
 const multer = require("multer");
@@ -50,7 +49,6 @@ router.post("/clear", protect, clearChat);
 router.get("/conversations", protect, getConversations);
 router.get("/unread-count", protect, getUnreadCount);
 router.put("/read", protect, markMessagesAsRead);
-router.put("/preferences", protect, updateTranslationPreferences);
 router.put("/:messageId", protect, editMessage);
 router.post("/:messageId/translate", protect, translateMessage);
 router.delete("/:messageId", protect, deleteMessage);

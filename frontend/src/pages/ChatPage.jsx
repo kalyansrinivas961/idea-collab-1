@@ -5,7 +5,6 @@ import api from "../api/client";
 import socket from "../api/socket";
 import EmojiPicker from "emoji-picker-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-hot-toast";
 
 const SERVER_URL = import.meta.env.VITE_API_URL || "http://localhost:5002";
 
@@ -27,8 +26,6 @@ const ChatPage = () => {
   const [translationModal, setTranslationModal] = useState({ show: false, messageId: null, content: "" });
   const [isTranslating, setIsTranslating] = useState(false);
   const [forwardModal, setForwardModal] = useState({ show: false, message: null });
-  const [preferencesModal, setPreferencesModal] = useState(false);
-  const [preferences, setPreferences] = useState({ autoTranslate: false, defaultLanguage: "English" });
   const [activeMenu, setActiveMenu] = useState(null); // track which message menu is open
   const [menuPlacement, setMenuPlacement] = useState('bottom'); // 'top' or 'bottom'
   
@@ -47,46 +44,8 @@ const ChatPage = () => {
 
   useEffect(() => {
     fetchConversations();
-    fetchUnreadCount();
-    fetchTranslationPreferences();
     fetchContacts();
   }, []);
-
-  const fetchUnreadCount = async () => {
-    try {
-      const res = await api.get("/messages/unread-count");
-      // You might want to store this in state or context if needed elsewhere
-      // For now we'll just log it or dispatch an event
-      console.log("Unread count:", res.data.count);
-    } catch (err) {
-      console.error("Failed to fetch unread count", err);
-    }
-  };
-
-  const fetchTranslationPreferences = async () => {
-    try {
-      // Assuming we have an endpoint for user profile or preferences
-      // For now, I'll use the new preferences endpoint if it supports GET, 
-      // or just assume default if not fetched.
-      // Since I added the PUT endpoint, I'll also add a way to get them if needed,
-      // but for now let's just use the current user from context if it has it.
-      if (user && user.translationPreferences) {
-        setPreferences(user.translationPreferences);
-      }
-    } catch (err) {
-      console.error("Failed to fetch preferences", err);
-    }
-  };
-
-  const updatePreferences = async (newPrefs) => {
-    try {
-      const res = await api.put("/messages/preferences", newPrefs);
-      setPreferences(res.data.preferences);
-      toast.success("Preferences updated");
-    } catch (err) {
-      toast.error("Failed to update preferences");
-    }
-  };
 
   useEffect(() => {
     if (selectedUser) {
@@ -126,11 +85,6 @@ const ChatPage = () => {
         setMessages((prev) => [...prev, message]);
         if (!selectedUser.isGroup) markMessagesRead(selectedUser._id);
         setPartnerTyping(false); // Stop typing indicator if message received
-
-        // Auto-translation logic
-        if (preferences.autoTranslate && message.sender._id !== user._id && message.content) {
-          autoTranslateMessage(message._id, preferences.defaultLanguage);
-        }
       }
 
       // Update conversations list for real-time reordering and highlighting
@@ -167,23 +121,6 @@ const ChatPage = () => {
         
         return [updatedConv, ...newConversations];
       });
-    };
-
-    const autoTranslateMessage = async (messageId, targetLanguage) => {
-      try {
-        const res = await api.post(`/messages/${messageId}/translate`, { targetLanguage });
-        setMessages(prev => prev.map(msg => 
-          msg._id === messageId 
-            ? { 
-                ...msg, 
-                translations: { ...(msg.translations || {}), [targetLanguage]: res.data.translation },
-                detectedLanguage: res.data.detectedLanguage 
-              } 
-            : msg
-        ));
-      } catch (err) {
-        console.error("Auto-translation failed", err);
-      }
     };
     
     const handleGroupCreated = (group) => {
@@ -413,18 +350,6 @@ const ChatPage = () => {
         targetLanguage
       });
       setTranslationModal(prev => ({ ...prev, translated: res.data.translation }));
-      
-      // Update the message in local state to show translation
-      setMessages(prev => prev.map(msg => 
-        msg._id === translationModal.messageId 
-          ? { 
-              ...msg, 
-              translations: { ...(msg.translations || {}), [targetLanguage]: res.data.translation },
-              detectedLanguage: res.data.detectedLanguage 
-            } 
-          : msg
-      ));
-      
       toast.success("Translated successfully");
     } catch (err) {
       console.error("Translation failed", err);
@@ -558,36 +483,36 @@ const ChatPage = () => {
       // Clear replyingTo state after successful send
       setReplyingTo(null);
 
-      // Replace optimistic message with real one
-      setMessages((prev) => 
-        prev.map(msg => msg._id === tempId ? { ...res.data, status: 'delivered' } : msg)
-      );
-      
-      // Move current conversation to top
-      setConversations((prev) => {
-        const existingConvIndex = prev.findIndex(c => c._id === selectedUser._id);
-        const newConvs = [...prev];
-        if (existingConvIndex > -1) {
-          const updatedConv = { 
-            ...newConvs[existingConvIndex], 
-            lastMessage: res.data,
-            updatedAt: new Date().toISOString()
-          };
-          newConvs.splice(existingConvIndex, 1);
-          return [updatedConv, ...newConvs];
-        } else {
-          // If not found, it might be a new contact chat, so add to top
-          return [selectedUser, ...prev];
-        }
-      });
-
-      // Stop typing
-      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-      setIsTyping(false);
-      if (!selectedUser.isGroup) {
-         socket.emit("stop_typing", { receiverId: selectedUser._id, senderId: user._id });
+    // Replace optimistic message with real one
+    setMessages((prev) => 
+      prev.map(msg => msg._id === tempId ? { ...res.data, status: 'delivered' } : msg)
+    );
+    
+    // Move current conversation to top
+    setConversations((prev) => {
+      const existingConvIndex = prev.findIndex(c => c._id === selectedUser._id);
+      const newConvs = [...prev];
+      if (existingConvIndex > -1) {
+        const updatedConv = { 
+          ...newConvs[existingConvIndex], 
+          lastMessage: res.data,
+          updatedAt: new Date().toISOString()
+        };
+        newConvs.splice(existingConvIndex, 1);
+        return [updatedConv, ...newConvs];
+      } else {
+        // If not found, it might be a new contact chat, so add to top
+        return [selectedUser, ...prev];
       }
-    } catch (err) {
+    });
+
+    // Stop typing
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    setIsTyping(false);
+    if (!selectedUser.isGroup) {
+       socket.emit("stop_typing", { receiverId: selectedUser._id, senderId: user._id });
+    }
+  } catch (err) {
       console.error("Failed to send message", err);
       // Mark as failed
       setMessages((prev) => 
@@ -826,13 +751,6 @@ const ChatPage = () => {
                   </div>
 
                 <div className="flex items-center gap-1 md:gap-2">
-                  <button 
-                    onClick={() => setPreferencesModal(true)}
-                    className="flex p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
-                    title="Translation Settings"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
-                  </button>
                   <button className="hidden sm:flex p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                   </button>
@@ -970,21 +888,6 @@ const ChatPage = () => {
                                 <div className="space-y-1">
                                   <p className="leading-relaxed whitespace-pre-wrap break-words font-medium">{msg.content}</p>
                                   {msg.isEdited && <span className="text-[9px] font-bold opacity-60 uppercase tracking-tighter">(Edited)</span>}
-                                  
-                                  {/* AI Translation Display */}
-                                  {msg.translations && Object.keys(msg.translations).length > 0 && (
-                                    <div className={`mt-2 pt-2 border-t ${isMe ? 'border-indigo-400/30' : 'border-slate-100'}`}>
-                                      <div className="flex items-center gap-1.5 mb-1">
-                                        <svg className="w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
-                                        <span className="text-[9px] font-black uppercase tracking-widest opacity-60">Translated from {msg.detectedLanguage || 'auto'}</span>
-                                      </div>
-                                      {Object.entries(msg.translations).map(([lang, text]) => (
-                                        <p key={lang} className={`text-xs font-bold ${isMe ? 'text-indigo-100' : 'text-indigo-700'}`}>
-                                          <span className="opacity-50 text-[9px] mr-1">[{lang}]</span> {text}
-                                        </p>
-                                      ))}
-                                    </div>
-                                  )}
                                 </div>
                               )
                             )}
@@ -1261,54 +1164,6 @@ const ChatPage = () => {
 
       {/* Delete Confirmation Modal */}
       {/* Modals and Overlays */}
-      {preferencesModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
-            <div className="p-6 border-b flex justify-between items-center bg-indigo-50/30">
-              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                Translation Preferences
-              </h3>
-              <button onClick={() => setPreferencesModal(false)} className="p-2 hover:bg-white rounded-full transition-colors">
-                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-            <div className="p-6 space-y-6">
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                <div>
-                  <p className="text-sm font-bold text-slate-800">Auto-Translate</p>
-                  <p className="text-[10px] text-slate-400 font-medium">Automatically translate incoming messages</p>
-                </div>
-                <button 
-                  onClick={() => updatePreferences({ autoTranslate: !preferences.autoTranslate })}
-                  className={`w-12 h-6 rounded-full transition-all relative ${preferences.autoTranslate ? 'bg-indigo-600' : 'bg-slate-300'}`}
-                >
-                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${preferences.autoTranslate ? 'left-7' : 'left-1'}`} />
-                </button>
-              </div>
-
-              <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Default Target Language</p>
-                <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto custom-scrollbar p-1">
-                  {['English', 'Spanish', 'French', 'German', 'Chinese', 'Hindi', 'Arabic', 'Portuguese', 'Russian', 'Japanese', 'Korean'].map(lang => (
-                    <button
-                      key={lang}
-                      onClick={() => updatePreferences({ defaultLanguage: lang })}
-                      className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all border ${preferences.defaultLanguage === lang ? 'bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-100' : 'bg-white text-slate-700 border-slate-200 hover:border-indigo-600'}`}
-                    >
-                      {lang}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="p-6 bg-slate-50 border-t flex justify-end">
-              <button onClick={() => setPreferencesModal(false)} className="bg-indigo-600 text-white px-8 py-2.5 rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all active:scale-95">Done</button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {forwardModal.show && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">

@@ -39,10 +39,6 @@ const messageSchema = new mongoose.Schema(
       ref: "Message",
       required: false,
     },
-    detectedLanguage: {
-      type: String,
-      default: "",
-    },
     translations: {
       type: Map,
       of: String,
