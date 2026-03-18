@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import api from "../api/client";
 import socket from "../api/socket";
 import EmojiPicker from "emoji-picker-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const SERVER_URL = import.meta.env.VITE_API_URL || "http://localhost:5002";
 
@@ -24,6 +25,9 @@ const ChatPage = () => {
   const [replyingTo, setReplyingTo] = useState(null);
   const [translationModal, setTranslationModal] = useState({ show: false, messageId: null, content: "" });
   const [isTranslating, setIsTranslating] = useState(false);
+  const [forwardModal, setForwardModal] = useState({ show: false, message: null });
+  const [activeMenu, setActiveMenu] = useState(null); // track which message menu is open
+  const [menuPlacement, setMenuPlacement] = useState('bottom'); // 'top' or 'bottom'
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -176,6 +180,25 @@ const ChatPage = () => {
     socket.on("chat:message_deleted", handleMessageDeleted);
     socket.on("chat:message_updated", handleMessageUpdated);
 
+    // Close menu on outside click
+    const handleClickOutside = (e) => {
+      if (activeMenu && !e.target.closest('.message-menu-container')) {
+        setActiveMenu(null);
+      }
+    };
+
+    // Keyboard shortcuts
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setActiveMenu(null);
+        setReplyingTo(null);
+        setEditingMessage(null);
+      }
+    };
+
+    window.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('keydown', handleKeyDown);
+
     return () => {
       socket.off("chat:message", handleMessage);
       socket.off("group:created", handleGroupCreated);
@@ -184,8 +207,10 @@ const ChatPage = () => {
       socket.off("chat:read", handleRead);
       socket.off("chat:message_deleted", handleMessageDeleted);
       socket.off("chat:message_updated", handleMessageUpdated);
+      window.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [selectedUser]);
+  }, [selectedUser, activeMenu]);
 
   const markMessagesRead = async (senderId) => {
     try {
@@ -337,6 +362,47 @@ const ChatPage = () => {
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard", { icon: "📋" });
+  };
+
+  const toggleMessageMenu = (e, messageId) => {
+    if (activeMenu === messageId) {
+      setActiveMenu(null);
+    } else {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const menuHeight = 250; // approximate max height of menu
+      
+      if (rect.bottom + menuHeight > windowHeight) {
+        setMenuPlacement('top');
+      } else {
+        setMenuPlacement('bottom');
+      }
+      setActiveMenu(messageId);
+    }
+  };
+
+  const handleForwardMessage = async (targetUser) => {
+    if (!forwardModal.message) return;
+    
+    try {
+      const formData = new FormData();
+      if (targetUser.isGroup) {
+        formData.append("conversationId", targetUser._id);
+      } else {
+        formData.append("receiverId", targetUser._id);
+      }
+      
+      formData.append("content", `[Forwarded]: ${forwardModal.message.content}`);
+      
+      // If original had attachment, we'd need to handle that too, but for simplicity let's do text
+      
+      await api.post("/messages", formData);
+      setForwardModal({ show: false, message: null });
+      toast.success(`Message forwarded to ${targetUser.name}`);
+    } catch (err) {
+      console.error("Forward failed", err);
+      toast.error("Failed to forward message");
+    }
   };
 
   const handleInputChange = (e) => {
@@ -848,57 +914,107 @@ const ChatPage = () => {
                           </div>
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className={`flex items-center gap-1 transition-all duration-200 ${isMe ? 'flex-row-reverse mr-1' : 'flex-row ml-1'} opacity-0 group-hover:opacity-100`}>
-                          {isMe && !msg.attachment && (
-                            <button
-                              onClick={() => setEditingMessage({ _id: msg._id, content: msg.content })}
-                              className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
-                              title="Edit"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
-                            </button>
-                          )}
+                        {/* Action Menu Trigger (⋮) */}
+                        <div className={`relative message-menu-container flex items-center transition-all duration-200 ${isMe ? 'mr-1 flex-row-reverse' : 'ml-1 flex-row'}`}>
                           <button
-                            onClick={() => setReplyingTo(msg)}
-                            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
-                            title="Reply"
+                            onClick={(e) => toggleMessageMenu(e, msg._id)}
+                            className={`p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${activeMenu === msg._id ? 'opacity-100 bg-indigo-50 text-indigo-600' : 'opacity-0 group-hover:opacity-100'}`}
+                            aria-haspopup="true"
+                            aria-expanded={activeMenu === msg._id}
+                            title="Message options"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l5 5m-5-5l5-5" />
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
                             </svg>
                           </button>
-                          <button
-                            onClick={() => copyToClipboard(msg.content)}
-                            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
-                            title="Copy"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                            </svg>
-                          </button>
-                          {msg.content && (
-                            <button
-                              onClick={() => setTranslationModal({ show: true, messageId: msg._id, content: msg.content })}
-                              className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"
-                              title="Translate"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-                              </svg>
-                            </button>
-                          )}
-                          <button
-                            onClick={() => confirmDelete(msg._id, isMe)}
-                            className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
-                            title="Delete"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
+
+                          {/* Dropdown Menu */}
+                          <AnimatePresence>
+                            {activeMenu === msg._id && (
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.95, y: menuPlacement === 'top' ? 10 : -10 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                                transition={{ duration: 0.15 }}
+                                className={`absolute z-[100] min-w-[160px] bg-white border border-slate-100 rounded-2xl shadow-xl py-2 overflow-hidden ${isMe ? 'right-0' : 'left-0'} ${menuPlacement === 'top' ? 'bottom-12' : 'top-12'} ${isMe ? (menuPlacement === 'top' ? 'origin-bottom-right' : 'origin-top-right') : (menuPlacement === 'top' ? 'origin-bottom-left' : 'origin-top-left')}`}
+                                role="menu"
+                                aria-orientation="vertical"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                                    e.preventDefault();
+                                    const items = e.currentTarget.querySelectorAll('[role="menuitem"]');
+                                    const index = Array.from(items).indexOf(document.activeElement);
+                                    let nextIndex = e.key === 'ArrowDown' ? index + 1 : index - 1;
+                                    if (nextIndex < 0) nextIndex = items.length - 1;
+                                    if (nextIndex >= items.length) nextIndex = 0;
+                                    items[nextIndex].focus();
+                                  }
+                                }}
+                              >
+                                <button
+                                  onClick={() => { setReplyingTo(msg); setActiveMenu(null); }}
+                                  className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors group/item"
+                                  role="menuitem"
+                                >
+                                  <svg className="w-4 h-4 text-slate-400 group-hover/item:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l5 5m-5-5l5-5" /></svg>
+                                  Reply
+                                </button>
+                                
+                                {isMe && !msg.attachment && (
+                                  <button
+                                    onClick={() => { setEditingMessage({ _id: msg._id, content: msg.content }); setActiveMenu(null); }}
+                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors group/item"
+                                    role="menuitem"
+                                  >
+                                    <svg className="w-4 h-4 text-slate-400 group-hover/item:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                    Edit
+                                  </button>
+                                )}
+
+                                <button
+                                  onClick={() => { copyToClipboard(msg.content); setActiveMenu(null); }}
+                                  className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors group/item"
+                                  role="menuitem"
+                                >
+                                  <svg className="w-4 h-4 text-slate-400 group-hover/item:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                                  Copy
+                                </button>
+
+                                {msg.content && (
+                                  <button
+                                    onClick={() => { setTranslationModal({ show: true, messageId: msg._id, content: msg.content }); setActiveMenu(null); }}
+                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors group/item"
+                                    role="menuitem"
+                                  >
+                                    <svg className="w-4 h-4 text-slate-400 group-hover/item:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
+                                    Translate
+                                  </button>
+                                )}
+
+                                {msg.content && (
+                                  <button
+                                    onClick={() => { setForwardModal({ show: true, message: msg }); setActiveMenu(null); }}
+                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors group/item"
+                                    role="menuitem"
+                                  >
+                                    <svg className="w-4 h-4 text-slate-400 group-hover/item:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                                    Forward
+                                  </button>
+                                )}
+
+                                <div className="h-px bg-slate-100 my-1"></div>
+
+                                <button
+                                  onClick={() => { confirmDelete(msg._id, isMe); setActiveMenu(null); }}
+                                  className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 transition-colors group/item font-medium"
+                                  role="menuitem"
+                                >
+                                  <svg className="w-4 h-4 text-red-400 group-hover/item:text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                  Delete
+                                </button>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
                       </div>
                     </React.Fragment>
@@ -1048,6 +1164,44 @@ const ChatPage = () => {
 
       {/* Delete Confirmation Modal */}
       {/* Modals and Overlays */}
+      {forwardModal.show && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
+            <div className="p-6 border-b flex justify-between items-center bg-indigo-50/30">
+              <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                Forward Message
+              </h3>
+              <button onClick={() => setForwardModal({ show: false, message: null })} className="p-2 hover:bg-white rounded-full transition-colors">
+                <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
+              <div className="bg-slate-50 p-4 rounded-2xl text-sm text-slate-600 italic border border-slate-100 mb-4">
+                "{forwardModal.message?.content}"
+              </div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Choose Contact</p>
+              {contacts.map(contact => (
+                <button
+                  key={contact._id}
+                  onClick={() => handleForwardMessage(contact)}
+                  className="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-indigo-50 transition-all border border-transparent hover:border-indigo-100 group"
+                >
+                  <img src={contact.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(contact.name)}`} alt="" className="w-10 h-10 rounded-full object-cover shadow-sm" />
+                  <div className="flex-1 text-left">
+                    <p className="text-sm font-bold text-slate-800 group-hover:text-indigo-700">{contact.name}</p>
+                    <p className="text-[10px] text-slate-400 font-medium">{contact.type === 'group' ? 'Group' : 'User'}</p>
+                  </div>
+                  <div className="bg-white p-2 rounded-xl shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                    <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {translationModal.show && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
