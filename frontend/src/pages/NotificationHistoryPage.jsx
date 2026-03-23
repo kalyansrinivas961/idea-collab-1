@@ -2,9 +2,11 @@ import React, { useState, useEffect, useCallback } from "react";
 import Layout from "../components/Layout";
 import api from "../api/client";
 import socket from "../api/socket";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { getNotificationUrl } from "../utils/notification";
 
 const NotificationHistoryPage = () => {
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -240,10 +242,16 @@ const NotificationHistoryPage = () => {
                       type="checkbox"
                       checked={selectedIds.includes(notification._id)}
                       onChange={() => handleSelectOne(notification._id)}
-                      className="mt-1.5"
+                      className="mt-1.5 relative z-10"
                     />
                     <div className="mt-1 text-xl">{getIcon(notification.type)}</div>
-                    <div className="flex-grow">
+                    <div 
+                      className="flex-grow cursor-pointer"
+                      onClick={() => {
+                        if (!notification.isRead) markAsRead([notification._id]);
+                        navigate(getNotificationUrl(notification));
+                      }}
+                    >
                       <div className="flex justify-between items-start">
                         <h3 className={`text-sm font-semibold ${!notification.isRead ? 'text-slate-900' : 'text-slate-600'}`}>
                           {notification.title}
@@ -254,16 +262,22 @@ const NotificationHistoryPage = () => {
                       </div>
                       <p className="text-sm text-slate-600 mt-1">{notification.message}</p>
                     </div>
-                    <div className="flex flex-col gap-1 ml-2">
+                    <div className="flex flex-col gap-1 ml-2 relative z-10">
                       <button
-                        onClick={() => markAsRead([notification._id])}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          markAsRead([notification._id]);
+                        }}
                         className="text-xs text-indigo-600 hover:text-indigo-800 p-1"
                         title="Mark as Read"
                       >
                         {notification.isRead ? "Read" : "Mark Read"}
                       </button>
                       <button
-                        onClick={() => deleteNotifications([notification._id])}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteNotifications([notification._id]);
+                        }}
                         className="text-xs text-red-600 hover:text-red-800 p-1"
                         title="Delete"
                       >

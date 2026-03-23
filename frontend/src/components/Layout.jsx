@@ -6,6 +6,7 @@ import socket from "../api/socket.js";
 import toast from "react-hot-toast";
 import AIChatBox from "./AIChatBox";
 import Footer from "./Footer.jsx";
+import { getNotificationUrl } from "../utils/notification";
 
 const Layout = ({ children }) => {
   const { user, logout } = useAuth();
@@ -157,7 +158,7 @@ const Layout = ({ children }) => {
               <p className="text-xs text-slate-300 leading-normal">{data.message}</p>
               <div className="mt-2 flex gap-2">
                 <Link 
-                  to={data.type === 'info' ? "/collaborations" : "/notifications"}
+                  to={getNotificationUrl(data)}
                   onClick={() => toast.dismiss()}
                   className="text-[10px] font-bold uppercase tracking-wider bg-white/10 hover:bg-white/20 px-2 py-1 rounded transition"
                 >

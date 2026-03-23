@@ -5,6 +5,15 @@ import NotificationHistoryPage from '../NotificationHistoryPage';
 import api from '../../api/client';
 import { BrowserRouter } from 'react-router-dom';
 
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
 // Mock Layout
 vi.mock('../../components/Layout', () => ({
   default: ({ children }) => <div data-testid="layout">{children}</div>,
@@ -98,7 +107,6 @@ describe('NotificationHistoryPage', () => {
 
   it('marks notification as read', async () => {
     api.put.mockResolvedValue({});
-    
     render(
       <BrowserRouter>
         <NotificationHistoryPage />
@@ -107,15 +115,82 @@ describe('NotificationHistoryPage', () => {
 
     await waitFor(() => screen.getByText('Test Notification'));
 
-    // Find the button for the first unread notification
-    // The button text is "Mark Read" if unread, "Read" if read.
-    // We want the one for item '1' (unread).
     const markReadBtn = screen.getAllByTitle('Mark as Read')[0];
     fireEvent.click(markReadBtn);
 
     await waitFor(() => {
       expect(api.put).toHaveBeenCalledWith('/notifications/read', { ids: ['1'] });
     });
+  });
+
+  it('navigates to the correct URL when a notification is clicked', async () => {
+    const mockFollowNotif = {
+      _id: '3',
+      type: 'info',
+      title: 'Follow Request',
+      message: 'Someone wants to follow you',
+      createdAt: new Date().toISOString(),
+      isRead: false,
+      relatedModel: 'FollowRequest',
+    };
+
+    api.get.mockResolvedValueOnce({
+      data: {
+        notifications: [mockFollowNotif],
+        total: 1,
+        totalPages: 1,
+        currentPage: 1,
+        unreadCount: 1,
+      },
+    });
+
+    render(
+      <BrowserRouter>
+        <NotificationHistoryPage />
+      </BrowserRouter>
+    );
+
+    await waitFor(() => screen.getByText('Follow Request'));
+
+    const notificationContent = screen.getByText('Someone wants to follow you');
+    fireEvent.click(notificationContent);
+
+    expect(mockNavigate).toHaveBeenCalledWith('/follow-requests');
+  });
+
+  it('navigates to collaborations when a collaboration request is clicked', async () => {
+    const mockCollabNotif = {
+      _id: '4',
+      type: 'info',
+      title: 'Collaboration Request',
+      message: 'Someone wants to collaborate',
+      createdAt: new Date().toISOString(),
+      isRead: false,
+      relatedModel: 'CollaborationRequest',
+    };
+
+    api.get.mockResolvedValueOnce({
+      data: {
+        notifications: [mockCollabNotif],
+        total: 1,
+        totalPages: 1,
+        currentPage: 1,
+        unreadCount: 1,
+      },
+    });
+
+    render(
+      <BrowserRouter>
+        <NotificationHistoryPage />
+      </BrowserRouter>
+    );
+
+    await waitFor(() => screen.getByText('Collaboration Request'));
+
+    const notificationContent = screen.getByText('Someone wants to collaborate');
+    fireEvent.click(notificationContent);
+
+    expect(mockNavigate).toHaveBeenCalledWith('/collaborations');
   });
 
   it('deletes notification', async () => {
