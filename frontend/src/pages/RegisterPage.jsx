@@ -16,17 +16,9 @@ const RegisterPage = () => {
     role: "Founder",
     skills: "",
     googleId: "",
-    avatarUrl: "",
-    otp: ""
+    avatarUrl: ""
   });
   const [isGoogleSignup, setIsGoogleSignup] = useState(false);
-  const [emailStatus, setEmailStatus] = useState({ 
-    validating: false, 
-    isValid: null, 
-    message: "" 
-  });
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,86 +26,12 @@ const RegisterPage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-    
-    // Clear validation and OTP state when user edits email
-    if (name === "email" && !isGoogleSignup) {
-      setEmailStatus({ validating: false, isValid: null, message: "" });
-      setOtpSent(false);
-      setOtpVerified(false);
-    }
-  };
-
-  const handleEmailBlur = async () => {
-    if (isGoogleSignup || !form.email || otpSent) return;
-
-    setEmailStatus({ validating: true, isValid: null, message: "" });
-    try {
-      const res = await api.post("/auth/verify-email", { email: form.email });
-      setEmailStatus({ 
-        validating: false, 
-        isValid: true, 
-        message: res.data.message 
-      });
-    } catch (err) {
-      setEmailStatus({ 
-        validating: false, 
-        isValid: false, 
-        message: err.response?.data?.message || "Email validation failed" 
-      });
-    }
-  };
-
-  const handleSendOtp = async () => {
-    if (!emailStatus.isValid || loading) return;
-
-    setLoading(true);
-    setError("");
-    try {
-      const res = await api.post("/auth/send-otp", { email: form.email });
-      setOtpSent(true);
-      setMessage(res.data.message);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to send verification code");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (!form.otp || loading) return;
-
-    setLoading(true);
-    setError("");
-    try {
-      const res = await api.post("/auth/verify-otp", { 
-        email: form.email, 
-        otp: form.otp 
-      });
-      setOtpVerified(true);
-      setMessage(res.data.message);
-    } catch (err) {
-      setError(err.response?.data?.message || "Invalid verification code");
-    } finally {
-      setLoading(false);
-    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setMessage("");
-
-    // Final check before submission
-    if (!isGoogleSignup) {
-      if (emailStatus.isValid === false) {
-        setError(emailStatus.message);
-        return;
-      }
-      if (!otpVerified) {
-        setError("Please verify your email address first");
-        return;
-      }
-    }
 
     setLoading(true);
 
@@ -124,7 +42,6 @@ const RegisterPage = () => {
         password: isGoogleSignup ? undefined : form.password,
         googleId: form.googleId || undefined,
         avatarUrl: form.avatarUrl || undefined,
-        otp: isGoogleSignup ? undefined : form.otp,
         role: form.role,
         skills: form.skills
           .split(",")
@@ -234,70 +151,18 @@ const RegisterPage = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-              <div className="relative">
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  onBlur={handleEmailBlur}
-                  className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                    isGoogleSignup ? "bg-slate-50 cursor-not-allowed" : ""
-                  } ${
-                    emailStatus.isValid === true ? "border-emerald-500" : 
-                    emailStatus.isValid === false ? "border-red-500" : ""
-                  }`}
-                  required
-                  readOnly={isGoogleSignup}
-                />
-                {emailStatus.validating && (
-                  <div className="absolute right-3 top-2.5">
-                    <div className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                  </div>
-                )}
-                {!isGoogleSignup && emailStatus.isValid && !otpSent && (
-                  <button
-                    type="button"
-                    onClick={handleSendOtp}
-                    disabled={loading}
-                    className="absolute right-2 top-1.5 bg-indigo-50 text-indigo-600 px-3 py-1 rounded text-xs font-medium hover:bg-indigo-100 disabled:opacity-50"
-                  >
-                    Send Code
-                  </button>
-                )}
-              </div>
-              {emailStatus.message && (
-                <p className={`text-[10px] mt-1 ${emailStatus.isValid ? "text-emerald-600" : "text-red-600"}`}>
-                  {emailStatus.message}
-                </p>
-              )}
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  isGoogleSignup ? "bg-slate-50 cursor-not-allowed" : ""
+                }`}
+                required
+                readOnly={isGoogleSignup}
+              />
             </div>
-
-            {!isGoogleSignup && otpSent && !otpVerified && (
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Verification Code</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    name="otp"
-                    placeholder="123456"
-                    maxLength="6"
-                    value={form.otp}
-                    onChange={handleChange}
-                    className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center font-bold tracking-widest"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={handleVerifyOtp}
-                    disabled={loading || !form.otp}
-                    className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-lg text-xs font-medium hover:bg-emerald-100 disabled:opacity-50"
-                  >
-                    Verify
-                  </button>
-                </div>
-              </div>
-            )}
 
             {!isGoogleSignup && (
               <div>
@@ -307,9 +172,8 @@ const RegisterPage = () => {
                   name="password"
                   value={form.password}
                   onChange={handleChange}
-                  className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${!otpVerified ? 'bg-slate-50 cursor-not-allowed' : ''}`}
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   required
-                  disabled={!otpVerified}
                 />
               </div>
             )}
@@ -345,7 +209,7 @@ const RegisterPage = () => {
             </div>
             <button
               type="submit"
-              disabled={loading || (!isGoogleSignup && !otpVerified)}
+              disabled={loading}
               className="w-full bg-indigo-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-indigo-700 disabled:opacity-60"
             >
               {loading ? "Creating account..." : "Create account"}

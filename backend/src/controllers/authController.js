@@ -143,7 +143,7 @@ exports.verifyOtp = async (req, res) => {
 };
 
 exports.registerUser = async (req, res) => {
-  const { name, email, password, role, headline, skills, googleId, avatarUrl, otp } = req.body;
+  const { name, email, password, role, headline, skills, googleId, avatarUrl } = req.body;
 
   try {
     // 1. Check if user already exists
@@ -153,17 +153,7 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // 2. Verify OTP for non-Google signups
-    if (!googleId) {
-      const otpRecord = await EmailOtp.findOne({ email, otp });
-      if (!otpRecord) {
-        return res.status(400).json({ message: "Invalid or expired verification code" });
-      }
-      // Cleanup OTP
-      await EmailOtp.deleteOne({ _id: otpRecord._id });
-    }
-
-    // 3. Create user (password is optional if googleId is present)
+    // 2. Create user (password is optional if googleId is present)
     const userData = {
       name,
       email,
@@ -397,20 +387,6 @@ exports.resetPasswordWithOtp = async (req, res) => {
     res.json({ message: "Password has been reset successfully. You can now log in with your new password." });
   } catch (error) {
     res.status(500).json({ message: error.message });
-  }
-};
-
-// For diagnostics
-exports.testEmail = async (req, res) => {
-  try {
-    await sendEmail({
-      email: req.user.email,
-      subject: "Test Email from IdeaCollab",
-      message: "This is a test email to verify your SendGrid configuration. If you received this, it works!",
-    });
-    res.json({ message: `Test email sent to ${req.user.email}. Please check your inbox.` });
-  } catch (error) {
-    res.status(500).json({ message: "Failed to send test email.", details: error.message });
   }
 };
 
