@@ -23,7 +23,7 @@ const sendEmail = async (options) => {
   const msg = {
     to: options.email,
     from: {
-      email: process.env.FROM_EMAIL,
+      email: process.env.FROM_EMAIL || "ak.srinivas961@gmail.com",
       name: process.env.FROM_NAME || "IdeaCollab"
     },
     subject: options.subject,

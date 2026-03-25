@@ -239,7 +239,13 @@ const ProfilePage = () => {
 
             {/* User Info Header */}
             <div className="flex-1 text-center md:text-left">
-              <h1 className="text-3xl font-black text-slate-900 mb-2">{user?.name}</h1>
+              <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
+                <h1 className="text-3xl font-black text-slate-900">{user?.name}</h1>
+                <div className="flex items-center gap-1.5 bg-amber-50 text-amber-700 px-3 py-1 rounded-full border border-amber-100 shadow-sm">
+                  <BarChart3 size={14} className="text-amber-500" />
+                  <span className="text-xs font-black tracking-wider uppercase">Reputation: {user?.reputation || 0}</span>
+                </div>
+              </div>
               <p className="text-lg text-indigo-600 font-semibold mb-4">{user?.headline || "Add a professional headline"}</p>
               <div className="flex flex-wrap justify-center md:justify-start gap-4">
                 <div className="flex items-center gap-1.5 text-slate-500 text-sm">

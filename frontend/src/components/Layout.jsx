@@ -238,8 +238,11 @@ const Layout = ({ children }) => {
                 <NavLink to="/ideas" className="text-slate-600 hover:text-indigo-600 font-medium">
                   Ideas
                 </NavLink>
-                <NavLink to="/users" className="text-slate-600 hover:text-indigo-600 font-medium">
+                <NavLink to="/users" className="text-slate-600 hover:text-indigo-600 flex items-center font-medium">
                   Community
+                </NavLink>
+                <NavLink to="/qa" className="text-slate-600 hover:text-indigo-600 flex items-center font-medium">
+                  Q&A
                 </NavLink>
                 <NavLink to="/collaborations" className="text-slate-600 hover:text-indigo-600 flex items-center font-medium">
                   Collaborations
@@ -339,6 +342,14 @@ const Layout = ({ children }) => {
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
               Community
+            </NavLink>
+            <NavLink 
+              to="/qa" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              Q&A
             </NavLink>
             <NavLink 
               to="/collaborations" 

@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema(
     savedIdeas: [{ type: mongoose.Schema.Types.ObjectId, ref: "Idea" }],
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    reputation: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

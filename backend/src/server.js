@@ -15,6 +15,7 @@ const chatRoutes = require("./routes/chatRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 const reportRoutes = require("./routes/reportRoutes");
+const qaRoutes = require("./routes/qaRoutes");
 
 const app = express();
 const server = http.createServer(app);
@@ -95,6 +96,7 @@ app.use("/api/messages", chatRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/qa", qaRoutes);
 
 // Health check endpoint
 app.get("/api/health", async (req, res) => {

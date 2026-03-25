@@ -23,6 +23,9 @@ import ChangePasswordPage from "./pages/ChangePasswordPage.jsx";
 import TermsPage from "./pages/TermsPage.jsx";
 import PrivacyPage from "./pages/PrivacyPage.jsx";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
+import QAListPage from "./pages/QAListPage.jsx";
+import PostProblemPage from "./pages/PostProblemPage.jsx";
+import ProblemDetailPage from "./pages/ProblemDetailPage.jsx";
 
 const App = () => {
   return (
@@ -112,6 +115,30 @@ const App = () => {
           element={
             <ProtectedRoute>
               <IdeaDetailsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/qa"
+          element={
+            <ProtectedRoute>
+              <QAListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/qa/post"
+          element={
+            <ProtectedRoute>
+              <PostProblemPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/qa/problem/:id"
+          element={
+            <ProtectedRoute>
+              <ProblemDetailPage />
             </ProtectedRoute>
           }
         />
