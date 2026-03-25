@@ -1,12 +1,24 @@
 const Problem = require("../models/Problem");
 const Solution = require("../models/Solution");
 const User = require("../models/User");
+const ActivityLog = require("../models/ActivityLog");
 const { createNotification } = require("./notificationController");
 
 // Reputation constants
 const REPUTATION_UPVOTE_PROBLEM = 2;
 const REPUTATION_UPVOTE_SOLUTION = 5;
 const REPUTATION_ACCEPT_SOLUTION = 15;
+
+/**
+ * Helper to log activity
+ */
+const logActivity = async (userId, action, metadata = {}) => {
+  try {
+    await ActivityLog.create({ user: userId, action, metadata });
+  } catch (error) {
+    console.error("Activity Logging Error:", error);
+  }
+};
 
 /**
  * Update user reputation
@@ -35,7 +47,48 @@ exports.createProblem = async (req, res) => {
       author: req.user._id,
     });
 
+    await logActivity(req.user._id, "create_problem", { problemId: problem._id });
+
     res.status(201).json(problem);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Delete a problem (Soft-delete with cascade and audit logging)
+ */
+exports.deleteProblem = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const problem = await Problem.findById(id);
+    if (!problem) return res.status(404).json({ message: "Problem not found" });
+
+    // Deletion Rights: Only author can delete
+    if (problem.author.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Not authorized to delete this problem" });
+    }
+
+    // Soft-delete problem
+    problem.isDeleted = true;
+    problem.deletedAt = new Date();
+    await problem.save();
+
+    // Cascade deletion of solutions (soft-delete)
+    await Solution.updateMany(
+      { problemId: id, isDeleted: false },
+      { $set: { isDeleted: true, deletedAt: new Date() } }
+    );
+
+    // Audit logging
+    await logActivity(req.user._id, "delete_problem", { 
+      problemId: id,
+      deletedAt: problem.deletedAt,
+      title: problem.title
+    });
+
+    res.json({ message: "Problem and associated solutions deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -152,6 +205,24 @@ exports.createSolution = async (req, res) => {
     const problem = await Problem.findById(problemId);
     if (!problem) return res.status(404).json({ message: "Problem not found" });
 
+    // Self-Reply Restriction: Prevent author from replying to their own question
+    // This applies only if it's a top-level reply (parentReply is null)
+    if (!parentReply && problem.author.toString() === req.user._id.toString()) {
+      return res.status(403).json({ message: "You cannot reply to your own question. Use the edit feature for updates." });
+    }
+
+    // Permission check for nested replies:
+    // User can reply to others' reactions (solutions) even on their own question.
+    if (parentReply) {
+      const parentSolution = await Solution.findById(parentReply);
+      if (!parentSolution) return res.status(404).json({ message: "Parent reply not found" });
+      
+      // Prevent replying to own solutions/replies
+      if (parentSolution.author.toString() === req.user._id.toString()) {
+        return res.status(403).json({ message: "You cannot reply to your own response." });
+      }
+    }
+
     const solution = await Solution.create({
       problemId,
       content,
@@ -160,16 +231,37 @@ exports.createSolution = async (req, res) => {
       author: req.user._id,
     });
 
-    // Create notification for problem author
+    await logActivity(req.user._id, "create_solution", { 
+      problemId, 
+      solutionId: solution._id,
+      isNested: !!parentReply 
+    });
+
+    // Create notification for problem author (if not the one replying)
     if (problem.author.toString() !== req.user._id.toString()) {
-      await createNotification(
-        problem.author,
-        "New Solution",
-        `${req.user.name} submitted a solution to your problem: ${problem.title}`,
-        "info",
-        "Problem",
-        problem._id
-      );
+      await createNotification(req, {
+        recipient: problem.author,
+        type: "info",
+        title: "New Solution",
+        message: `${req.user.name} submitted a solution to your problem: ${problem.title}`,
+        relatedId: problem._id,
+        relatedModel: "Problem",
+      });
+    }
+
+    // If it's a reply to someone's solution, notify the solution author
+    if (parentReply) {
+      const parentSolution = await Solution.findById(parentReply);
+      if (parentSolution && parentSolution.author.toString() !== req.user._id.toString()) {
+        await createNotification(req, {
+          recipient: parentSolution.author,
+          type: "info",
+          title: "New Reply",
+          message: `${req.user.name} replied to your solution`,
+          relatedId: problem._id,
+          relatedModel: "Problem",
+        });
+      }
     }
 
     res.status(201).json(solution);

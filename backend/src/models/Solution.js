@@ -26,8 +26,19 @@ const solutionSchema = new mongoose.Schema(
     downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     isAccepted: { type: Boolean, default: false },
     parentReply: { type: mongoose.Schema.Types.ObjectId, ref: "Solution" }, // For threaded replies
+    isDeleted: { type: Boolean, default: false },
+    deletedAt: { type: Date },
   },
   { timestamps: true }
 );
+
+// Middleware to filter out deleted solutions
+solutionSchema.pre(/^find/, function(next) {
+  if (this.getOptions().withDeleted) {
+    return next();
+  }
+  this.where({ isDeleted: { $ne: true } });
+  next();
+});
 
 module.exports = mongoose.model("Solution", solutionSchema);

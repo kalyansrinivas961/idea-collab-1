@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   createProblem,
+  deleteProblem,
   getProblems,
   getProblemById,
   voteProblem,
@@ -19,7 +20,8 @@ router.route("/problems")
   .post(protect, createProblem);
 
 router.route("/problems/:id")
-  .get(getProblemById);
+  .get(getProblemById)
+  .delete(protect, deleteProblem);
 
 router.post("/problems/:id/vote", protect, voteProblem);
 

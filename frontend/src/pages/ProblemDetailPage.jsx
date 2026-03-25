@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { ChevronLeft, ArrowUp, ArrowDown, Check, MessageSquare } from "lucide-react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { ChevronLeft, ArrowUp, ArrowDown, Check, MessageSquare, Trash2, Reply } from "lucide-react";
 import Layout from "../components/Layout.jsx";
 import api from "../api/client.js";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 
 const ProblemDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const [problem, setProblem] = useState(null);
   const [solutions, setSolutions] = useState([]);
@@ -16,6 +17,8 @@ const ProblemDetailPage = () => {
   const [language, setLanguage] = useState("javascript");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubloading] = useState(false);
+  const [replyTo, setReplyTo] = useState(null); // ID of solution being replied to
+  const [replyText, setReplyText] = useState("");
 
   const fetchProblem = async () => {
     try {
@@ -34,6 +37,18 @@ const ProblemDetailPage = () => {
   useEffect(() => {
     fetchProblem();
   }, [id]);
+
+  const handleDeleteProblem = async () => {
+    if (!window.confirm("Are you sure you want to permanently delete this question and all its solutions? This action cannot be undone.")) return;
+
+    try {
+      await api.delete(`/qa/problems/${id}`);
+      toast.success("Question deleted successfully");
+      navigate("/qa");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete question");
+    }
+  };
 
   const handleVoteProblem = async (type) => {
     if (!currentUser) return toast.error("Please login to vote");
@@ -68,23 +83,33 @@ const ProblemDetailPage = () => {
     }
   };
 
-  const handleSubmitSolution = async (e) => {
-    e.preventDefault();
-    if (!newSolution.trim()) return toast.error("Please provide a solution");
+  const handleSubmitSolution = async (e, isReply = false) => {
+    if (e) e.preventDefault();
+    const content = isReply ? replyText : newSolution;
+    if (!content.trim()) return toast.error("Please provide a solution");
 
     setSubloading(true);
     try {
       const res = await api.post(`/qa/problems/${id}/solutions`, {
         problemId: id,
-        content: newSolution,
-        codeSnippets: code ? [{ language, code }] : []
+        content,
+        codeSnippets: !isReply && code ? [{ language, code }] : [],
+        parentReply: isReply ? replyTo : null
       });
-      setSolutions(prev => [...prev, { ...res.data, author: currentUser }]);
-      setNewMessage("");
-      setCode("");
-      toast.success("Solution submitted!");
+      
+      const newSol = { ...res.data, author: currentUser };
+      setSolutions(prev => [...prev, newSol]);
+      
+      if (isReply) {
+        setReplyText("");
+        setReplyTo(null);
+      } else {
+        setNewMessage("");
+        setCode("");
+      }
+      toast.success(isReply ? "Reply submitted!" : "Solution submitted!");
     } catch (err) {
-      toast.error("Failed to submit solution");
+      toast.error(err.response?.data?.message || "Failed to submit solution");
     } finally {
       setSubloading(false);
     }
@@ -109,15 +134,29 @@ const ProblemDetailPage = () => {
 
   const isAuthor = currentUser?._id === problem.author._id;
 
+  // Group solutions by parentReply to support threading
+  const topLevelSolutions = solutions.filter(s => !s.parentReply);
+  const replies = solutions.filter(s => s.parentReply);
+
   return (
     <Layout>
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <div className="mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <Link to="/qa" className="text-slate-500 hover:text-indigo-600 font-medium text-sm flex items-center gap-1 transition-colors group">
             <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
             Back to Q&A
           </Link>
+          
+          {isAuthor && (
+            <button 
+              onClick={handleDeleteProblem}
+              className="flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-bold transition-all border border-red-100"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              Delete Question
+            </button>
+          )}
         </div>
 
         {/* Problem Section */}
@@ -194,64 +233,123 @@ const ProblemDetailPage = () => {
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
               <MessageSquare size={20} className="text-indigo-600" />
-              {solutions.length} Solutions
+              {topLevelSolutions.length} Solutions
             </h2>
             <div className="h-px flex-1 bg-slate-100 mx-6"></div>
           </div>
 
-          <div className="space-y-6">
-            {solutions.map((solution) => (
-              <div key={solution._id} className="flex flex-col md:flex-row gap-6">
-                <div className="flex flex-row md:flex-col items-center gap-2 justify-center md:justify-start">
-                  <button 
-                    onClick={() => handleVoteSolution(solution._id, 'upvote')}
-                    className={`p-1.5 rounded-lg transition-all ${solution.upvotes.includes(currentUser?._id) ? 'text-indigo-600 bg-indigo-50' : 'text-slate-300 hover:text-indigo-400 hover:bg-slate-50'}`}
-                  >
-                    <ArrowUp className="w-5 h-5" />
-                  </button>
-                  <span className="text-xs font-semibold text-slate-600">{solution.upvotes.length - solution.downvotes.length}</span>
-                  <button 
-                    onClick={() => handleVoteSolution(solution._id, 'downvote')}
-                    className={`p-1.5 rounded-lg transition-all ${solution.downvotes.includes(currentUser?._id) ? 'text-red-500 bg-red-50' : 'text-slate-300 hover:text-red-400 hover:bg-slate-50'}`}
-                  >
-                    <ArrowDown className="w-5 h-5" />
-                  </button>
-                  {solution.isAccepted && (
-                    <div className="mt-2 text-emerald-500 bg-emerald-50 p-1 rounded-lg" title="Accepted Solution">
-                      <Check className="w-5 h-5" strokeWidth={3} />
-                    </div>
-                  )}
-                </div>
-
-                <div className={`flex-1 bg-white border rounded-2xl p-6 transition-all ${solution.isAccepted ? 'border-emerald-500 shadow-sm' : 'border-slate-100 hover:border-slate-200'}`}>
-                  <p className="text-slate-600 leading-relaxed font-medium mb-6 whitespace-pre-wrap">{solution.content}</p>
-                  
-                  {solution.codeSnippets?.length > 0 && (
-                    <div className="mb-6 rounded-xl overflow-hidden border border-slate-100">
-                      <div className="bg-slate-50 border-b border-slate-100 text-slate-500 px-4 py-2 text-[9px] font-bold uppercase tracking-widest">{solution.codeSnippets[0].language}</div>
-                      <pre className="bg-slate-900 text-indigo-300 p-4 font-mono text-xs overflow-x-auto">
-                        <code>{solution.codeSnippets[0].code}</code>
-                      </pre>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <img src={solution.author.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(solution.author.name)}`} alt="" className="w-8 h-8 rounded-lg object-cover" />
-                      <div>
-                        <span className="block text-xs font-bold text-slate-800">{solution.author.name}</span>
-                        <span className="text-[9px] font-bold text-slate-400 uppercase">{new Date(solution.createdAt).toLocaleDateString()}</span>
+          <div className="space-y-8">
+            {topLevelSolutions.map((solution) => (
+              <div key={solution._id} className="space-y-4">
+                <div className="flex flex-col md:flex-row gap-6">
+                  <div className="flex flex-row md:flex-col items-center gap-2 justify-center md:justify-start">
+                    <button 
+                      onClick={() => handleVoteSolution(solution._id, 'upvote')}
+                      className={`p-1.5 rounded-lg transition-all ${solution.upvotes.includes(currentUser?._id) ? 'text-indigo-600 bg-indigo-50' : 'text-slate-300 hover:text-indigo-400 hover:bg-slate-50'}`}
+                    >
+                      <ArrowUp className="w-5 h-5" />
+                    </button>
+                    <span className="text-xs font-semibold text-slate-600">{solution.upvotes.length - solution.downvotes.length}</span>
+                    <button 
+                      onClick={() => handleVoteSolution(solution._id, 'downvote')}
+                      className={`p-1.5 rounded-lg transition-all ${solution.downvotes.includes(currentUser?._id) ? 'text-red-500 bg-red-50' : 'text-slate-300 hover:text-red-400 hover:bg-slate-50'}`}
+                    >
+                      <ArrowDown className="w-5 h-5" />
+                    </button>
+                    {solution.isAccepted && (
+                      <div className="mt-2 text-emerald-500 bg-emerald-50 p-1 rounded-lg" title="Accepted Solution">
+                        <Check className="w-5 h-5" strokeWidth={3} />
                       </div>
-                    </div>
-                    {isAuthor && (
-                      <button 
-                        onClick={() => handleAcceptSolution(solution._id)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${solution.isAccepted ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
-                      >
-                        {solution.isAccepted ? 'Revoke Acceptance' : 'Accept Solution'}
-                      </button>
                     )}
                   </div>
+
+                  <div className={`flex-1 bg-white border rounded-2xl p-6 transition-all ${solution.isAccepted ? 'border-emerald-500 shadow-sm' : 'border-slate-100 hover:border-slate-200'}`}>
+                    <p className="text-slate-600 leading-relaxed font-medium mb-6 whitespace-pre-wrap">{solution.content}</p>
+                    
+                    {solution.codeSnippets?.length > 0 && (
+                      <div className="mb-6 rounded-xl overflow-hidden border border-slate-100">
+                        <div className="bg-slate-50 border-b border-slate-100 text-slate-500 px-4 py-2 text-[9px] font-bold uppercase tracking-widest">{solution.codeSnippets[0].language}</div>
+                        <pre className="bg-slate-900 text-indigo-300 p-4 font-mono text-xs overflow-x-auto">
+                          <code>{solution.codeSnippets[0].code}</code>
+                        </pre>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <img src={solution.author.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(solution.author.name)}`} alt="" className="w-8 h-8 rounded-lg object-cover" />
+                        <div>
+                          <span className="block text-xs font-bold text-slate-800">{solution.author.name}</span>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase">{new Date(solution.createdAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => setReplyTo(solution._id === replyTo ? null : solution._id)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-all uppercase tracking-wider"
+                        >
+                          <Reply className="w-3 h-3" />
+                          Reply
+                        </button>
+                        {isAuthor && (
+                          <button 
+                            onClick={() => handleAcceptSolution(solution._id)}
+                            className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all uppercase tracking-wider ${solution.isAccepted ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
+                          >
+                            {solution.isAccepted ? 'Revoke Acceptance' : 'Accept Solution'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Reply Form */}
+                {replyTo === solution._id && (
+                  <div className="ml-12 md:ml-16 bg-slate-50 border border-slate-100 rounded-2xl p-6">
+                    <div className="flex items-center gap-2 mb-4 text-slate-500 font-bold text-[10px] uppercase tracking-widest">
+                      <Reply className="w-3 h-3" />
+                      Replying to {solution.author.name}
+                    </div>
+                    <textarea
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      placeholder="Type your reply..."
+                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-all font-medium text-sm min-h-[100px] mb-4"
+                    />
+                    <div className="flex justify-end gap-3">
+                      <button 
+                        onClick={() => setReplyTo(null)}
+                        className="px-4 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 rounded-lg transition-all"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        onClick={() => handleSubmitSolution(null, true)}
+                        disabled={submitting}
+                        className="bg-indigo-600 text-white px-6 py-2 rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center gap-2"
+                      >
+                        {submitting && <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+                        Submit Reply
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Nested Replies */}
+                <div className="ml-12 md:ml-16 space-y-4">
+                  {replies.filter(r => r.parentReply === solution._id).map(reply => (
+                    <div key={reply._id} className="bg-slate-50 border border-slate-100 rounded-2xl p-6">
+                      <p className="text-slate-600 text-sm leading-relaxed mb-4">{reply.content}</p>
+                      <div className="flex items-center gap-3">
+                        <img src={reply.author.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(reply.author.name)}`} alt="" className="w-6 h-6 rounded-md object-cover" />
+                        <div>
+                          <span className="block text-[10px] font-bold text-slate-800">{reply.author.name}</span>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tight">{new Date(reply.createdAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
@@ -259,57 +357,66 @@ const ProblemDetailPage = () => {
         </div>
 
         {/* Post Solution Section */}
-        <div className="bg-white border border-slate-100 rounded-2xl p-8 shadow-sm">
-          <h2 className="text-xl font-bold text-slate-800 mb-2">Your Solution</h2>
-          <p className="text-slate-500 font-medium mb-8">Share your expertise and help resolve this challenge.</p>
-          
-          <form onSubmit={handleSubmitSolution} className="space-y-6">
-            <textarea
-              placeholder="Explain your approach clearly..."
-              value={newSolution}
-              onChange={(e) => setNewMessage(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-6 py-4 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium min-h-[150px] text-sm"
-              required
-            />
+        {!isAuthor ? (
+          <div className="bg-white border border-slate-100 rounded-2xl p-8 shadow-sm">
+            <h2 className="text-xl font-bold text-slate-800 mb-2">Your Solution</h2>
+            <p className="text-slate-500 font-medium mb-8">Share your expertise and help resolve this challenge.</p>
             
-            <div className="bg-slate-50 border border-slate-100 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Code Snippet (Optional)</label>
-                <select
-                  value={language}
-                  onChange={(e) => setLanguage(e.target.value)}
-                  className="bg-white border border-slate-200 text-[10px] font-bold rounded-lg px-2 py-1 outline-none"
-                >
-                  <option value="javascript">JS</option>
-                  <option value="python">PY</option>
-                  <option value="html">HTML</option>
-                  <option value="css">CSS</option>
-                </select>
-              </div>
+            <form onSubmit={(e) => handleSubmitSolution(e, false)} className="space-y-6">
               <textarea
-                placeholder="// Paste code here..."
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className="w-full bg-slate-900 border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 font-mono text-sm min-h-[120px] text-indigo-300"
+                placeholder="Explain your approach clearly..."
+                value={newSolution}
+                onChange={(e) => setNewMessage(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-6 py-4 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium min-h-[150px] text-sm"
+                required
               />
-            </div>
+              
+              <div className="bg-slate-50 border border-slate-100 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Code Snippet (Optional)</label>
+                  <select
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    className="bg-white border border-slate-200 text-[10px] font-bold rounded-lg px-2 py-1 outline-none"
+                  >
+                    <option value="javascript">JS</option>
+                    <option value="python">PY</option>
+                    <option value="html">HTML</option>
+                    <option value="css">CSS</option>
+                  </select>
+                </div>
+                <textarea
+                  placeholder="// Paste code here..."
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  className="w-full bg-slate-900 border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 font-mono text-sm min-h-[120px] text-indigo-300"
+                />
+              </div>
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 shadow-sm"
-            >
-              {submitting ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              ) : (
-                <>
-                  Submit Solution
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                </>
-              )}
-            </button>
-          </form>
-        </div>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 shadow-sm"
+              >
+                {submitting ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    Submit Solution
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-8 text-center">
+            <h3 className="text-indigo-800 font-bold mb-2">You are the author of this question</h3>
+            <p className="text-indigo-600 text-sm font-medium">
+              You cannot reply to your own question directly. However, you can reply to other users' solutions to discuss their approach.
+            </p>
+          </div>
+        )}
       </div>
     </Layout>
   );

@@ -30,11 +30,22 @@ const problemSchema = new mongoose.Schema(
       enum: ["open", "closed", "moderated"],
       default: "open",
     },
+    isDeleted: { type: Boolean, default: false },
+    deletedAt: { type: Date },
   },
   { timestamps: true }
 );
 
 // Add text index for search
 problemSchema.index({ title: "text", description: "text", tags: "text" });
+
+// Middleware to filter out deleted problems
+problemSchema.pre(/^find/, function(next) {
+  if (this.getOptions().withDeleted) {
+    return next();
+  }
+  this.where({ isDeleted: { $ne: true } });
+  next();
+});
 
 module.exports = mongoose.model("Problem", problemSchema);
