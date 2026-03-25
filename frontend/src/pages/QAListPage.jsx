@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Plus, Search } from "lucide-react";
 import Layout from "../components/Layout.jsx";
 import api from "../api/client.js";
 
@@ -35,19 +36,17 @@ const QAListPage = () => {
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Q&A Section</h1>
-            <p className="text-slate-500 font-medium">Solve technical problems or post your challenges.</p>
+            <h1 className="text-xl font-semibold text-slate-800 tracking-tight">Q&A Section</h1>
+            <p className="text-slate-500 text-sm">Solve technical problems or post your challenges.</p>
           </div>
           <Link
             to="/qa/post"
-            className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 active:scale-95 flex items-center gap-2"
+            className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-all shadow-sm active:scale-95 flex items-center gap-2"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
-            </svg>
+            <Plus className="w-4 h-4" strokeWidth={2.5} />
             Post a Problem
           </Link>
         </div>
@@ -60,16 +59,14 @@ const QAListPage = () => {
               placeholder="Search problems..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white border-2 border-slate-100 rounded-2xl px-4 py-3 pl-11 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-medium"
+              className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 pl-11 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm"
             />
-            <svg className="w-5 h-5 text-slate-400 absolute left-4 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
           </div>
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="bg-white border-2 border-slate-100 rounded-2xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-all font-medium text-slate-700"
+            className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-slate-700 text-sm outline-none"
           >
             <option value="">All Categories</option>
             <option value="technical">Technical</option>
@@ -82,14 +79,14 @@ const QAListPage = () => {
             placeholder="Filter by tags (e.g. react, node)"
             value={tags}
             onChange={(e) => setTags(e.target.value)}
-            className="bg-white border-2 border-slate-100 rounded-2xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-all font-medium"
+            className="bg-white border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm outline-none"
           />
         </div>
 
         {/* Problems List */}
         {loading ? (
           <div className="flex justify-center py-20">
-            <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : problems.length > 0 ? (
           <div className="space-y-4">
@@ -97,11 +94,11 @@ const QAListPage = () => {
               <Link
                 key={problem._id}
                 to={`/qa/problem/${problem._id}`}
-                className="block bg-white border border-slate-100 rounded-3xl p-6 hover:shadow-xl hover:shadow-slate-200/50 transition-all group"
+                className="block bg-white border border-slate-100 rounded-2xl p-6 hover:shadow-md transition-all group"
               >
                 <div className="flex items-start gap-4">
-                  <div className="hidden md:flex flex-col items-center gap-1 min-w-[60px] py-2 bg-slate-50 rounded-2xl">
-                    <span className="text-lg font-black text-indigo-600">{problem.upvotes.length - problem.downvotes.length}</span>
+                  <div className="hidden md:flex flex-col items-center gap-1 min-w-[60px] py-2 bg-slate-50 rounded-xl">
+                    <span className="text-lg font-bold text-indigo-600">{problem.upvotes.length - problem.downvotes.length}</span>
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Votes</span>
                   </div>
                   <div className="flex-1 min-w-0">
@@ -118,7 +115,7 @@ const QAListPage = () => {
                     </h2>
                     <div className="flex flex-wrap gap-2 mb-4">
                       {problem.tags.map((tag) => (
-                        <span key={tag} className="bg-slate-100 text-slate-600 px-3 py-1 rounded-xl text-xs font-bold">
+                        <span key={tag} className="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold">
                           #{tag}
                         </span>
                       ))}
@@ -131,7 +128,7 @@ const QAListPage = () => {
                           className="w-6 h-6 rounded-full object-cover"
                         />
                         <span className="text-xs font-bold text-slate-600">{problem.author.name}</span>
-                        <span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[10px] font-black">
+                        <span className="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[10px] font-bold">
                           {problem.author.reputation}
                         </span>
                       </div>
@@ -145,8 +142,8 @@ const QAListPage = () => {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-3xl p-12 text-center border-2 border-dashed border-slate-200">
-            <div className="bg-slate-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white rounded-2xl p-12 text-center border-2 border-dashed border-slate-200">
+            <div className="bg-slate-50 w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>

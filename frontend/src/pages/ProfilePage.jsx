@@ -187,7 +187,7 @@ const ProfilePage = () => {
     <Layout>
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header Section */}
-        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mb-8 overflow-hidden relative group/header">
+        <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 mb-8 overflow-hidden relative group/header">
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full -mr-32 -mt-32 opacity-50 blur-3xl"></div>
           
           {/* Prominent Logout Button */}
@@ -197,7 +197,7 @@ const ProfilePage = () => {
                 logout();
               }
             }}
-            className="absolute top-6 right-6 p-3 bg-white border border-slate-100 text-slate-400 hover:text-red-600 hover:bg-red-50 hover:border-red-100 rounded-2xl shadow-sm transition-all z-20 group/logout"
+            className="absolute top-6 right-6 p-3 bg-white border border-slate-100 text-slate-400 hover:text-red-600 hover:bg-red-50 hover:border-red-100 rounded-xl shadow-sm transition-all z-20 group/logout"
             aria-label="Logout Account"
             title="Sign out of your account"
           >
@@ -218,7 +218,7 @@ const ProfilePage = () => {
               onDrop={onDrop}
               onClick={handleAvatarClick}
             >
-              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden shadow-xl">
+              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden shadow-md">
                 <img 
                   src={preview || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name)}&background=random`} 
                   alt="Profile" 
@@ -240,13 +240,13 @@ const ProfilePage = () => {
             {/* User Info Header */}
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
-                <h1 className="text-3xl font-black text-slate-900">{user?.name}</h1>
-                <div className="flex items-center gap-1.5 bg-amber-50 text-amber-700 px-3 py-1 rounded-full border border-amber-100 shadow-sm">
-                  <BarChart3 size={14} className="text-amber-500" />
-                  <span className="text-xs font-black tracking-wider uppercase">Reputation: {user?.reputation || 0}</span>
+                <h1 className="text-xl font-semibold text-slate-800">{user?.name}</h1>
+                <div className="flex items-center gap-1.5 bg-slate-50 text-slate-600 px-3 py-1 rounded-full border border-slate-100 shadow-sm">
+                  <BarChart3 size={14} className="text-indigo-500" />
+                  <span className="text-[10px] font-medium tracking-wider uppercase">Reputation: {user?.reputation || 0}</span>
                 </div>
               </div>
-              <p className="text-lg text-indigo-600 font-semibold mb-4">{user?.headline || "Add a professional headline"}</p>
+              <p className="text-base text-indigo-600 font-medium mb-4">{user?.headline || "Add a professional headline"}</p>
               <div className="flex flex-wrap justify-center md:justify-start gap-4">
                 <div className="flex items-center gap-1.5 text-slate-500 text-sm">
                   <Mail size={16} />
@@ -273,9 +273,9 @@ const ProfilePage = () => {
                 { label: "Ideas", value: stats?.ideasCount || 0 },
                 { label: "Collaborations", value: stats?.collaborationsCount || 0 }
               ].map((stat, i) => (
-                <div key={i} className="bg-slate-50 p-4 rounded-2xl text-center">
-                  <div className="text-xl font-bold text-slate-900">{stat.value}</div>
-                  <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">{stat.label}</div>
+                <div key={i} className="bg-slate-50 p-4 rounded-xl text-center border border-slate-100 transition-colors hover:bg-slate-100/50">
+                  <div className="text-xl font-semibold text-slate-800">{stat.value}</div>
+                  <div className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -283,7 +283,7 @@ const ProfilePage = () => {
         </div>
 
         {/* Tabs Navigation */}
-        <div className="flex flex-wrap gap-2 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-slate-100">
+        <div className="flex flex-wrap gap-2 mb-8 bg-white p-2 rounded-xl shadow-sm border border-slate-100">
           <TabButton id="profile" icon={UserIcon} label="Personal Info" />
           <TabButton id="activity" icon={Activity} label="Activity Timeline" />
           <TabButton id="stats" icon={BarChart3} label="Insights" />
@@ -302,42 +302,42 @@ const ProfilePage = () => {
                   exit={{ opacity: 0, y: -20 }}
                   className="space-y-6"
                 >
-                  <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                    <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                  <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
+                    <h2 className="text-xl font-semibold text-slate-800 mb-6 flex items-center gap-2">
                       <UserIcon className="text-indigo-600" size={24} />
                       Basic Information
                     </h2>
                     <form onSubmit={handleSaveProfile} className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-sm font-bold text-slate-700">Full Name</label>
+                          <label className="text-sm font-medium text-slate-700">Full Name</label>
                           <input 
                             type="text" 
                             name="name"
                             value={profileForm.name}
                             onChange={handleProfileChange}
-                            className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition-all"
+                            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
                             placeholder="Your Name"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-bold text-slate-700">Professional Headline</label>
+                          <label className="text-sm font-medium text-slate-700">Professional Headline</label>
                           <input 
                             type="text" 
                             name="headline"
                             value={profileForm.headline}
                             onChange={handleProfileChange}
-                            className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition-all"
+                            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
                             placeholder="e.g. Senior UX Designer"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-bold text-slate-700">Primary Role</label>
+                          <label className="text-sm font-medium text-slate-700">Primary Role</label>
                           <select 
                             name="role"
                             value={profileForm.role}
                             onChange={handleProfileChange}
-                            className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition-all"
+                            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
                           >
                             <option value="Developer">Developer</option>
                             <option value="Designer">Designer</option>
@@ -347,45 +347,45 @@ const ProfilePage = () => {
                           </select>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-bold text-slate-700">Location</label>
+                          <label className="text-sm font-medium text-slate-700">Location</label>
                           <input 
                             type="text" 
                             name="location"
                             value={profileForm.location}
                             onChange={handleProfileChange}
-                            className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition-all"
+                            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
                             placeholder="City, Country"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-700">Bio</label>
+                        <label className="text-sm font-medium text-slate-700">Bio</label>
                         <textarea 
                           name="bio"
                           value={profileForm.bio}
                           onChange={handleProfileChange}
                           rows={4}
-                          className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition-all resize-none"
+                          className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none resize-none"
                           placeholder="Tell us about yourself..."
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-700">Skills (comma separated)</label>
+                        <label className="text-sm font-medium text-slate-700">Skills (comma separated)</label>
                         <input 
                           type="text" 
                           name="skills"
                           value={profileForm.skills}
                           onChange={handleProfileChange}
-                          className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 transition-all"
+                          className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
                           placeholder="React, Node.js, Design Thinking"
                         />
                       </div>
 
                       <div className="pt-4 border-t border-slate-100">
-                        <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                          <Globe className="text-indigo-600" size={20} />
+                        <h3 className="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
+                          <Globe className="text-indigo-600" size="20" />
                           Social Links
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -396,16 +396,16 @@ const ProfilePage = () => {
                             { name: "portfolio", label: "Portfolio URL", icon: ExternalLink }
                           ].map((social) => (
                             <div key={social.name} className="space-y-2">
-                              <label className="text-sm font-bold text-slate-700">{social.label}</label>
+                              <label className="text-sm font-medium text-slate-700">{social.label}</label>
                               <div className="relative">
                                 <social.icon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                 <input 
-                                  type="url" 
+                                  type="text" 
                                   name={social.name}
                                   value={socialForm[social.name]}
                                   onChange={handleSocialChange}
-                                  className="w-full bg-slate-50 border-none rounded-xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-indigo-500 transition-all"
-                                  placeholder="https://..."
+                                  className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                                  placeholder={`${social.label}...`}
                                 />
                               </div>
                             </div>
@@ -413,24 +413,20 @@ const ProfilePage = () => {
                         </div>
                       </div>
 
-                      <div className="flex justify-end gap-4 pt-6">
-                        <button 
-                          type="button" 
-                          className="px-8 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition-all"
-                        >
-                          Cancel
-                        </button>
-                        <button 
+                      <div className="flex justify-end pt-6">
+                        <button
                           type="submit"
                           disabled={loading}
-                          className="px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all disabled:opacity-50 flex items-center gap-2"
+                          className="bg-indigo-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 active:scale-95 disabled:opacity-50 flex items-center gap-2"
                         >
                           {loading ? (
-                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                           ) : (
-                            <CheckCircle2 size={18} />
+                            <>
+                              <CheckCircle2 size={18} />
+                              Save Changes
+                            </>
                           )}
-                          Save Changes
                         </button>
                       </div>
                     </form>
@@ -492,16 +488,16 @@ const ProfilePage = () => {
                   exit={{ opacity: 0, y: -20 }}
                   className="space-y-6"
                 >
-                  <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                    <h2 className="text-xl font-bold text-slate-900 mb-8 flex items-center gap-2">
+                  <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
+                    <h2 className="text-xl font-bold text-slate-800 mb-8 flex items-center gap-2">
                       <BarChart3 className="text-indigo-600" size={24} />
-                      Performance Insights
+                      Account Insights
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="p-6 bg-indigo-50 rounded-2xl">
                         <h3 className="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-4">Collaboration Impact</h3>
                         <div className="flex items-end gap-2">
-                          <span className="text-4xl font-black text-slate-900">{stats?.collaborationsCount || 0}</span>
+                          <span className="text-4xl font-bold text-slate-800">{stats?.collaborationsCount || 0}</span>
                           <span className="text-slate-500 font-medium mb-1">Projects</span>
                         </div>
                         <p className="mt-4 text-slate-600 text-sm">Number of ideas where you are a primary collaborator.</p>
@@ -509,7 +505,7 @@ const ProfilePage = () => {
                       <div className="p-6 bg-amber-50 rounded-2xl">
                         <h3 className="text-sm font-bold text-amber-600 uppercase tracking-wider mb-4">Idea Reach</h3>
                         <div className="flex items-end gap-2">
-                          <span className="text-4xl font-black text-slate-900">{stats?.totalLikes || 0}</span>
+                          <span className="text-4xl font-bold text-slate-800">{stats?.totalLikes || 0}</span>
                           <span className="text-slate-500 font-medium mb-1">Engagements</span>
                         </div>
                         <p className="mt-4 text-slate-600 text-sm">Total likes received across all your shared ideas.</p>
@@ -527,8 +523,8 @@ const ProfilePage = () => {
                   exit={{ opacity: 0, y: -20 }}
                   className="space-y-6"
                 >
-                  <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                    <h2 className="text-xl font-bold text-slate-900 mb-8 flex items-center gap-2">
+                  <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
+                    <h2 className="text-xl font-bold text-slate-800 mb-8 flex items-center gap-2">
                       <Shield className="text-indigo-600" size={24} />
                       Privacy Settings
                     </h2>
@@ -540,7 +536,7 @@ const ProfilePage = () => {
                       ].map((item) => (
                         <div key={item.key} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
                           <div className="flex-1">
-                            <h3 className="font-bold text-slate-900">{item.label}</h3>
+                            <h3 className="font-bold text-slate-800">{item.label}</h3>
                             <p className="text-sm text-slate-500">{item.desc}</p>
                           </div>
                           <button
@@ -589,8 +585,8 @@ const ProfilePage = () => {
           {/* Sidebar */}
           <div className="lg:col-span-4 space-y-6">
             {/* Completion Widget */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Profile Strength</h3>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+              <h3 className="text-lg font-bold text-slate-800 mb-4">Profile Strength</h3>
               <div className="relative w-32 h-32 mx-auto mb-6">
                 <svg className="w-full h-full transform -rotate-90">
                   <circle
@@ -616,7 +612,7 @@ const ProfilePage = () => {
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-black text-slate-900">{calculateProfileCompletion(user)}%</span>
+                  <span className="text-2xl font-bold text-slate-800">{calculateProfileCompletion(user)}%</span>
                 </div>
               </div>
               <ul className="space-y-3">
@@ -637,12 +633,12 @@ const ProfilePage = () => {
             </div>
 
             {/* Account Info */}
-            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Account Status</h3>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+              <h3 className="text-lg font-bold text-slate-800 mb-4">Account Status</h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-slate-500">Member Since</span>
-                  <span className="font-bold text-slate-900">{new Date(user?.createdAt).toLocaleDateString()}</span>
+                  <span className="font-bold text-slate-800">{new Date(user?.createdAt).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-slate-500">Status</span>
