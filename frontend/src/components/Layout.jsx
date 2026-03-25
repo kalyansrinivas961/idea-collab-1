@@ -254,9 +254,6 @@ const Layout = ({ children }) => {
                 <NavLink to="/ideas" className="text-slate-600 hover:text-indigo-600 font-medium">
                   Ideas
                 </NavLink>
-                <NavLink to="/users" className="text-slate-600 hover:text-indigo-600 font-medium">
-                  Community
-                </NavLink>
                 <NavLink to="/qa" className="text-slate-600 hover:text-indigo-600 flex items-center font-medium">
                   Q&A
                 </NavLink>
@@ -338,14 +335,6 @@ const Layout = ({ children }) => {
             >
               <Lightbulb className="w-5 h-5" />
               Ideas
-            </NavLink>
-            <NavLink 
-              to="/users" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
-            >
-              <Users className="w-5 h-5" />
-              Community
             </NavLink>
             <NavLink 
               to="/qa" 
