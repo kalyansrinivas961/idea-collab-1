@@ -235,31 +235,31 @@ const Layout = ({ children }) => {
   }, [user]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b bg-white">
+    <div className="min-h-screen flex flex-col transition-colors duration-300 dark:bg-slate-950">
+      <header className="border-b bg-white dark:bg-slate-900 dark:border-slate-800 transition-colors">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/dashboard" className="flex items-center gap-2">
             <span className="h-8 w-8 rounded bg-indigo-600 text-white flex items-center justify-center font-bold">
               IC
             </span>
-            <span className="font-semibold text-lg text-slate-800">IdeaCollab</span>
+            <span className="font-semibold text-lg text-slate-800 dark:text-white">IdeaCollab</span>
           </Link>
           {user && (
             <div className="flex items-center gap-2 md:gap-6">
               <nav className="hidden md:flex items-center gap-4 text-sm">
-                <NavLink to="/dashboard" className="text-slate-600 hover:text-indigo-600 font-medium">
+                <NavLink to="/dashboard" className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors">
                   Dashboard
                 </NavLink>
-                <NavLink to="/ideas/new" className="text-slate-600 hover:text-indigo-600 font-medium">
+                <NavLink to="/ideas/new" className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors">
                   Add Idea
                 </NavLink>
-                <NavLink to="/ideas" className="text-slate-600 hover:text-indigo-600 font-medium">
+                <NavLink to="/ideas" className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition-colors">
                   Ideas
                 </NavLink>
-                <NavLink to="/qa" className="text-slate-600 hover:text-indigo-600 flex items-center font-medium">
+                <NavLink to="/qa" className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center font-medium transition-colors">
                   Q&A
                 </NavLink>
-                <NavLink to="/collaborations" className="text-slate-600 hover:text-indigo-600 flex items-center font-medium">
+                <NavLink to="/collaborations" className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center font-medium transition-colors">
                   Collaborations
                   {pendingCount > 0 && (
                     <span className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
@@ -267,7 +267,7 @@ const Layout = ({ children }) => {
                     </span>
                   )}
                 </NavLink>
-                <NavLink to="/follow-requests" className="text-slate-600 hover:text-indigo-600 flex items-center font-medium">
+                <NavLink to="/follow-requests" className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center font-medium transition-colors">
                   Requests
                   {followRequestCount > 0 && (
                     <span className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
@@ -277,28 +277,28 @@ const Layout = ({ children }) => {
                 </NavLink>
               </nav>
               <div className="flex items-center gap-1 md:gap-3">
-                <NavLink to="/notifications" className="text-slate-600 hover:text-indigo-600 flex items-center relative p-2 min-w-[44px] min-h-[44px] justify-center" title="Notifications" aria-label="Notifications">
+                <NavLink to="/notifications" className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center relative p-2 min-w-[44px] min-h-[44px] justify-center transition-colors" title="Notifications" aria-label="Notifications">
                   <Bell className="w-6 h-6" />
                   {unreadNotifCount > 0 && (
-                    <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
+                    <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white dark:border-slate-900">
                       {unreadNotifCount}
                     </span>
                   )}
                 </NavLink>
-                <NavLink to="/messages" className="text-slate-600 hover:text-indigo-600 flex items-center relative p-2 min-w-[44px] min-h-[44px] justify-center" title="Messages" aria-label="Messages">
+                <NavLink to="/messages" className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center relative p-2 min-w-[44px] min-h-[44px] justify-center transition-colors" title="Messages" aria-label="Messages">
                   <MessageSquare className="w-6 h-6" />
                   {unreadMessageCount > 0 && (
-                    <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
+                    <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white dark:border-slate-900">
                       {unreadMessageCount}
                     </span>
                   )}
                 </NavLink>
-                <NavLink to="/profile" className="text-slate-600 hover:text-indigo-600 p-2 min-w-[44px] min-h-[44px] justify-center flex items-center" title="Profile" aria-label="Profile">
+                <NavLink to="/profile" className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 p-2 min-w-[44px] min-h-[44px] justify-center flex items-center transition-colors" title="Profile" aria-label="Profile">
                   <User className="w-6 h-6" />
                 </NavLink>
                 <button 
                   onClick={() => setIsLogoutModalOpen(true)}
-                  className="text-slate-600 hover:text-red-600 p-2 min-w-[44px] min-h-[44px] justify-center flex items-center transition-colors"
+                  className="text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 p-2 min-w-[44px] min-h-[44px] justify-center flex items-center transition-colors"
                   title="Logout"
                   aria-label="Logout"
                 >
@@ -307,7 +307,7 @@ const Layout = ({ children }) => {
                 {/* Hamburger Menu Button */}
                 <button 
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="md:hidden p-2 text-slate-600 hover:text-indigo-600 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  className="md:hidden p-2 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
                   aria-label="Toggle menu"
                 >
                   {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -320,12 +320,12 @@ const Layout = ({ children }) => {
 
       {/* Mobile Menu Overlay */}
       {user && isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-b shadow-lg animate-fade-in-down fixed w-full z-40 top-[61px]">
+        <div className="md:hidden bg-white dark:bg-slate-900 border-b dark:border-slate-800 shadow-lg animate-fade-in-down fixed w-full z-40 top-[61px] transition-colors">
           <nav className="flex flex-col p-4 space-y-1">
             <NavLink 
               to="/dashboard" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
             >
               <LayoutDashboard className="w-5 h-5" />
               Dashboard
@@ -333,7 +333,7 @@ const Layout = ({ children }) => {
             <NavLink 
               to="/ideas/new" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
             >
               <PlusSquare className="w-5 h-5" />
               Add Idea
@@ -341,7 +341,7 @@ const Layout = ({ children }) => {
             <NavLink 
               to="/ideas" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
             >
               <Lightbulb className="w-5 h-5" />
               Ideas
@@ -349,7 +349,7 @@ const Layout = ({ children }) => {
             <NavLink 
               to="/qa" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
             >
               <HelpCircle className="w-5 h-5" />
               Q&A
@@ -357,7 +357,7 @@ const Layout = ({ children }) => {
             <NavLink 
               to="/collaborations" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={({isActive}) => `flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
             >
               <div className="flex items-center gap-3">
                 <Handshake className="w-5 h-5" />
@@ -370,7 +370,7 @@ const Layout = ({ children }) => {
             <NavLink 
               to="/notifications" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={({isActive}) => `flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
             >
               <div className="flex items-center gap-3">
                 <Bell className="w-5 h-5" />
@@ -383,7 +383,7 @@ const Layout = ({ children }) => {
             <NavLink 
               to="/profile" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
             >
               <User className="w-5 h-5" />
               My Profile
@@ -391,7 +391,7 @@ const Layout = ({ children }) => {
             <NavLink 
               to="/followers" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
             >
               <UserPlus className="w-5 h-5" />
               Followers
@@ -399,7 +399,7 @@ const Layout = ({ children }) => {
             <NavLink 
               to="/following" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
             >
               <UserPlus className="w-5 h-5" />
               Following
@@ -407,7 +407,7 @@ const Layout = ({ children }) => {
             <NavLink 
               to="/follow-requests" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={({isActive}) => `flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
             >
               <div className="flex items-center gap-3">
                 <UserPlus className="w-5 h-5" />
@@ -422,7 +422,7 @@ const Layout = ({ children }) => {
                 setIsMobileMenuOpen(false);
                 setIsLogoutModalOpen(true);
               }}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
             >
               <LogOut className="w-5 h-5" />
               Logout
@@ -430,7 +430,7 @@ const Layout = ({ children }) => {
           </nav>
         </div>
       )}
-      <main className={`flex-1 bg-slate-50 ${window.location.pathname.startsWith('/messages') ? 'p-0' : ''}`}>
+      <main className={`flex-1 bg-slate-50 dark:bg-slate-950 transition-colors duration-300 ${window.location.pathname.startsWith('/messages') ? 'p-0' : ''}`}>
         <div className={`${window.location.pathname.startsWith('/messages') ? 'max-w-full px-0 py-0 h-full' : 'max-w-6xl mx-auto px-4 py-6'}`}>{children}</div>
       </main>
       <Footer />

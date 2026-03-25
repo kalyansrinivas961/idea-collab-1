@@ -26,11 +26,13 @@ import { useAuth } from "../context/AuthContext";
 import api from "../api/client";
 import Layout from "../components/Layout";
 import ConfirmationModal from "../components/ConfirmationModal";
+import { useTheme } from "../context/ThemeContext";
 import { toast } from "react-hot-toast";
 import { calculateProfileCompletion } from "../utils/user";
 
 const ProfilePage = () => {
   const { user, updateUser, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   
   // States
   const [activeTab, setActiveTab] = useState("profile");
@@ -177,7 +179,7 @@ const ProfilePage = () => {
       className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
         activeTab === id 
           ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" 
-          : "text-slate-500 hover:bg-slate-50"
+          : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
       }`}
     >
       <Icon size={18} />
@@ -189,14 +191,14 @@ const ProfilePage = () => {
     <Layout>
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header Section */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 mb-8 overflow-hidden relative group/header">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full -mr-32 -mt-32 opacity-50 blur-3xl"></div>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-800 mb-8 overflow-hidden relative group/header">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 dark:bg-indigo-900/20 rounded-full -mr-32 -mt-32 opacity-50 blur-3xl"></div>
           
           <div className="relative flex flex-col md:flex-row items-center gap-8">
             {/* Avatar Section */}
             <div 
               className={`relative group cursor-pointer rounded-full p-1 border-4 transition-all ${
-                isDragging ? "border-indigo-500 scale-105" : "border-white"
+                isDragging ? "border-indigo-500 scale-105" : "border-white dark:border-slate-800"
               }`}
               onDragOver={onDragOver}
               onDragLeave={onDragLeave}
@@ -225,25 +227,25 @@ const ProfilePage = () => {
             {/* User Info Header */}
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
-                <h1 className="text-xl font-semibold text-slate-800">{user?.name}</h1>
-                <div className="flex items-center gap-1.5 bg-slate-50 text-slate-600 px-3 py-1 rounded-full border border-slate-100 shadow-sm">
+                <h1 className="text-xl font-semibold text-slate-800 dark:text-white">{user?.name}</h1>
+                <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-3 py-1 rounded-full border border-slate-100 dark:border-slate-700 shadow-sm">
                   <BarChart3 size={14} className="text-indigo-500" />
                   <span className="text-[10px] font-medium tracking-wider uppercase">Reputation: {user?.reputation || 0}</span>
                 </div>
               </div>
-              <p className="text-base text-indigo-600 font-medium mb-4">{user?.headline || "Add a professional headline"}</p>
+              <p className="text-base text-indigo-600 dark:text-indigo-400 font-medium mb-4">{user?.headline || "Add a professional headline"}</p>
               <div className="flex flex-wrap justify-center md:justify-start gap-4">
-                <div className="flex items-center gap-1.5 text-slate-500 text-sm">
+                <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-sm">
                   <Mail size={16} />
                   <span>{user?.email}</span>
                 </div>
                 {user?.location && (
-                  <div className="flex items-center gap-1.5 text-slate-500 text-sm">
+                  <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-sm">
                     <MapPin size={16} />
                     <span>{user?.location}</span>
                   </div>
                 )}
-                <div className="flex items-center gap-1.5 text-slate-500 text-sm">
+                <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-sm">
                   <Briefcase size={16} />
                   <span>{user?.role || "Member"}</span>
                 </div>
@@ -258,9 +260,9 @@ const ProfilePage = () => {
                 { label: "Ideas", value: stats?.ideasCount || 0 },
                 { label: "Collaborations", value: stats?.collaborationsCount || 0 }
               ].map((stat, i) => (
-                <div key={i} className="bg-slate-50 p-4 rounded-xl text-center border border-slate-100 transition-colors hover:bg-slate-100/50">
-                  <div className="text-xl font-semibold text-slate-800">{stat.value}</div>
-                  <div className="text-[10px] text-slate-500 font-medium uppercase tracking-wider">{stat.label}</div>
+                <div key={i} className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl text-center border border-slate-100 dark:border-slate-800 transition-colors hover:bg-slate-100/50 dark:hover:bg-slate-800">
+                  <div className="text-xl font-semibold text-slate-800 dark:text-white">{stat.value}</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -268,7 +270,7 @@ const ProfilePage = () => {
         </div>
 
         {/* Tabs Navigation */}
-        <div className="flex flex-wrap gap-2 mb-8 bg-white p-2 rounded-xl shadow-sm border border-slate-100">
+        <div className="flex flex-wrap gap-2 mb-8 bg-white dark:bg-slate-900 p-2 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
           <TabButton id="profile" icon={UserIcon} label="Personal Info" />
           <TabButton id="activity" icon={Activity} label="Activity Timeline" />
           <TabButton id="stats" icon={BarChart3} label="Insights" />
@@ -287,42 +289,42 @@ const ProfilePage = () => {
                   exit={{ opacity: 0, y: -20 }}
                   className="space-y-6"
                 >
-                  <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
-                    <h2 className="text-xl font-semibold text-slate-800 mb-6 flex items-center gap-2">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-800">
+                    <h2 className="text-xl font-semibold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
                       <UserIcon className="text-indigo-600" size={24} />
                       Basic Information
                     </h2>
                     <form onSubmit={handleSaveProfile} className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label className="text-sm font-medium text-slate-700">Full Name</label>
+                          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Full Name</label>
                           <input 
                             type="text" 
                             name="name"
                             value={profileForm.name}
                             onChange={handleProfileChange}
-                            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white"
                             placeholder="Your Name"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-medium text-slate-700">Professional Headline</label>
+                          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Professional Headline</label>
                           <input 
                             type="text" 
                             name="headline"
                             value={profileForm.headline}
                             onChange={handleProfileChange}
-                            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white"
                             placeholder="e.g. Senior UX Designer"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-medium text-slate-700">Primary Role</label>
+                          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Primary Role</label>
                           <select 
                             name="role"
                             value={profileForm.role}
                             onChange={handleProfileChange}
-                            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white"
                           >
                             <option value="Developer">Developer</option>
                             <option value="Designer">Designer</option>
@@ -332,44 +334,44 @@ const ProfilePage = () => {
                           </select>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-medium text-slate-700">Location</label>
+                          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Location</label>
                           <input 
                             type="text" 
                             name="location"
                             value={profileForm.location}
                             onChange={handleProfileChange}
-                            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white"
                             placeholder="City, Country"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700">Bio</label>
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Bio</label>
                         <textarea 
                           name="bio"
                           value={profileForm.bio}
                           onChange={handleProfileChange}
                           rows={4}
-                          className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none resize-none"
+                          className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none resize-none dark:text-white"
                           placeholder="Tell us about yourself..."
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium text-slate-700">Skills (comma separated)</label>
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Skills (comma separated)</label>
                         <input 
                           type="text" 
                           name="skills"
                           value={profileForm.skills}
                           onChange={handleProfileChange}
-                          className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                          className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white"
                           placeholder="React, Node.js, Design Thinking"
                         />
                       </div>
 
-                      <div className="pt-4 border-t border-slate-100">
-                        <h3 className="text-lg font-semibold text-slate-900 mb-6 flex items-center gap-2">
+                      <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                           <Globe className="text-indigo-600" size="20" />
                           Social Links
                         </h3>
@@ -381,7 +383,7 @@ const ProfilePage = () => {
                             { name: "portfolio", label: "Portfolio URL", icon: ExternalLink }
                           ].map((social) => (
                             <div key={social.name} className="space-y-2">
-                              <label className="text-sm font-medium text-slate-700">{social.label}</label>
+                              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{social.label}</label>
                               <div className="relative">
                                 <social.icon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                                 <input 
@@ -389,7 +391,7 @@ const ProfilePage = () => {
                                   name={social.name}
                                   value={socialForm[social.name]}
                                   onChange={handleSocialChange}
-                                  className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none"
+                                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white"
                                   placeholder={`${social.label}...`}
                                 />
                               </div>
@@ -425,28 +427,28 @@ const ProfilePage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100"
+                  className="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-sm border border-slate-100 dark:border-slate-800"
                 >
-                  <h2 className="text-xl font-bold text-slate-900 mb-8 flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-2">
                     <Activity className="text-indigo-600" size={24} />
                     Recent Activity
                   </h2>
-                  <div className="space-y-8 relative before:absolute before:left-[17px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
+                  <div className="space-y-8 relative before:absolute before:left-[17px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100 dark:before:bg-slate-800">
                     {activities.length > 0 ? activities.map((log, i) => (
                       <div key={log._id} className="relative flex gap-6 group">
-                        <div className="w-9 h-9 rounded-full bg-white border-4 border-indigo-50 flex items-center justify-center z-10 shadow-sm group-hover:scale-110 transition-transform">
+                        <div className="w-9 h-9 rounded-full bg-white dark:bg-slate-900 border-4 border-indigo-50 dark:border-indigo-900/30 flex items-center justify-center z-10 shadow-sm group-hover:scale-110 transition-transform">
                           <div className="w-2 h-2 rounded-full bg-indigo-600"></div>
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-bold text-slate-900 capitalize">
+                            <span className="text-sm font-bold text-slate-900 dark:text-slate-200 capitalize">
                               {log.action.replace('_', ' ')}
                             </span>
-                            <span className="text-xs font-medium text-slate-400">
+                            <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
                               {new Date(log.createdAt).toLocaleDateString()}
                             </span>
                           </div>
-                          <p className="text-slate-500 text-sm">
+                          <p className="text-slate-500 dark:text-slate-400 text-sm">
                             {log.action === 'update_profile' && "You updated your professional profile information."}
                             {log.action === 'request_follow' && `You requested to follow ${log.targetUser?.name}.`}
                             {log.action === 'accept_follow' && `You accepted ${log.targetUser?.name}'s follow request.`}
@@ -457,8 +459,8 @@ const ProfilePage = () => {
                       </div>
                     )) : (
                       <div className="text-center py-12">
-                        <Activity className="mx-auto text-slate-200 mb-4" size={48} />
-                        <p className="text-slate-400 font-medium">No recent activity to show.</p>
+                        <Activity className="mx-auto text-slate-200 dark:text-slate-800 mb-4" size={48} />
+                        <p className="text-slate-400 dark:text-slate-500 font-medium">No recent activity to show.</p>
                       </div>
                     )}
                   </div>
@@ -473,27 +475,27 @@ const ProfilePage = () => {
                   exit={{ opacity: 0, y: -20 }}
                   className="space-y-6"
                 >
-                  <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
-                    <h2 className="text-xl font-bold text-slate-800 mb-8 flex items-center gap-2">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-800">
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-8 flex items-center gap-2">
                       <BarChart3 className="text-indigo-600" size={24} />
                       Account Insights
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="p-6 bg-indigo-50 rounded-2xl">
-                        <h3 className="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-4">Collaboration Impact</h3>
+                      <div className="p-6 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl">
+                        <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-4">Collaboration Impact</h3>
                         <div className="flex items-end gap-2">
-                          <span className="text-4xl font-bold text-slate-800">{stats?.collaborationsCount || 0}</span>
-                          <span className="text-slate-500 font-medium mb-1">Projects</span>
+                          <span className="text-4xl font-bold text-slate-800 dark:text-white">{stats?.collaborationsCount || 0}</span>
+                          <span className="text-slate-500 dark:text-slate-400 font-medium mb-1">Projects</span>
                         </div>
-                        <p className="mt-4 text-slate-600 text-sm">Number of ideas where you are a primary collaborator.</p>
+                        <p className="mt-4 text-slate-600 dark:text-slate-400 text-sm">Number of ideas where you are a primary collaborator.</p>
                       </div>
-                      <div className="p-6 bg-amber-50 rounded-2xl">
-                        <h3 className="text-sm font-bold text-amber-600 uppercase tracking-wider mb-4">Idea Reach</h3>
+                      <div className="p-6 bg-amber-50 dark:bg-amber-900/20 rounded-2xl">
+                        <h3 className="text-sm font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider mb-4">Idea Reach</h3>
                         <div className="flex items-end gap-2">
-                          <span className="text-4xl font-bold text-slate-800">{stats?.totalLikes || 0}</span>
-                          <span className="text-slate-500 font-medium mb-1">Engagements</span>
+                          <span className="text-4xl font-bold text-slate-800 dark:text-white">{stats?.totalLikes || 0}</span>
+                          <span className="text-slate-500 dark:text-slate-400 font-medium mb-1">Engagements</span>
                         </div>
-                        <p className="mt-4 text-slate-600 text-sm">Total likes received across all your shared ideas.</p>
+                        <p className="mt-4 text-slate-600 dark:text-slate-400 text-sm">Total likes received across all your shared ideas.</p>
                       </div>
                     </div>
                   </div>
@@ -508,26 +510,44 @@ const ProfilePage = () => {
                   exit={{ opacity: 0, y: -20 }}
                   className="space-y-6"
                 >
-                  <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
-                    <h2 className="text-xl font-bold text-slate-800 mb-8 flex items-center gap-2">
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-800">
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-8 flex items-center gap-2">
                       <Shield className="text-indigo-600" size={24} />
-                      Privacy Settings
+                      Privacy & Interface
                     </h2>
                     <div className="space-y-6">
+                      {/* Theme Toggle */}
+                      <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
+                        <div className="flex-1">
+                          <h3 className="font-bold text-slate-800 dark:text-white">Dark Mode</h3>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">Switch between light and dark visual themes.</p>
+                        </div>
+                        <button
+                          onClick={toggleTheme}
+                          className={`w-12 h-6 rounded-full transition-colors relative ${
+                            theme === "dark" ? "bg-indigo-600" : "bg-slate-300"
+                          }`}
+                        >
+                          <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
+                            theme === "dark" ? "left-7" : "left-1"
+                          }`}></div>
+                        </button>
+                      </div>
+
                       {[
                         { key: "showEmail", label: "Public Email", desc: "Show your email address on your public profile." },
                         { key: "showLocation", label: "Public Location", desc: "Display your city and country to other users." },
                         { key: "allowDirectMessages", label: "Direct Messages", desc: "Allow other users to send you direct messages." }
                       ].map((item) => (
-                        <div key={item.key} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
+                        <div key={item.key} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
                           <div className="flex-1">
-                            <h3 className="font-bold text-slate-800">{item.label}</h3>
-                            <p className="text-sm text-slate-500">{item.desc}</p>
+                            <h3 className="font-bold text-slate-800 dark:text-white">{item.label}</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">{item.desc}</p>
                           </div>
                           <button
                             onClick={() => handlePrivacyToggle(item.key)}
                             className={`w-12 h-6 rounded-full transition-colors relative ${
-                              privacySettings[item.key] ? "bg-indigo-600" : "bg-slate-300"
+                              privacySettings[item.key] ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-600"
                             }`}
                           >
                             <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
@@ -538,15 +558,15 @@ const ProfilePage = () => {
                       ))}
                     </div>
 
-                    <div className="mt-12 pt-8 border-t border-slate-100">
+                    <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
                       <h2 className="text-xl font-bold text-red-600 mb-6 flex items-center gap-2">
                         <AlertCircle size={24} />
                         Danger Zone
                       </h2>
-                      <div className="bg-red-50 p-6 rounded-2xl border border-red-100 flex flex-col md:flex-row items-center justify-between gap-6">
+                      <div className="bg-red-50 dark:bg-red-900/10 p-6 rounded-2xl border border-red-100 dark:border-red-900/20 flex flex-col md:flex-row items-center justify-between gap-6">
                         <div>
-                          <h3 className="font-bold text-red-900">Sign Out</h3>
-                          <p className="text-sm text-red-600">Terminate your current session on this device.</p>
+                          <h3 className="font-bold text-red-900 dark:text-red-400">Logout</h3>
+                          <p className="text-sm text-red-600 dark:text-red-500">Terminate your current session on this device.</p>
                         </div>
                         <button 
                           onClick={() => setIsLogoutModalOpen(true)}
@@ -566,8 +586,8 @@ const ProfilePage = () => {
           {/* Sidebar */}
           <div className="lg:col-span-4 space-y-6">
             {/* Completion Widget */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-              <h3 className="text-lg font-bold text-slate-800 mb-4">Profile Strength</h3>
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Profile Strength</h3>
               <div className="relative w-32 h-32 mx-auto mb-6">
                 <svg className="w-full h-full transform -rotate-90">
                   <circle
@@ -577,7 +597,7 @@ const ProfilePage = () => {
                     stroke="currentColor"
                     strokeWidth="8"
                     fill="transparent"
-                    className="text-slate-100"
+                    className="text-slate-100 dark:text-slate-800"
                   />
                   <motion.circle
                     cx="64"
@@ -593,7 +613,7 @@ const ProfilePage = () => {
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-slate-800">{calculateProfileCompletion(user)}%</span>
+                  <span className="text-2xl font-bold text-slate-800 dark:text-white">{calculateProfileCompletion(user)}%</span>
                 </div>
               </div>
               <ul className="space-y-3">
@@ -604,35 +624,35 @@ const ProfilePage = () => {
                   { label: "Socials Linked", done: Object.values(user?.socialLinks || {}).some(v => !!v) }
                 ].map((task, i) => (
                   <li key={i} className="flex items-center gap-3 text-sm">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${task.done ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-300"}`}>
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${task.done ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" : "bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600"}`}>
                       <CheckCircle2 size={12} strokeWidth={3} />
                     </div>
-                    <span className={task.done ? "text-slate-700 font-medium" : "text-slate-400"}>{task.label}</span>
+                    <span className={task.done ? "text-slate-700 dark:text-slate-300 font-medium" : "text-slate-400 dark:text-slate-500"}>{task.label}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
             {/* Account Info */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-              <h3 className="text-lg font-bold text-slate-800 mb-4">Account Status</h3>
+            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Account Status</h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-500">Member Since</span>
-                  <span className="font-bold text-slate-800">{new Date(user?.createdAt).toLocaleDateString()}</span>
+                  <span className="text-slate-500 dark:text-slate-400">Member Since</span>
+                  <span className="font-bold text-slate-800 dark:text-white">{new Date(user?.createdAt).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-500">Status</span>
+                  <span className="text-slate-500 dark:text-slate-400">Status</span>
                   <span className={`px-2 py-0.5 rounded-full text-xs font-bold uppercase ${
-                    user?.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 
-                    user?.status === 'Suspended' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'
+                    user?.status === 'Active' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 
+                    user?.status === 'Suspended' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                   }`}>
                     {user?.status || 'Active'}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-500">Verification</span>
-                  <span className="flex items-center gap-1 text-indigo-600 font-bold">
+                  <span className="text-slate-500 dark:text-slate-400">Verification</span>
+                  <span className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400 font-bold">
                     <Shield size={14} />
                     Verified
                   </span>

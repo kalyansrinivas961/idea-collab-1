@@ -41,10 +41,10 @@ const DashboardPage = () => {
   return (
     <Layout>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800">
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-white">
           Welcome back, {user?.name?.split(" ")[0]}! 👋
         </h1>
-        <p className="text-slate-500 mt-1">
+        <p className="text-slate-500 dark:text-slate-400 mt-1">
           Here's what's happening in your creative network today.
         </p>
       </div>
@@ -52,19 +52,19 @@ const DashboardPage = () => {
       <DashboardStats />
 
       {/* Community Search Entry */}
-      <div className="mb-8 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="mb-8 bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+          <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
             <Users size={24} />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-800">Find Collaborators</h2>
-            <p className="text-sm text-slate-500">Search for developers, designers, and creators in the community.</p>
+            <h2 className="text-lg font-bold text-slate-800 dark:text-white">Find Collaborators</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Search for developers, designers, and creators in the community.</p>
           </div>
         </div>
         <Link 
           to="/users" 
-          className="w-full md:w-auto bg-slate-900 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-indigo-600 transition-all flex items-center justify-center gap-2 shadow-sm"
+          className="w-full md:w-auto bg-slate-900 dark:bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-indigo-600 dark:hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-sm dark:shadow-none"
         >
           <Search size={16} />
           Search Creators
