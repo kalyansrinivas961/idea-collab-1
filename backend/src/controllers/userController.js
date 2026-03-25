@@ -138,18 +138,94 @@ exports.getSavedIdeas = async (req, res) => {
 
 exports.searchUsers = async (req, res) => {
   const query = req.query.query || "";
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
+  const role = req.query.role;
+  const location = req.query.location;
+  const skill = req.query.skill;
+
   try {
-    const searchRegex = new RegExp(query, "i");
-    const users = await User.find({
-      $or: [
-        { name: searchRegex },
-        { email: searchRegex },
-        { headline: searchRegex },
-        { skills: { $in: [searchRegex] } }
-      ]
-    }).select("name avatarUrl headline role skills");
+    let filter = { status: "Active" };
     
-    res.json(users);
+    // Add specific filters if provided
+    if (role) filter.role = role;
+    if (location) filter.location = new RegExp(location, "i");
+    if (skill) filter.skills = { $in: [new RegExp(skill, "i")] };
+
+    let users;
+    let total;
+
+    if (query) {
+      // 1. Try Exact Match for Name or Email first (Highest Priority)
+      const exactMatch = await User.find({
+        ...filter,
+        $or: [
+          { name: new RegExp(`^${query}$`, "i") },
+          { email: query.toLowerCase() }
+        ]
+      }).select("name avatarUrl headline role skills reputation location").limit(limit);
+
+      if (exactMatch.length > 0) {
+        users = exactMatch;
+        total = exactMatch.length;
+      } else {
+        // 2. Use Text Search with relevance scoring
+        users = await User.find(
+          { ...filter, $text: { $search: query } },
+          { score: { $meta: "textScore" } }
+        )
+        .sort({ score: { $meta: "textScore" } })
+        .skip(skip)
+        .limit(limit)
+        .select("name avatarUrl headline role skills reputation location");
+        
+        total = await User.countDocuments({ ...filter, $text: { $search: query } });
+
+        // 3. Fallback to Regex if Text Search returns nothing (Partial Matches)
+        if (users.length === 0) {
+          const searchRegex = new RegExp(query, "i");
+          users = await User.find({
+            ...filter,
+            $or: [
+              { name: searchRegex },
+              { email: searchRegex },
+              { headline: searchRegex },
+              { skills: { $in: [searchRegex] } }
+            ]
+          })
+          .skip(skip)
+          .limit(limit)
+          .select("name avatarUrl headline role skills reputation location");
+          
+          total = await User.countDocuments({
+            ...filter,
+            $or: [
+              { name: searchRegex },
+              { email: searchRegex },
+              { headline: searchRegex },
+              { skills: { $in: [searchRegex] } }
+            ]
+          });
+        }
+      }
+    } else {
+      // Generic discovery (no query)
+      users = await User.find(filter)
+        .sort({ reputation: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .select("name avatarUrl headline role skills reputation location");
+      
+      total = await User.countDocuments(filter);
+    }
+    
+    res.json({
+      users,
+      page,
+      pages: Math.ceil(total / limit),
+      total
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
