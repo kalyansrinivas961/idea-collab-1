@@ -4,11 +4,10 @@ const User = require("../models/User");
 const EmailOtp = require("../models/EmailOtp");
 const mongoose = require("mongoose");
 
-// Mock nodemailer
-jest.mock("nodemailer", () => ({
-  createTransport: jest.fn().mockReturnValue({
-    sendMail: jest.fn().mockResolvedValue(true),
-  }),
+// Mock SendGrid
+jest.mock("@sendgrid/mail", () => ({
+  setApiKey: jest.fn(),
+  send: jest.fn().mockResolvedValue(true),
 }));
 
 describe("OTP Workflow", () => {

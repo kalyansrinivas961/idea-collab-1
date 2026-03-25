@@ -1,39 +1,31 @@
-const nodemailer = require("nodemailer");
+const sgMail = require("@sendgrid/mail");
 
+/**
+ * Send email using SendGrid API
+ * @param {Object} options - Email options (email, subject, message, html)
+ */
 const sendEmail = async (options) => {
   const MAX_RETRIES = 3;
   let retryCount = 0;
 
-  // Check if SMTP is configured
-  if (!process.env.SMTP_HOST || !process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+  // Configure SendGrid with API Key
+  if (!process.env.SENDGRID_API_KEY) {
     console.warn("\n--- [MOCK EMAIL MODE] ---");
     console.warn("Recipient:", options.email);
     console.warn("OTP/Message:", options.message);
-    console.warn("To send real emails, please configure SMTP settings in .env");
+    console.warn("To send real emails, please configure SENDGRID_API_KEY in .env");
     console.warn("-------------------------\n");
     return true;
   }
 
-  // Create transporter with timeout and pool
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT) || 587,
-    secure: process.env.SMTP_PORT == 465,
-    auth: {
-      user: process.env.SMTP_EMAIL,
-      pass: process.env.SMTP_PASSWORD,
-    },
-    tls: {
-      rejectUnauthorized: false
-    },
-    connectionTimeout: 10000, // 10 seconds
-    greetingTimeout: 5000,   // 5 seconds
-    socketTimeout: 15000,    // 15 seconds
-  });
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-  const message = {
-    from: `${process.env.FROM_NAME || "IdeaCollab"} <${process.env.FROM_EMAIL || process.env.SMTP_EMAIL}>`,
+  const msg = {
     to: options.email,
+    from: {
+      email: process.env.FROM_EMAIL || "ak.srinivas961@gmail.com",
+      name: process.env.FROM_NAME || "IdeaCollab"
+    },
     subject: options.subject,
     text: options.message,
     html: options.html || `<p>${options.message}</p>`,
@@ -41,19 +33,21 @@ const sendEmail = async (options) => {
 
   const attemptSend = async () => {
     try {
-      await transporter.sendMail(message);
-      console.log(`[EMAIL SUCCESS] Sent to ${options.email} (Attempt ${retryCount + 1})`);
+      await sgMail.send(msg);
+      console.log(`[SENDGRID SUCCESS] Email sent to ${options.email} (Attempt ${retryCount + 1})`);
       return true;
     } catch (error) {
       retryCount++;
-      console.error(`[EMAIL ERROR] Attempt ${retryCount} failed for ${options.email}:`, error.message);
+      const errorMessage = error.response ? error.response.body : error.message;
+      console.error(`[SENDGRID ERROR] Attempt ${retryCount} failed for ${options.email}:`, errorMessage);
       
       if (retryCount < MAX_RETRIES) {
+        // Exponential backoff
         const delay = Math.pow(2, retryCount) * 1000;
         await new Promise(resolve => setTimeout(resolve, delay));
         return attemptSend();
       }
-      throw error;
+      throw new Error(`Failed to send email via SendGrid: ${JSON.stringify(errorMessage)}`);
     }
   };
 
