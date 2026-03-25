@@ -254,6 +254,9 @@ const Layout = ({ children }) => {
                 <NavLink to="/ideas" className="text-slate-600 hover:text-indigo-600 font-medium">
                   Ideas
                 </NavLink>
+                <NavLink to="/users" className="text-slate-600 hover:text-indigo-600 font-medium">
+                  Community
+                </NavLink>
                 <NavLink to="/qa" className="text-slate-600 hover:text-indigo-600 flex items-center font-medium">
                   Q&A
                 </NavLink>

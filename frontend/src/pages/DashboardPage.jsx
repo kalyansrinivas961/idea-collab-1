@@ -3,6 +3,7 @@ import api from "../api/client.js";
 import socket from "../api/socket.js";
 import Layout from "../components/Layout.jsx";
 import { Link } from "react-router-dom";
+import { Users, Search } from "lucide-react";
 import LikeButton from "../components/LikeButton.jsx";
 import SaveButton from "../components/SaveButton.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -49,6 +50,26 @@ const DashboardPage = () => {
       </div>
 
       <DashboardStats />
+
+      {/* Community Search Entry */}
+      <div className="mb-8 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+            <Users size={24} />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-slate-800">Find Collaborators</h2>
+            <p className="text-sm text-slate-500">Search for developers, designers, and creators in the community.</p>
+          </div>
+        </div>
+        <Link 
+          to="/users" 
+          className="w-full md:w-auto bg-slate-900 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-indigo-600 transition-all flex items-center justify-center gap-2 shadow-sm"
+        >
+          <Search size={16} />
+          Search Creators
+        </Link>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Feed */}

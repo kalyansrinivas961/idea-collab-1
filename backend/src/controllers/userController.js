@@ -138,18 +138,34 @@ exports.getSavedIdeas = async (req, res) => {
 
 exports.searchUsers = async (req, res) => {
   const query = req.query.query || "";
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 12;
+  const skip = (page - 1) * limit;
+
   try {
     const searchRegex = new RegExp(query, "i");
-    const users = await User.find({
+    const searchQuery = {
       $or: [
         { name: searchRegex },
         { email: searchRegex },
         { headline: searchRegex },
         { skills: { $in: [searchRegex] } }
       ]
-    }).select("name avatarUrl headline role skills");
+    };
+
+    const users = await User.find(searchQuery)
+      .select("name avatarUrl headline role skills email")
+      .skip(skip)
+      .limit(limit);
     
-    res.json(users);
+    const total = await User.countDocuments(searchQuery);
+    
+    res.json({
+      users,
+      total,
+      pages: Math.ceil(total / limit),
+      currentPage: page
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
