@@ -25,6 +25,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import api from "../api/client";
 import Layout from "../components/Layout";
+import ConfirmationModal from "../components/ConfirmationModal";
 import { toast } from "react-hot-toast";
 import { calculateProfileCompletion } from "../utils/user";
 
@@ -39,6 +40,7 @@ const ProfilePage = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState(user?.avatarUrl || "");
   const [avatarFile, setAvatarFile] = useState(null);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   
   // Form States
   const [profileForm, setProfileForm] = useState({
@@ -190,23 +192,6 @@ const ProfilePage = () => {
         <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-100 mb-8 overflow-hidden relative group/header">
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full -mr-32 -mt-32 opacity-50 blur-3xl"></div>
           
-          {/* Prominent Logout Button */}
-          <button
-            onClick={() => {
-              if (window.confirm("Are you sure you want to log out?")) {
-                logout();
-              }
-            }}
-            className="absolute top-6 right-6 p-3 bg-white border border-slate-100 text-slate-400 hover:text-red-600 hover:bg-red-50 hover:border-red-100 rounded-xl shadow-sm transition-all z-20 group/logout"
-            aria-label="Logout Account"
-            title="Sign out of your account"
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold opacity-0 group-hover/header:opacity-100 group-hover/logout:opacity-100 transition-opacity hidden md:inline">Sign Out</span>
-              <LogOut size={20} />
-            </div>
-          </button>
-
           <div className="relative flex flex-col md:flex-row items-center gap-8">
             {/* Avatar Section */}
             <div 
@@ -564,11 +549,7 @@ const ProfilePage = () => {
                           <p className="text-sm text-red-600">Terminate your current session on this device.</p>
                         </div>
                         <button 
-                          onClick={() => {
-                            if (window.confirm("Are you sure you want to log out?")) {
-                              logout();
-                            }
-                          }}
+                          onClick={() => setIsLogoutModalOpen(true)}
                           className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all shadow-lg shadow-red-100 flex items-center gap-2"
                         >
                           <LogOut size={18} />
@@ -661,6 +642,16 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
+      
+      <ConfirmationModal
+        isOpen={isLogoutModalOpen}
+        title="Logout Confirmation"
+        message="Are you sure you want to log out? You will need to sign in again to access your ideas and collaborations."
+        confirmText="Logout"
+        onConfirm={logout}
+        onCancel={() => setIsLogoutModalOpen(false)}
+        isDanger={true}
+      />
     </Layout>
   );
 };

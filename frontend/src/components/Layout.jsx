@@ -22,6 +22,7 @@ import socket from "../api/socket.js";
 import toast from "react-hot-toast";
 import AIChatBox from "./AIChatBox";
 import Footer from "./Footer.jsx";
+import ConfirmationModal from "./ConfirmationModal.jsx";
 import { getNotificationUrl } from "../utils/notification";
 
 const Layout = ({ children }) => {
@@ -31,6 +32,7 @@ const Layout = ({ children }) => {
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
   const [followRequestCount, setFollowRequestCount] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const fetchUnreadMessageCount = () => {
     api
@@ -294,6 +296,14 @@ const Layout = ({ children }) => {
                 <NavLink to="/profile" className="text-slate-600 hover:text-indigo-600 p-2 min-w-[44px] min-h-[44px] justify-center flex items-center" title="Profile" aria-label="Profile">
                   <User className="w-6 h-6" />
                 </NavLink>
+                <button 
+                  onClick={() => setIsLogoutModalOpen(true)}
+                  className="text-slate-600 hover:text-red-600 p-2 min-w-[44px] min-h-[44px] justify-center flex items-center transition-colors"
+                  title="Logout"
+                  aria-label="Logout"
+                >
+                  <LogOut className="w-6 h-6" />
+                </button>
                 {/* Hamburger Menu Button */}
                 <button 
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -409,8 +419,8 @@ const Layout = ({ children }) => {
             </NavLink>
             <button 
               onClick={() => {
-                logout();
                 setIsMobileMenuOpen(false);
+                setIsLogoutModalOpen(true);
               }}
               className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
             >
@@ -425,6 +435,16 @@ const Layout = ({ children }) => {
       </main>
       <Footer />
       <AIChatBox />
+      
+      <ConfirmationModal
+        isOpen={isLogoutModalOpen}
+        title="Logout Confirmation"
+        message="Are you sure you want to log out? You will need to sign in again to access your ideas and collaborations."
+        confirmText="Logout"
+        onConfirm={logout}
+        onCancel={() => setIsLogoutModalOpen(false)}
+        isDanger={true}
+      />
     </div>
   );
 };

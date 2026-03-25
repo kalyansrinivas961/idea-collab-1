@@ -4,6 +4,7 @@ import { ChevronLeft, ArrowUp, ArrowDown, Check, MessageSquare, Trash2, Reply } 
 import Layout from "../components/Layout.jsx";
 import api from "../api/client.js";
 import { useAuth } from "../context/AuthContext.jsx";
+import ConfirmationModal from "../components/ConfirmationModal.jsx";
 import toast from "react-hot-toast";
 
 const ProblemDetailPage = () => {
@@ -19,6 +20,8 @@ const ProblemDetailPage = () => {
   const [submitting, setSubloading] = useState(false);
   const [replyTo, setReplyTo] = useState(null); // ID of solution being replied to
   const [replyText, setReplyText] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchProblem = async () => {
     try {
@@ -39,14 +42,15 @@ const ProblemDetailPage = () => {
   }, [id]);
 
   const handleDeleteProblem = async () => {
-    if (!window.confirm("Are you sure you want to permanently delete this question and all its solutions? This action cannot be undone.")) return;
-
+    setIsDeleting(true);
     try {
       await api.delete(`/qa/problems/${id}`);
       toast.success("Question deleted successfully");
       navigate("/qa");
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to delete question");
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
     }
   };
 
@@ -150,7 +154,7 @@ const ProblemDetailPage = () => {
           
           {isAuthor && (
             <button 
-              onClick={handleDeleteProblem}
+              onClick={() => setIsDeleteModalOpen(true)}
               className="flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-bold transition-all border border-red-100"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -416,10 +420,21 @@ const ProblemDetailPage = () => {
               You cannot reply to your own question directly. However, you can reply to other users' solutions to discuss their approach.
             </p>
           </div>
-        )}
-      </div>
-    </Layout>
-  );
-};
+         )}
+       </div>
+       
+       <ConfirmationModal
+         isOpen={isDeleteModalOpen}
+         title="Delete Question"
+         message="Are you sure you want to permanently delete this question and all its solutions? This action cannot be undone."
+         confirmText="Delete"
+         onConfirm={handleDeleteProblem}
+         onCancel={() => setIsDeleteModalOpen(false)}
+         isDanger={true}
+         isLoading={isDeleting}
+       />
+     </Layout>
+   );
+ };
 
 export default ProblemDetailPage;
