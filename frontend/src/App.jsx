@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext.jsx";
+import { ThemeProvider } from "./context/ThemeContext.jsx";
 import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
@@ -29,161 +30,163 @@ import ProblemDetailPage from "./pages/ProblemDetailPage.jsx";
 
 const App = () => {
   return (
-    <AuthProvider>
-      <Toaster position="top-right" reverseOrder={false} />
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/terms" element={<TermsPage />} />
-        <Route path="/privacy" element={<PrivacyPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/messages"
-          element={
-            <ProtectedRoute>
-              <ChatPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/saved-ideas"
-          element={
-            <ProtectedRoute>
-              <SavedIdeasPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/follow-requests"
-          element={
-            <ProtectedRoute>
-              <FollowRequestsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/followers"
-          element={
-            <ProtectedRoute>
-              <FollowersPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/following"
-          element={
-            <ProtectedRoute>
-              <FollowingPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/users"
-          element={
-            <ProtectedRoute>
-              <UsersPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/ideas"
-          element={
-            <ProtectedRoute>
-              <IdeasListPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/ideas/new"
-          element={
-            <ProtectedRoute>
-              <AddIdeaPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/ideas/:id"
-          element={
-            <ProtectedRoute>
-              <IdeaDetailsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/qa"
-          element={
-            <ProtectedRoute>
-              <QAListPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/qa/post"
-          element={
-            <ProtectedRoute>
-              <PostProblemPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/qa/problem/:id"
-          element={
-            <ProtectedRoute>
-              <ProblemDetailPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/collaborations"
-          element={
-            <ProtectedRoute>
-              <CollaborationRequestsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/change-password"
-          element={
-            <ProtectedRoute>
-              <ChangePasswordPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/notifications"
-          element={
-            <ProtectedRoute>
-              <NotificationHistoryPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/users/:id"
-          element={
-            <ProtectedRoute>
-              <UserProfilePage />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Toaster position="top-right" reverseOrder={false} />
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/messages"
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/saved-ideas"
+            element={
+              <ProtectedRoute>
+                <SavedIdeasPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/follow-requests"
+            element={
+              <ProtectedRoute>
+                <FollowRequestsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/followers"
+            element={
+              <ProtectedRoute>
+                <FollowersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/following"
+            element={
+              <ProtectedRoute>
+                <FollowingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute>
+                <UsersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ideas"
+            element={
+              <ProtectedRoute>
+                <IdeasListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ideas/new"
+            element={
+              <ProtectedRoute>
+                <AddIdeaPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ideas/:id"
+            element={
+              <ProtectedRoute>
+                <IdeaDetailsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/qa"
+            element={
+              <ProtectedRoute>
+                <QAListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/qa/post"
+            element={
+              <ProtectedRoute>
+                <PostProblemPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/qa/problem/:id"
+            element={
+              <ProtectedRoute>
+                <ProblemDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/collaborations"
+            element={
+              <ProtectedRoute>
+                <CollaborationRequestsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/change-password"
+            element={
+              <ProtectedRoute>
+                <ChangePasswordPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <NotificationHistoryPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/users/:id"
+            element={
+              <ProtectedRoute>
+                <UserProfilePage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 

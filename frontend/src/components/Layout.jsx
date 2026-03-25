@@ -14,9 +14,12 @@ import {
   Handshake,
   UserPlus,
   LogOut,
-  ArrowRight
+  ArrowRight,
+  Sun,
+  Moon
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
+import { useTheme } from "../context/ThemeContext.jsx";
 import api from "../api/client.js";
 import socket from "../api/socket.js";
 import toast from "react-hot-toast";
@@ -26,6 +29,7 @@ import { getNotificationUrl } from "../utils/notification";
 
 const Layout = ({ children }) => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [pendingCount, setPendingCount] = useState(0);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
@@ -233,105 +237,98 @@ const Layout = ({ children }) => {
   }, [user]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b bg-white">
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      <header className="border-b bg-white dark:bg-slate-900 dark:border-slate-800 sticky top-0 z-50 transition-colors duration-300">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <span className="h-8 w-8 rounded bg-indigo-600 text-white flex items-center justify-center font-bold">
+          <Link to="/dashboard" className="flex items-center gap-2 group">
+            <span className="h-8 w-8 rounded bg-indigo-600 text-white flex items-center justify-center font-bold group-hover:bg-indigo-700 transition-colors">
               IC
             </span>
-            <span className="font-semibold text-lg text-slate-800">IdeaCollab</span>
+            <span className="font-bold text-xl text-slate-800 dark:text-white tracking-tight">IdeaCollab</span>
           </Link>
-          {user && (
-            <div className="flex items-center gap-2 md:gap-6">
-              <nav className="hidden md:flex items-center gap-4 text-sm">
-                <NavLink to="/dashboard" className="text-slate-600 hover:text-indigo-600 font-medium">
+          <div className="flex items-center gap-2 md:gap-4">
+            {user && (
+              <nav className="hidden md:flex items-center gap-1 text-sm">
+                <NavLink to="/dashboard" className={({isActive}) => `px-3 py-2 rounded-lg font-medium transition-colors ${isActive ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
                   Dashboard
                 </NavLink>
-                <NavLink to="/ideas/new" className="text-slate-600 hover:text-indigo-600 font-medium">
-                  Add Idea
-                </NavLink>
-                <NavLink to="/ideas" className="text-slate-600 hover:text-indigo-600 font-medium">
+                <NavLink to="/ideas" className={({isActive}) => `px-3 py-2 rounded-lg font-medium transition-colors ${isActive ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
                   Ideas
                 </NavLink>
-                <NavLink to="/qa" className="text-slate-600 hover:text-indigo-600 flex items-center font-medium">
+                <NavLink to="/qa" className={({isActive}) => `px-3 py-2 rounded-lg font-medium transition-colors ${isActive ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
                   Q&A
                 </NavLink>
-                <NavLink to="/collaborations" className="text-slate-600 hover:text-indigo-600 flex items-center font-medium">
-                  Collaborations
+                <NavLink to="/collaborations" className={({isActive}) => `px-3 py-2 rounded-lg font-medium transition-colors flex items-center gap-1.5 ${isActive ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20' : 'text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                  Collabs
                   {pendingCount > 0 && (
-                    <span className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                    <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">
                       {pendingCount}
                     </span>
                   )}
                 </NavLink>
-                <NavLink to="/follow-requests" className="text-slate-600 hover:text-indigo-600 flex items-center font-medium">
-                  Requests
-                  {followRequestCount > 0 && (
-                    <span className="ml-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
-                      {followRequestCount}
-                    </span>
-                  )}
-                </NavLink>
               </nav>
-              <div className="flex items-center gap-1 md:gap-3">
-                <NavLink to="/notifications" className="text-slate-600 hover:text-indigo-600 flex items-center relative p-2 min-w-[44px] min-h-[44px] justify-center" title="Notifications" aria-label="Notifications">
-                  <Bell className="w-6 h-6" />
-                  {unreadNotifCount > 0 && (
-                    <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
-                      {unreadNotifCount}
-                    </span>
-                  )}
-                </NavLink>
-                <NavLink to="/messages" className="text-slate-600 hover:text-indigo-600 flex items-center relative p-2 min-w-[44px] min-h-[44px] justify-center" title="Messages" aria-label="Messages">
-                  <MessageSquare className="w-6 h-6" />
-                  {unreadMessageCount > 0 && (
-                    <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">
-                      {unreadMessageCount}
-                    </span>
-                  )}
-                </NavLink>
-                <NavLink to="/profile" className="text-slate-600 hover:text-indigo-600 p-2 min-w-[44px] min-h-[44px] justify-center flex items-center" title="Profile" aria-label="Profile">
-                  <User className="w-6 h-6" />
-                </NavLink>
-                {/* Hamburger Menu Button */}
-                <button 
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="md:hidden p-2 text-slate-600 hover:text-indigo-600 min-w-[44px] min-h-[44px] flex items-center justify-center"
-                  aria-label="Toggle menu"
-                >
-                  {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                </button>
-              </div>
+            )}
+            
+            <div className="flex items-center gap-1 md:gap-2 border-l dark:border-slate-800 pl-2 md:pl-4">
+              <button 
+                onClick={toggleTheme}
+                className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                aria-label="Toggle Theme"
+                title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+              >
+                {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+              </button>
+
+              {user && (
+                <>
+                  <NavLink to="/notifications" className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 relative transition-colors" title="Notifications">
+                    <Bell className="w-5 h-5" />
+                    {unreadNotifCount > 0 && (
+                      <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold px-1 rounded-full border-2 border-white dark:border-slate-900">
+                        {unreadNotifCount}
+                      </span>
+                    )}
+                  </NavLink>
+                  <NavLink to="/messages" className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 relative transition-colors" title="Messages">
+                    <MessageSquare className="w-5 h-5" />
+                    {unreadMessageCount > 0 && (
+                      <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold px-1 rounded-full border-2 border-white dark:border-slate-900">
+                        {unreadMessageCount}
+                      </span>
+                    )}
+                  </NavLink>
+                  <NavLink to="/profile" className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Profile">
+                    <User className="w-5 h-5" />
+                  </NavLink>
+                  <button 
+                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    className="md:hidden p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  >
+                    {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                  </button>
+                </>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </header>
 
       {/* Mobile Menu Overlay */}
       {user && isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-b shadow-lg animate-fade-in-down fixed w-full z-40 top-[61px]">
+        <div className="md:hidden bg-white dark:bg-slate-900 border-b dark:border-slate-800 shadow-xl animate-fade-in-down fixed w-full z-40 top-[61px] max-h-[calc(100vh-61px)] overflow-y-auto">
           <nav className="flex flex-col p-4 space-y-1">
             <NavLink 
               to="/dashboard" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
             >
               <LayoutDashboard className="w-5 h-5" />
               Dashboard
             </NavLink>
             <NavLink 
-              to="/ideas/new" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
-            >
-              <PlusSquare className="w-5 h-5" />
-              Add Idea
-            </NavLink>
-            <NavLink 
               to="/ideas" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
             >
               <Lightbulb className="w-5 h-5" />
               Ideas
@@ -339,7 +336,7 @@ const Layout = ({ children }) => {
             <NavLink 
               to="/qa" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
             >
               <HelpCircle className="w-5 h-5" />
               Q&A
@@ -347,7 +344,7 @@ const Layout = ({ children }) => {
             <NavLink 
               to="/collaborations" 
               onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
+              className={({isActive}) => `flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
             >
               <div className="flex items-center gap-3">
                 <Handshake className="w-5 h-5" />
@@ -357,74 +354,36 @@ const Layout = ({ children }) => {
                 <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">{pendingCount}</span>
               )}
             </NavLink>
-            <NavLink 
-              to="/notifications" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
-            >
-              <div className="flex items-center gap-3">
-                <Bell className="w-5 h-5" />
-                Notifications
-              </div>
-              {unreadNotifCount > 0 && (
-                <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">{unreadNotifCount}</span>
-              )}
-            </NavLink>
-            <NavLink 
-              to="/profile" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
-            >
-              <User className="w-5 h-5" />
-              My Profile
-            </NavLink>
-            <NavLink 
-              to="/followers" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
-            >
-              <UserPlus className="w-5 h-5" />
-              Followers
-            </NavLink>
-            <NavLink 
-              to="/following" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
-            >
-              <UserPlus className="w-5 h-5" />
-              Following
-            </NavLink>
-            <NavLink 
-              to="/follow-requests" 
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={({isActive}) => `flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}
-            >
-              <div className="flex items-center gap-3">
-                <UserPlus className="w-5 h-5" />
-                Follow Requests
-              </div>
-              {followRequestCount > 0 && (
-                <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">{followRequestCount}</span>
-              )}
-            </NavLink>
-            <button 
-              onClick={() => {
-                logout();
-                setIsMobileMenuOpen(false);
-              }}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
-            >
-              <LogOut className="w-5 h-5" />
-              Logout
-            </button>
+            <div className="pt-2 mt-2 border-t dark:border-slate-800">
+              <NavLink 
+                to="/profile" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}
+              >
+                <User className="w-5 h-5" />
+                My Profile
+              </NavLink>
+              <button 
+                onClick={() => {
+                  logout();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+              >
+                <LogOut className="w-5 h-5" />
+                Logout
+              </button>
+            </div>
           </nav>
         </div>
       )}
-      <main className={`flex-1 bg-slate-50 ${window.location.pathname.startsWith('/messages') ? 'p-0' : ''}`}>
+
+      <main className={`flex-1 ${window.location.pathname.startsWith('/messages') ? 'p-0' : 'bg-slate-50 dark:bg-slate-950 transition-colors duration-300'}`}>
         <div className={`${window.location.pathname.startsWith('/messages') ? 'max-w-full px-0 py-0 h-full' : 'max-w-6xl mx-auto px-4 py-6'}`}>{children}</div>
       </main>
-      <Footer />
+
       <AIChatBox />
+      <Footer />
     </div>
   );
 };

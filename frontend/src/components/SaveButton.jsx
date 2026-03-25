@@ -37,10 +37,10 @@ const SaveButton = ({ idea }) => {
     <button
       onClick={handleToggleSave}
       disabled={loading}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all ${
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 ${
         isSaved
-          ? "bg-indigo-50 border-indigo-200 text-indigo-600"
-          : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:border-slate-300"
+          ? "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 shadow-sm"
+          : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
       }`}
       title={isSaved ? "Unsave" : "Save"}
     >

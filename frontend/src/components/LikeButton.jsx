@@ -31,10 +31,10 @@ const LikeButton = ({ idea }) => {
   return (
     <button 
       onClick={handleToggleLike}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all ${
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all duration-300 ${
         hasLiked 
-          ? "bg-rose-50 border-rose-200 text-rose-600" 
-          : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:border-slate-300"
+          ? "bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 shadow-sm" 
+          : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
       }`}
       title={hasLiked ? "Unlike" : "Like"}
     >
