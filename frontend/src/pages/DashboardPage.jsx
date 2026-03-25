@@ -91,8 +91,8 @@ const DashboardPage = () => {
           </div>
 
           <div className="flex items-center justify-between">
-            <h2 className="font-bold text-xl text-slate-800">Latest Ideas</h2>
-            <Link to="/ideas" className="text-sm text-indigo-600 font-medium hover:underline">
+            <h2 className="font-bold text-xl text-slate-800 dark:text-white">Latest Ideas</h2>
+            <Link to="/ideas" className="text-sm text-indigo-600 dark:text-indigo-400 font-medium hover:underline">
               View all
             </Link>
           </div>
@@ -101,10 +101,10 @@ const DashboardPage = () => {
             {loading ? (
               // Skeleton Loader
               [1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-xl p-6 shadow-sm border animate-pulse">
-                  <div className="h-4 bg-slate-200 rounded w-1/4 mb-4"></div>
-                  <div className="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-slate-200 rounded w-1/2"></div>
+                <div key={i} className="bg-white dark:bg-slate-900 rounded-xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 animate-pulse">
+                  <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/4 mb-4"></div>
+                  <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
                 </div>
               ))
             ) : ideas.length > 0 ? (
@@ -112,67 +112,61 @@ const DashboardPage = () => {
                 <Link
                   key={idea._id}
                   to={`/ideas/${idea._id}`}
-                  className="block bg-white rounded-xl p-5 shadow-sm border hover:border-indigo-300 transition group"
+                  className="block bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 transition group"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="text-lg font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
+                      <h3 className="text-lg font-bold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                         {idea.title}
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700">
+                        <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300">
                           {idea.category}
                         </span>
-                        <span className="text-xs text-slate-400">
+                        <span className="text-xs text-slate-400 dark:text-slate-500">
                           • {new Date(idea.createdAt).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
                   </div>
                   
-                  <p className="text-slate-600 text-sm line-clamp-2 mb-4 leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-2 mb-4 leading-relaxed">
                     {idea.description}
                   </p>
                   
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-2">
                       <img 
                         src={idea.owner?.avatarUrl || "https://via.placeholder.com/30"} 
                         alt={idea.owner?.name}
                         className="w-6 h-6 rounded-full object-cover"
                       />
-                      <span className="text-xs font-medium text-slate-700">
+                      <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
                         {idea.owner?.name}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-4 text-slate-500">
+                    <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400">
                       <div className="flex items-center gap-1 text-xs" onClick={(e) => e.preventDefault()}>
                         <LikeButton idea={idea} />
                       </div>
                       <div className="flex items-center gap-1 text-xs" onClick={(e) => e.preventDefault()}>
                         <SaveButton idea={idea} />
                       </div>
-                      <div className="flex items-center gap-1 text-xs">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        {idea.collaborators?.length || 0}
-                      </div>
                     </div>
                   </div>
                 </Link>
               ))
             ) : (
-              <div className="bg-white rounded-xl p-8 text-center border border-dashed border-slate-300">
-                <div className="mx-auto w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-3">
+              <div className="bg-white dark:bg-slate-900 rounded-xl p-8 text-center border border-dashed border-slate-300 dark:border-slate-700">
+                <div className="mx-auto w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center mb-3">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
                 </div>
-                <h3 className="text-slate-900 font-medium mb-1">No ideas yet</h3>
-                <p className="text-slate-500 text-sm mb-4">Be the first to share something amazing!</p>
-                <Link to="/ideas/new" className="text-indigo-600 font-semibold text-sm hover:underline">
+                <h3 className="text-slate-900 dark:text-white font-medium mb-1">No ideas yet</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">Be the first to share something amazing!</p>
+                <Link to="/ideas/new" className="text-indigo-600 dark:text-indigo-400 font-semibold text-sm hover:underline">
                   Share an idea &rarr;
                 </Link>
               </div>
@@ -184,12 +178,12 @@ const DashboardPage = () => {
         <aside className="space-y-6">
           <RecommendedUsers />
 
-          <div className="bg-gradient-to-br from-indigo-50 to-white rounded-xl p-5 border border-indigo-100 shadow-sm">
-            <h2 className="font-semibold text-indigo-900 mb-3 flex items-center gap-2">
+          <div className="bg-gradient-to-br from-indigo-50 to-white dark:from-slate-900 dark:to-slate-800 rounded-xl p-5 border border-indigo-100 dark:border-slate-800 shadow-sm">
+            <h2 className="font-semibold text-indigo-900 dark:text-indigo-400 mb-3 flex items-center gap-2">
                <span>💡</span> 
                <span>Pro Tips</span>
             </h2>
-            <ul className="text-sm text-slate-600 space-y-3">
+            <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-3">
                <li className="flex items-start gap-2">
                  <span className="text-indigo-500 mt-0.5">•</span>
                  <span>Define your problem statement clearly to attract the right talent.</span>
