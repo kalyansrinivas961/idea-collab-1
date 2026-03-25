@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../api/client.js";
 import socket from "../api/socket.js";
 import Layout from "../components/Layout.jsx";
-import { Link, useNavigate } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Link } from "react-router-dom";
 import LikeButton from "../components/LikeButton.jsx";
 import SaveButton from "../components/SaveButton.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -12,19 +11,8 @@ import RecommendedUsers from "../components/RecommendedUsers.jsx";
 
 const DashboardPage = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [ideas, setIdeas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/ideas?search=${encodeURIComponent(searchQuery.trim())}`);
-    } else {
-      navigate("/ideas");
-    }
-  };
 
   useEffect(() => {
     // Initial fetch
@@ -51,29 +39,13 @@ const DashboardPage = () => {
 
   return (
     <Layout>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">
-            Welcome back, {user?.name?.split(" ")[0]}! 👋
-          </h1>
-          <p className="text-slate-500 mt-1">
-            Here's what's happening in your creative network today.
-          </p>
-        </div>
-
-        {/* Dashboard Search */}
-        <form onSubmit={handleSearch} className="relative w-full md:w-72 lg:w-96">
-          <input
-            type="text"
-            placeholder="Search ideas..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 pl-11 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm"
-            aria-label="Search ideas"
-          />
-          <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-          <button type="submit" className="hidden">Search</button>
-        </form>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-slate-800">
+          Welcome back, {user?.name?.split(" ")[0]}! 👋
+        </h1>
+        <p className="text-slate-500 mt-1">
+          Here's what's happening in your creative network today.
+        </p>
       </div>
 
       <DashboardStats />
