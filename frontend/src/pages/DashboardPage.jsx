@@ -41,10 +41,10 @@ const DashboardPage = () => {
   return (
     <Layout>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-white transition-colors duration-300">
+        <h1 className="text-2xl font-bold text-slate-800">
           Welcome back, {user?.name?.split(" ")[0]}! 👋
         </h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1 transition-colors duration-300">
+        <p className="text-slate-500 mt-1">
           Here's what's happening in your creative network today.
         </p>
       </div>
@@ -52,19 +52,19 @@ const DashboardPage = () => {
       <DashboardStats />
 
       {/* Community Search Entry */}
-      <div className="mb-8 bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6 transition-all duration-300">
+      <div className="mb-8 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 transition-colors duration-300">
+          <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
             <Users size={24} />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-800 dark:text-white transition-colors duration-300">Find Collaborators</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 transition-colors duration-300">Search for developers, designers, and creators in the community.</p>
+            <h2 className="text-lg font-bold text-slate-800">Find Collaborators</h2>
+            <p className="text-sm text-slate-500">Search for developers, designers, and creators in the community.</p>
           </div>
         </div>
         <Link 
           to="/users" 
-          className="w-full md:w-auto bg-slate-900 dark:bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-indigo-600 dark:hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-sm"
+          className="w-full md:w-auto bg-slate-900 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-indigo-600 transition-all flex items-center justify-center gap-2 shadow-sm"
         >
           <Search size={16} />
           Search Creators
@@ -75,7 +75,7 @@ const DashboardPage = () => {
         {/* Main Feed */}
         <div className="lg:col-span-2 space-y-6">
           {/* Call to Action Banner */}
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-700 dark:to-purple-700 rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row items-center justify-between gap-4 transition-all duration-300">
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="text-center md:text-left">
               <h2 className="font-bold text-xl mb-1">Have a brilliant idea?</h2>
               <p className="text-indigo-100 text-sm opacity-90">
@@ -91,105 +91,120 @@ const DashboardPage = () => {
           </div>
 
           <div className="flex items-center justify-between">
-            <h2 className="font-bold text-xl text-slate-800 dark:text-white transition-colors duration-300">Latest Ideas</h2>
-            <Link to="/ideas" className="text-sm text-indigo-600 dark:text-indigo-400 font-medium hover:underline transition-colors duration-300">
+            <h2 className="font-bold text-xl text-slate-800">Latest Ideas</h2>
+            <Link to="/ideas" className="text-sm text-indigo-600 font-medium hover:underline">
               View all
             </Link>
           </div>
 
           <div className="space-y-4">
             {loading ? (
-              [1, 2, 3].map((n) => (
-                <div key={n} className="bg-white dark:bg-slate-900 h-32 rounded-xl animate-pulse border dark:border-slate-800"></div>
+              // Skeleton Loader
+              [1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-xl p-6 shadow-sm border animate-pulse">
+                  <div className="h-4 bg-slate-200 rounded w-1/4 mb-4"></div>
+                  <div className="h-4 bg-slate-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-slate-200 rounded w-1/2"></div>
+                </div>
               ))
             ) : ideas.length > 0 ? (
               ideas.map((idea) => (
-                <div 
-                  key={idea._id} 
-                  className="bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all duration-300 group"
+                <Link
+                  key={idea._id}
+                  to={`/ideas/${idea._id}`}
+                  className="block bg-white rounded-xl p-5 shadow-sm border hover:border-indigo-300 transition group"
                 >
-                  <div className="flex justify-between items-start mb-3">
-                    <Link to={`/ideas/${idea._id}`} className="flex-1">
-                      <h3 className="font-bold text-lg text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
                         {idea.title}
                       </h3>
-                    </Link>
-                    <div className="flex gap-2">
-                      <LikeButton idea={idea} />
-                      <SaveButton idea={idea} />
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700">
+                          {idea.category}
+                        </span>
+                        <span className="text-xs text-slate-400">
+                          • {new Date(idea.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   
-                  <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-2 mb-4 transition-colors duration-300">
+                  <p className="text-slate-600 text-sm line-clamp-2 mb-4 leading-relaxed">
                     {idea.description}
                   </p>
                   
-                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-50 dark:border-slate-800/50 transition-colors duration-300">
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center overflow-hidden">
-                        {idea.owner?.avatarUrl ? (
-                          <img src={idea.owner.avatarUrl} alt={idea.owner.name} className="w-full h-full object-cover" />
-                        ) : (
-                          <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
-                            {idea.owner?.name?.charAt(0)}
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                      <img 
+                        src={idea.owner?.avatarUrl || "https://via.placeholder.com/30"} 
+                        alt={idea.owner?.name}
+                        className="w-6 h-6 rounded-full object-cover"
+                      />
+                      <span className="text-xs font-medium text-slate-700">
                         {idea.owner?.name}
                       </span>
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-md transition-colors duration-300">
-                      {idea.category}
-                    </span>
+
+                    <div className="flex items-center gap-4 text-slate-500">
+                      <div className="flex items-center gap-1 text-xs" onClick={(e) => e.preventDefault()}>
+                        <LikeButton idea={idea} />
+                      </div>
+                      <div className="flex items-center gap-1 text-xs" onClick={(e) => e.preventDefault()}>
+                        <SaveButton idea={idea} />
+                      </div>
+                      <div className="flex items-center gap-1 text-xs">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        {idea.collaborators?.length || 0}
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </Link>
               ))
             ) : (
-              <div className="bg-white dark:bg-slate-900 rounded-2xl p-12 text-center border border-dashed dark:border-slate-800 transition-colors duration-300">
-                <p className="text-slate-500 dark:text-slate-400">No ideas found. Be the first to share one!</p>
+              <div className="bg-white rounded-xl p-8 text-center border border-dashed border-slate-300">
+                <div className="mx-auto w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mb-3">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </div>
+                <h3 className="text-slate-900 font-medium mb-1">No ideas yet</h3>
+                <p className="text-slate-500 text-sm mb-4">Be the first to share something amazing!</p>
+                <Link to="/ideas/new" className="text-indigo-600 font-semibold text-sm hover:underline">
+                  Share an idea &rarr;
+                </Link>
               </div>
             )}
           </div>
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-6">
+        <aside className="space-y-6">
           <RecommendedUsers />
-          
-          <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-300">
-            <h2 className="font-bold text-slate-800 dark:text-white mb-4 transition-colors duration-300">Quick Actions</h2>
-            <div className="space-y-2">
-              <Link 
-                to="/ideas/new" 
-                className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 group"
-              >
-                <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 transition-colors">
-                  <PlusSquare size={18} />
-                </div>
-                <span className="font-medium text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Post an Idea</span>
-              </Link>
-              <Link 
-                to="/qa/post" 
-                className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 group"
-              >
-                <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 transition-colors">
-                  <HelpCircle size={18} />
-                </div>
-                <span className="font-medium text-sm group-hover:text-emerald-600 dark:group-hover:text-emerald-400">Ask a Question</span>
-              </Link>
-              <Link 
-                to="/messages" 
-                className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-300 group"
-              >
-                <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 transition-colors">
-                  <MessageSquare size={18} />
-                </div>
-                <span className="font-medium text-sm group-hover:text-purple-600 dark:group-hover:text-purple-400">Check Messages</span>
-              </Link>
-            </div>
+
+          <div className="bg-gradient-to-br from-indigo-50 to-white rounded-xl p-5 border border-indigo-100 shadow-sm">
+            <h2 className="font-semibold text-indigo-900 mb-3 flex items-center gap-2">
+               <span>💡</span> 
+               <span>Pro Tips</span>
+            </h2>
+            <ul className="text-sm text-slate-600 space-y-3">
+               <li className="flex items-start gap-2">
+                 <span className="text-indigo-500 mt-0.5">•</span>
+                 <span>Define your problem statement clearly to attract the right talent.</span>
+               </li>
+               <li className="flex items-start gap-2">
+                 <span className="text-indigo-500 mt-0.5">•</span>
+                 <span>Update your profile skills to get better recommendations.</span>
+               </li>
+               <li className="flex items-start gap-2">
+                 <span className="text-indigo-500 mt-0.5">•</span>
+                 <span>Engage with other creators by commenting on their ideas.</span>
+               </li>
+            </ul>
           </div>
-        </div>
+        </aside>
       </div>
     </Layout>
   );

@@ -25,29 +25,30 @@ const RecommendedUsers = () => {
   if (loading || users.length === 0) return null;
 
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800 transition-all duration-300">
+    <div className="bg-white rounded-xl p-4 shadow-sm border">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-semibold text-slate-800 dark:text-white transition-colors duration-300">Who to follow</h2>
-        <Link to="/users" className="text-xs text-indigo-600 dark:text-indigo-400 font-medium hover:underline transition-colors duration-300">
+        <h2 className="font-semibold text-slate-800">Who to follow</h2>
+        <Link to="/users" className="text-xs text-indigo-600 font-medium hover:underline">
           View all
         </Link>
       </div>
       <div className="space-y-4">
         {users.map((u) => (
-          <div key={u._id} className="flex items-center gap-3 group">
+          <div key={u._id} className="flex items-center gap-3">
             <Link to={`/users/${u._id}`}>
               <img
                 src={u.avatarUrl || "https://via.placeholder.com/150"}
                 alt={u.name}
-                className="w-10 h-10 rounded-full object-cover border border-slate-100 dark:border-slate-800 transition-colors duration-300"
+                className="w-10 h-10 rounded-full object-cover border border-slate-100"
               />
             </Link>
             <div className="flex-1 min-w-0">
-              <Link to={`/users/${u._id}`} className="block truncate font-medium text-slate-800 dark:text-slate-200 hover:text-indigo-600 dark:hover:text-indigo-400 text-sm transition-colors duration-300">
+              <Link to={`/users/${u._id}`} className="block truncate font-medium text-slate-800 hover:text-indigo-600 text-sm">
                 {u.name}
               </Link>
-              <p className="truncate text-xs text-slate-500 dark:text-slate-400 transition-colors duration-300">{u.headline || u.role || "Member"}</p>
+              <p className="truncate text-xs text-slate-500">{u.headline || u.role || "Member"}</p>
             </div>
+            {/* Could add a follow button here later */}
           </div>
         ))}
       </div>

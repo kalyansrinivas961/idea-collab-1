@@ -55,26 +55,26 @@ const IdeasListPage = () => {
   return (
     <Layout>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-semibold text-slate-800 dark:text-white transition-colors duration-300">
+        <h1 className="text-xl font-semibold text-slate-800">
           {activeTab === "saved" ? "Saved Ideas" : "Explore Ideas"}
         </h1>
-        <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1 transition-colors duration-300">
+        <div className="flex bg-slate-100 rounded-lg p-1">
           <button
             onClick={() => setActiveTab("all")}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-300 ${
+            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
               activeTab === "all"
-                ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                ? "bg-white text-indigo-600 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
             }`}
           >
             All Ideas
           </button>
           <button
             onClick={() => setActiveTab("saved")}
-            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-300 ${
+            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
               activeTab === "saved"
-                ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                ? "bg-white text-indigo-600 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
             }`}
           >
             Saved
@@ -88,7 +88,7 @@ const IdeasListPage = () => {
             e.preventDefault();
             fetchIdeas();
           }}
-          className="flex flex-col md:flex-row items-stretch md:items-center gap-3 bg-white dark:bg-slate-900 rounded-xl p-3 shadow-sm border border-slate-100 dark:border-slate-800 mb-4 transition-all duration-300"
+          className="flex flex-col md:flex-row items-stretch md:items-center gap-3 bg-white rounded-xl p-3 shadow-sm border mb-4"
         >
           <div className="flex-1 relative">
             <input
@@ -96,75 +96,59 @@ const IdeasListPage = () => {
               placeholder="Search by title"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full border dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[44px] transition-all duration-300"
+              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[44px]"
             />
           </div>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="border dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[44px] transition-all duration-300"
+          <div className="w-full md:w-48 relative">
+            <input
+              type="text"
+              placeholder="Filter by category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[44px]"
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full md:w-auto px-6 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition min-h-[44px]"
           >
-            <option value="">All Categories</option>
-            <option value="Tech">Tech</option>
-            <option value="Health">Health</option>
-            <option value="Education">Education</option>
-            <option value="Finance">Finance</option>
-            <option value="Social">Social</option>
-            <option value="Sustainability">Sustainability</option>
-          </select>
+            Apply
+          </button>
         </form>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="space-y-3">
         {ideas.map((idea) => (
-          <div
+          <Link
             key={idea._id}
-            className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all duration-300 flex flex-col group"
+            to={`/ideas/${idea._id}`}
+            className="block bg-white rounded-xl p-4 shadow-sm border hover:border-indigo-200"
           >
-            <div className="flex justify-between items-start mb-4">
-              <Link to={`/ideas/${idea._id}`} className="flex-1">
-                <h3 className="font-bold text-lg text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300">
-                  {idea.title}
-                </h3>
-              </Link>
-              <div className="flex gap-1.5 ml-2">
-                <LikeButton idea={idea} />
-                <SaveButton idea={idea} />
-              </div>
-            </div>
-
-            <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-3 mb-6 transition-colors duration-300">
-              {idea.description}
-            </p>
-
-            <div className="mt-auto pt-4 border-t border-slate-50 dark:border-slate-800/50 flex items-center justify-between transition-colors duration-300">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center overflow-hidden">
-                  {idea.owner?.avatarUrl ? (
-                    <img src={idea.owner.avatarUrl} alt={idea.owner.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
-                      {idea.owner?.name?.charAt(0)}
-                    </span>
-                  )}
-                </div>
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                  {idea.owner?.name}
-                </span>
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-md transition-colors duration-300">
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="font-semibold text-slate-800 hover:text-indigo-600 transition-colors">{idea.title}</h3>
+              <span className="text-xs rounded-full bg-indigo-50 text-indigo-700 px-2 py-0.5">
                 {idea.category}
               </span>
             </div>
-          </div>
+            <p className="text-sm text-slate-600 line-clamp-2 mb-2">{idea.description}</p>
+            <div className="flex items-center justify-between text-xs text-slate-500 mt-2">
+              <div className="flex items-center gap-3">
+                <span className="font-medium text-slate-700">{idea.owner?.name}</span>
+                <LikeButton idea={idea} />
+                <SaveButton idea={idea} />
+              </div>
+              <span>{idea.collaborators?.length || 0} collaborators</span>
+            </div>
+          </Link>
         ))}
+        {ideas.length === 0 && (
+          <div className="bg-white rounded-xl p-6 text-sm text-slate-500 text-center border">
+            {activeTab === "saved"
+              ? "You haven't saved any ideas yet."
+              : "No ideas match the current filters."}
+          </div>
+        )}
       </div>
-      
-      {ideas.length === 0 && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-12 text-center border border-dashed dark:border-slate-800 transition-colors duration-300">
-          <p className="text-slate-500 dark:text-slate-400">No ideas found matching your criteria.</p>
-        </div>
-      )}
     </Layout>
   );
 };
