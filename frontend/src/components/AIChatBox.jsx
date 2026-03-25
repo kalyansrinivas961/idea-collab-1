@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import api from "../api/client";
+import { useAuth } from "../context/AuthContext";
 
 const AIChatBox = () => {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   
   // Hide AI Chatbox on messages page to avoid overlap with chat input
@@ -81,10 +83,12 @@ const AIChatBox = () => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className={`fixed right-6 md:right-8 z-50 flex flex-col items-end transition-all duration-300 ${
+      user ? "bottom-20 md:bottom-8" : "bottom-6 md:bottom-8"
+    }`}>
       {/* Chat Window */}
       {isOpen && (
-        <div className="bg-white dark:bg-slate-900 w-80 sm:w-96 h-[500px] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 mb-4 flex flex-col overflow-hidden animate-fade-in-up">
+        <div className="bg-white dark:bg-slate-900 w-[calc(100vw-48px)] sm:w-96 h-[500px] max-h-[70vh] rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 mb-4 flex flex-col overflow-hidden animate-fade-in-up">
           {/* Header */}
           <div className="bg-gradient-to-r from-indigo-600 to-violet-600 p-4 flex justify-between items-center shadow-md">
             <div className="flex items-center gap-2">
