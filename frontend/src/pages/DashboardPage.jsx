@@ -20,9 +20,9 @@ const DashboardPage = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/users?query=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/ideas?search=${encodeURIComponent(searchQuery.trim())}`);
     } else {
-      navigate("/users");
+      navigate("/ideas");
     }
   };
 
@@ -61,19 +61,19 @@ const DashboardPage = () => {
           </p>
         </div>
 
-        {/* Dashboard Search (Discovery) */}
-         <form onSubmit={handleSearch} className="relative w-full md:w-72 lg:w-96">
-           <input
-             type="text"
-             placeholder="Search users..."
-             value={searchQuery}
-             onChange={(e) => setSearchQuery(e.target.value)}
-             className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 pl-11 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm"
-             aria-label="Search users for discovery"
-           />
-           <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-           <button type="submit" className="hidden">Search</button>
-         </form>
+        {/* Dashboard Search */}
+        <form onSubmit={handleSearch} className="relative w-full md:w-72 lg:w-96">
+          <input
+            type="text"
+            placeholder="Search ideas..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 pl-11 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm"
+            aria-label="Search ideas"
+          />
+          <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+          <button type="submit" className="hidden">Search</button>
+        </form>
       </div>
 
       <DashboardStats />

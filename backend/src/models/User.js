@@ -38,26 +38,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Add text index for advanced search
-userSchema.index({ 
-  name: "text", 
-  email: "text", 
-  headline: "text", 
-  skills: "text", 
-  location: "text", 
-  bio: "text" 
-}, {
-  weights: {
-    name: 10,
-    email: 8,
-    headline: 5,
-    skills: 3,
-    location: 2,
-    bio: 1
-  },
-  name: "UserSearchIndex"
-});
-
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password") || !this.password) return next();
   this.password = await bcrypt.hash(this.password, 10);
