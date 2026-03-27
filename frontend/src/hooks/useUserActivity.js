@@ -4,12 +4,12 @@ import { useAuth } from "../context/AuthContext";
 
 /**
  * Custom hook to track user activity and broadcast status via Socket.io.
- * Displays "active" status for 3 minutes after the last user interaction.
+ * Displays "active" status for 15 minutes after the last user interaction.
  * 
- * @param {number} timeout - Inactivity timeout in milliseconds (default: 3 minutes)
+ * @param {number} timeout - Inactivity timeout in milliseconds (default: 15 minutes)
  * @returns {boolean} isActive - Current activity status of the user
  */
-export const useUserActivity = (timeout = 3 * 60 * 1000) => {
+export const useUserActivity = (timeout = 15 * 60 * 1000) => {
   const { user } = useAuth();
   const [isActive, setIsActive] = useState(true);
   const timeoutRef = useRef(null);

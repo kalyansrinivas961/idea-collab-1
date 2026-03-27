@@ -53,8 +53,14 @@ const UserProfilePage = () => {
 
     socket.on("user_activity", handleUserActivity);
 
+    // Refresh presence status every 30 seconds
+    const refreshInterval = setInterval(() => {
+      fetchProfileData();
+    }, 30000);
+
     return () => {
       socket.off("user_activity", handleUserActivity);
+      clearInterval(refreshInterval);
     };
   }, [id]);
 
@@ -161,8 +167,8 @@ const UserProfilePage = () => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              {userActivityStatus[profileUser._id] === 'active' && (
-                <div className="absolute bottom-2 right-2 md:bottom-4 md:right-4 w-6 h-6 md:w-8 md:h-8 bg-green-500 border-4 border-white dark:border-slate-900 rounded-full shadow-lg ring-4 ring-green-500/20 animate-pulse z-10"></div>
+              {userActivityStatus[profileUser._id] && userActivityStatus[profileUser._id] !== 'offline' && (
+                <div className={`absolute bottom-2 right-2 md:bottom-4 md:right-4 w-6 h-6 md:w-8 md:h-8 bg-${userActivityStatus[profileUser._id] === 'online' ? 'green' : 'amber'}-500 border-4 border-white dark:border-slate-900 rounded-full shadow-lg ring-4 ring-${userActivityStatus[profileUser._id] === 'online' ? 'green' : 'amber'}-500/20 animate-pulse z-10`}></div>
               )}
             </div>
 

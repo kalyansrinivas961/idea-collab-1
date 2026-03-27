@@ -29,6 +29,7 @@ const ChatPage = () => {
   const [activeMenu, setActiveMenu] = useState(null); // track which message menu is open
   const [menuPlacement, setMenuPlacement] = useState('bottom'); // 'top' or 'bottom'
   const [userActivityStatus, setUserActivityStatus] = useState({}); // { userId: 'active' | 'inactive' }
+  const [newlyArrivedIds, setNewlyArrivedIds] = useState(new Set()); // set of message IDs to highlight
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -84,6 +85,21 @@ const ChatPage = () => {
 
       if (isRelevant) {
         setMessages((prev) => [...prev, message]);
+        
+        // Add to newly arrived set for 3s highlight
+        setNewlyArrivedIds(prev => {
+          const next = new Set(prev);
+          next.add(message._id);
+          return next;
+        });
+        setTimeout(() => {
+          setNewlyArrivedIds(prev => {
+            const next = new Set(prev);
+            next.delete(message._id);
+            return next;
+          });
+        }, 3000);
+
         if (!selectedUser.isGroup) markMessagesRead(selectedUser._id);
         setPartnerTyping(false); // Stop typing indicator if message received
       }
@@ -667,8 +683,8 @@ const ChatPage = () => {
                       ) : (
                         <div className="relative">
                           <img src={conv.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.name)}&background=random`} alt={conv.name} className="w-14 h-14 rounded-2xl object-cover shadow-md border-2 border-white dark:border-slate-800" />
-                          {userActivityStatus[conv._id] === 'active' && (
-                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full shadow-sm ring-2 ring-green-500/20 animate-pulse"></div>
+                          {userActivityStatus[conv._id] && userActivityStatus[conv._id] !== 'offline' && (
+                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 bg-${userActivityStatus[conv._id] === 'online' ? 'green' : 'amber'}-500 border-2 border-white dark:border-slate-900 rounded-full shadow-sm ring-2 ring-${userActivityStatus[conv._id] === 'online' ? 'green' : 'amber'}-500/20 animate-pulse`}></div>
                           )}
                         </div>
                       )}
@@ -690,7 +706,9 @@ const ChatPage = () => {
                               {conv.lastMessage.content || (conv.lastMessage.attachment ? 'Sent an attachment' : '...')}
                             </>
                           ) : (
-                            conv.isGroup ? `${conv.members?.length || 0} members` : (conv.headline || "Active now")
+                            <span className={userActivityStatus[conv._id] === 'online' ? 'text-green-600 dark:text-green-400 font-bold' : userActivityStatus[conv._id] === 'away' ? 'text-amber-600 dark:text-amber-400 font-bold' : ''}>
+                              {conv.isGroup ? `${conv.members?.length || 0} members` : (userActivityStatus[conv._id] || conv.headline || "Offline")}
+                            </span>
                           )}
                         </p>
                       </div>
@@ -750,8 +768,8 @@ const ChatPage = () => {
                       ) : (
                         <>
                           <img src={selectedUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}&background=random`} alt={selectedUser.name} className="w-12 h-12 landscape:w-10 landscape:h-10 rounded-2xl object-cover shadow-lg border-2 border-white dark:border-slate-800 transition-transform group-active:scale-95" />
-                          {userActivityStatus[selectedUser._id] === 'active' && (
-                            <div className="absolute -bottom-1 -right-1 w-4 h-4 landscape:w-3 landscape:h-3 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full shadow-sm ring-2 ring-green-500/20 animate-pulse"></div>
+                          {userActivityStatus[selectedUser._id] && userActivityStatus[selectedUser._id] !== 'offline' && (
+                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 landscape:w-3 landscape:h-3 bg-${userActivityStatus[selectedUser._id] === 'online' ? 'green' : 'amber'}-500 border-2 border-white dark:border-slate-900 rounded-full shadow-sm ring-2 ring-${userActivityStatus[selectedUser._id] === 'online' ? 'green' : 'amber'}-500/20 animate-pulse`}></div>
                           )}
                         </>
                       )}
@@ -770,8 +788,8 @@ const ChatPage = () => {
                             </div>
                           </div>
                         ) : (
-                          <span className="text-[10px] md:text-xs landscape:text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider truncate">
-                            {selectedUser.isGroup ? `${selectedUser.members?.length || 0} participants` : (selectedUser.role || "Active Now")}
+                          <span className={`text-[10px] md:text-xs landscape:text-[9px] font-bold uppercase tracking-wider truncate ${userActivityStatus[selectedUser._id] === 'online' ? 'text-green-600 dark:text-green-400' : userActivityStatus[selectedUser._id] === 'away' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                            {selectedUser.isGroup ? `${selectedUser.members?.length || 0} participants` : (userActivityStatus[selectedUser._id] || selectedUser.role || "Offline")}
                           </span>
                         )}
                       </div>
@@ -862,7 +880,14 @@ const ChatPage = () => {
                               </div>
                             )}
                             
-                            <div id={`msg-${msg._id}`} className={`relative rounded-2xl px-4 py-3 text-sm shadow-sm transition-all hover:shadow-md ${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-bl-none'} landscape:px-3 landscape:py-2 landscape:text-xs`}>
+                            <div 
+                              id={`msg-${msg._id}`} 
+                              className={`relative rounded-2xl px-4 py-3 text-sm shadow-sm transition-all duration-500 hover:shadow-md ${
+                                isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-bl-none'
+                              } ${
+                                newlyArrivedIds.has(msg._id) ? 'highlight-new scale-[1.02]' : ''
+                              } landscape:px-3 landscape:py-2 landscape:text-xs`}
+                            >
                               {/* Attachment Display */}
                             {msg.attachment && (
                               <div className="mb-3 rounded-xl overflow-hidden bg-black/5 dark:bg-black/20 ring-1 ring-black/5 dark:ring-white/5">

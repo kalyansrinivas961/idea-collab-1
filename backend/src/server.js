@@ -104,16 +104,18 @@ io.on("connection", (socket) => {
       if (!userId) return;
       const User = require("./models/User");
       const isOnline = status === "active";
+      const presenceStatus = isOnline ? "online" : "offline";
       
       const updatedUser = await User.findByIdAndUpdate(userId, { 
         isOnline, 
+        presenceStatus,
         lastActive: new Date() 
       }, { new: true });
 
       if (updatedUser) {
         // Broadcast to everyone to update their local state
-        io.emit("user_activity", { userId, status });
-        console.log(`[Status Change] User ${userId} (${updatedUser.name}) updated to: ${status} at ${new Date().toISOString()}`);
+        io.emit("user_activity", { userId, status: presenceStatus });
+        console.log(`[Status Change] User ${userId} (${updatedUser.name}) updated to: ${presenceStatus} at ${new Date().toISOString()}`);
       }
     } catch (err) {
       console.error("[Status Change Error]:", err);
@@ -135,11 +137,12 @@ io.on("connection", (socket) => {
           const User = require("./models/User");
           const updatedUser = await User.findByIdAndUpdate(userId, { 
             isOnline: false, 
+            presenceStatus: "offline",
             lastActive: new Date() 
           }, { new: true });
           
           if (updatedUser) {
-            io.emit("user_activity", { userId, status: "inactive" });
+            io.emit("user_activity", { userId, status: "offline" });
             console.log(`[Status Change] User ${userId} (${updatedUser.name}) marked as offline due to disconnection at ${new Date().toISOString()}.`);
           }
         } catch (err) {
@@ -150,37 +153,45 @@ io.on("connection", (socket) => {
   });
 });
 
-// Periodic cleanup: mark users as offline if they've been idle for 30 minutes
-// This runs every 5 minutes and checks the lastActive timestamp
+// Periodic cleanup: mark users as away or offline after inactivity
+// Threshold: 15 minutes for "away", 30 minutes for "offline" (or as requested)
+// The user specifically asked for "away" or "offline" after 15 min.
+// Let's implement: 15 min -> away, 30 min -> offline
 setInterval(async () => {
   try {
     const User = require("./models/User");
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
     const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
     
-    // Find users who are online but have been idle for more than 30 minutes
+    // 1. Mark users as "away" if idle for > 15 mins but < 30 mins
+    const awayUsers = await User.find({ 
+      presenceStatus: "online", 
+      lastActive: { $lt: fifteenMinutesAgo, $gt: thirtyMinutesAgo } 
+    });
+    
+    if (awayUsers.length > 0) {
+      const userIds = awayUsers.map(u => u._id);
+      await User.updateMany({ _id: { $in: userIds } }, { presenceStatus: "away" });
+      userIds.forEach(id => io.emit("user_activity", { userId: id.toString(), status: "away" }));
+      console.log(`Presence Cleanup: ${awayUsers.length} users marked as AWAY`);
+    }
+
+    // 2. Mark users as "offline" if idle for > 30 mins
     const idleUsers = await User.find({ 
       isOnline: true, 
       lastActive: { $lt: thirtyMinutesAgo } 
     });
     
     if (idleUsers.length > 0) {
-      console.log(`Cleanup Task: Marking ${idleUsers.length} idle users as offline.`);
-      
       const userIds = idleUsers.map(u => u._id);
-      
-      await User.updateMany(
-        { _id: { $in: userIds } },
-        { isOnline: false }
-      );
-      
-      userIds.forEach(userId => {
-        io.emit("user_activity", { userId: userId.toString(), status: "inactive" });
-      });
+      await User.updateMany({ _id: { $in: userIds } }, { isOnline: false, presenceStatus: "offline" });
+      userIds.forEach(id => io.emit("user_activity", { userId: id.toString(), status: "offline" }));
+      console.log(`Presence Cleanup: ${idleUsers.length} idle users marked as OFFLINE`);
     }
   } catch (err) {
     console.error("Error in idle user cleanup task:", err);
   }
-}, 5 * 60 * 1000);
+}, 1 * 60 * 1000); // Run every minute for better precision
 
 // Routes
 app.use("/api/auth", authRoutes);
