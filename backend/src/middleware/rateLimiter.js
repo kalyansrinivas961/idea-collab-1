@@ -20,14 +20,4 @@ const relationshipLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-const otpLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 3, // Limit each IP to 3 OTP requests per 10 minutes
-  message: {
-    message: "Too many OTP requests. Please try again after 10 minutes.",
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-module.exports = { passwordChangeLimiter, relationshipLimiter, otpLimiter };
+module.exports = { passwordChangeLimiter, relationshipLimiter };

@@ -14,7 +14,7 @@ const sendEmail = async (options) => {
   if (!hasSmtpSettings && !process.env.BREVO_API_KEY) {
     console.warn("\n--- [MOCK EMAIL MODE] ---");
     console.warn("Recipient:", options.email);
-    console.warn("OTP/Message:", options.message);
+    console.warn("Message:", options.message);
     console.warn("To send real emails, please configure BREVO_SMTP settings or BREVO_API_KEY in .env");
     console.warn("-------------------------\n");
     return true;

@@ -9,7 +9,6 @@ const CollaborationRequest = require("../models/CollaborationRequest");
 const Conversation = require("../models/Conversation");
 const Message = require("../models/Message");
 const Notification = require("../models/Notification");
-const PhoneOtp = require("../models/PhoneOtp");
 
 const BACKUP_DIR = path.join(__dirname, "../../backups");
 if (!fs.existsSync(BACKUP_DIR)) {
@@ -53,7 +52,6 @@ const backupAndCleanup = async () => {
         await Conversation.deleteMany({});
         await Message.deleteMany({});
         await Notification.deleteMany({});
-        await PhoneOtp.deleteMany({});
         console.log("Cleanup complete (non-transactional).");
     } else {
         const session = await mongoose.startSession();
