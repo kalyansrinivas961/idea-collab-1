@@ -523,30 +523,30 @@ const ChatPage = () => {
 
   return (
     <Layout>
-      <div className="bg-white dark:bg-slate-900 md:rounded-xl shadow-sm border-0 md:border overflow-hidden h-[calc(100vh-64px-56px)] md:h-[calc(100vh-140px)] landscape:h-[calc(100vh-64px)] flex flex-col md:flex-row -mx-4 md:mx-0 transition-colors duration-300">
+      <div className="bg-white dark:bg-slate-900 md:rounded-xl shadow-sm border-0 md:border overflow-hidden h-[calc(100vh-64px-56px)] md:h-[calc(100vh-140px)] landscape:h-[calc(100vh-64px)] flex flex-col md:flex-row -mx-4 md:mx-0 transition-colors duration-300 relative">
         {/* Sidebar (Conversation List) */}
         <div className={`w-full md:w-1/3 lg:w-1/4 border-r dark:border-slate-800 flex-col ${selectedUser ? 'hidden md:flex' : 'flex'} h-full bg-white dark:bg-slate-900 transition-colors`}>
           <div className="p-4 border-b dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50 backdrop-blur-sm sticky top-0 z-20 min-h-[64px] landscape:min-h-[50px] landscape:py-2">
-            <h2 className="text-lg font-bold text-slate-800 dark:text-white landscape:text-base">Messages</h2>
-            <div className="flex gap-1.5">
+            <h2 className="text-xl font-black text-slate-800 dark:text-white landscape:text-lg tracking-tight">Messages</h2>
+            <div className="flex gap-2">
               <button 
                 onClick={() => setShowCreateGroup(true)}
-                className="p-2 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-full transition min-w-[40px] min-h-[40px] landscape:min-w-[32px] landscape:min-h-[32px] flex items-center justify-center border border-indigo-100 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm"
+                className="p-2.5 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-2xl transition-all min-w-[44px] min-h-[44px] flex items-center justify-center border border-indigo-100 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm active:scale-90"
                 title="Create Group"
               >
-                <svg className="w-5 h-5 landscape:w-4 landscape:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
               </button>
               <button 
                 onClick={() => setShowContacts(!showContacts)}
-                className="p-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-full transition min-w-[40px] min-h-[40px] landscape:min-w-[32px] landscape:min-h-[32px] flex items-center justify-center shadow-md"
+                className="p-2.5 bg-indigo-600 text-white hover:bg-indigo-700 rounded-2xl transition-all min-w-[44px] min-h-[44px] flex items-center justify-center shadow-lg shadow-indigo-200 active:scale-90"
                 title="New Chat"
               >
-                <svg className="w-5 h-5 landscape:w-4 landscape:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
               </button>
             </div>
           </div>
           
-          <div className="flex-1 overflow-y-auto scrollbar-hide">
+          <div className="flex-1 overflow-y-auto scrollbar-hide overscroll-contain">
             {loading ? (
               <div className="flex flex-col justify-center items-center h-64 gap-3">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
@@ -640,34 +640,34 @@ const ChatPage = () => {
                   <div 
                     key={conv._id}
                     onClick={() => setSelectedUser(conv)}
-                    className={`flex items-center gap-3.5 p-4 hover:bg-slate-50/80 cursor-pointer transition-all relative ${selectedUser?._id === conv._id ? 'bg-indigo-50/50 border-l-4 border-l-indigo-600' : 'border-l-4 border-l-transparent'}`}
+                    className={`flex items-center gap-4 p-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 cursor-pointer transition-all relative border-l-4 ${selectedUser?._id === conv._id ? 'bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-600' : 'border-transparent'}`}
                   >
                     <div className="relative flex-shrink-0">
                       {conv.isGroup ? (
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-md">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-lg">
                           <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                         </div>
                       ) : (
-                        <>
-                          <img src={conv.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.name)}&background=random`} alt={conv.name} className="w-14 h-14 rounded-2xl object-cover shadow-sm border border-slate-100" />
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"></div>
-                        </>
+                        <div className="relative">
+                          <img src={conv.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.name)}&background=random`} alt={conv.name} className="w-14 h-14 rounded-2xl object-cover shadow-md border-2 border-white dark:border-slate-800" />
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full shadow-sm"></div>
+                        </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex justify-between items-baseline mb-0.5">
-                        <h3 className={`text-sm md:text-base landscape:text-xs truncate pr-2 ${conv.unreadCount > 0 || conv.isNew ? 'font-black text-indigo-900' : 'font-bold text-slate-800'}`}>
+                      <div className="flex justify-between items-baseline mb-1">
+                        <h3 className={`text-sm md:text-base landscape:text-xs truncate pr-2 tracking-tight ${conv.unreadCount > 0 || conv.isNew ? 'font-black text-indigo-900 dark:text-indigo-400' : 'font-bold text-slate-800 dark:text-slate-200'}`}>
                           {conv.name}
                         </h3>
-                        <span className={`text-[10px] landscape:text-[9px] whitespace-nowrap ${conv.unreadCount > 0 || conv.isNew ? 'text-indigo-600 font-bold' : 'text-slate-400 font-medium'}`}>
+                        <span className={`text-[10px] landscape:text-[9px] whitespace-nowrap font-bold uppercase tracking-wider ${conv.unreadCount > 0 || conv.isNew ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'}`}>
                           {conv.lastMessage ? new Date(conv.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '12:45 PM'}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <p className={`text-xs landscape:text-[10px] truncate leading-relaxed ${conv.unreadCount > 0 || conv.isNew ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}>
+                        <p className={`text-xs landscape:text-[10px] truncate leading-relaxed font-medium ${conv.unreadCount > 0 || conv.isNew ? 'text-slate-900 dark:text-slate-300' : 'text-slate-500 dark:text-slate-400'}`}>
                           {conv.lastMessage ? (
                             <>
-                              {conv.lastMessage.sender._id === user._id ? 'You: ' : ''}
+                              <span className="opacity-50">{conv.lastMessage.sender._id === user._id ? 'You: ' : ''}</span>
                               {conv.lastMessage.content || (conv.lastMessage.attachment ? 'Sent an attachment' : '...')}
                             </>
                           ) : (
@@ -677,7 +677,7 @@ const ChatPage = () => {
                       </div>
                     </div>
                     {(conv.unreadCount > 0 || conv.isNew) && (
-                      <div className="absolute right-4 bottom-4 min-w-[20px] h-5 bg-indigo-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1.5 shadow-md shadow-indigo-100 animate-pulse">
+                      <div className="absolute right-4 bottom-4 min-w-[20px] h-5 bg-indigo-600 text-white text-[10px] font-black rounded-full flex items-center justify-center px-1.5 shadow-lg shadow-indigo-200 dark:shadow-none animate-pulse">
                         {conv.unreadCount || 1}
                       </div>
                     )}
@@ -701,68 +701,72 @@ const ChatPage = () => {
         </div>
 
         {/* Chat Area */}
-        <div className={`flex-1 flex flex-col bg-slate-50/30 dark:bg-slate-950/30 ${selectedUser ? 'fixed inset-0 z-[70] md:relative md:z-auto' : 'hidden md:flex'} h-full transition-all duration-300`}>
+        <AnimatePresence mode="wait">
           {selectedUser ? (
-            <>
+            <motion.div 
+              key="chat-area"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className={`flex-1 flex flex-col bg-slate-50/30 dark:bg-slate-950/30 fixed inset-0 z-[70] md:relative md:z-auto h-full transition-all duration-300`}
+            >
               {/* Header */}
-              <div className="p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b dark:border-slate-800 flex items-center justify-between shadow-sm z-20 sticky top-0 min-h-[64px] landscape:min-h-[50px] landscape:py-1.5">
+              <div className="p-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b dark:border-slate-800 flex items-center justify-between shadow-sm z-20 sticky top-0 min-h-[72px] landscape:min-h-[56px]">
                 <div className="flex items-center gap-3 min-w-0">
                     <button 
                       onClick={() => setSelectedUser(null)}
-                      className="md:hidden text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 p-2 -ml-1 min-w-[44px] min-h-[44px] landscape:min-w-[36px] landscape:min-h-[36px] flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full transition-colors"
+                      className="md:hidden text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 p-2 -ml-1 min-w-[48px] min-h-[48px] flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-2xl transition-all active:scale-90"
                     >
-                      <svg className="w-5 h-5 landscape:w-4 landscape:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
                     
-                    <div className="relative flex-shrink-0">
+                    <div className="relative flex-shrink-0 group cursor-pointer" onClick={() => {/* Show user profile */}}>
                       {selectedUser.isGroup ? (
-                        <div className="w-11 h-11 landscape:w-9 landscape:h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-sm">
-                          <svg className="w-6 h-6 landscape:w-5 landscape:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        <div className="w-12 h-12 landscape:w-10 landscape:h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-lg">
+                          <svg className="w-7 h-7 landscape:w-6 landscape:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                         </div>
                       ) : (
                         <>
-                          <img src={selectedUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}&background=random`} alt={selectedUser.name} className="w-11 h-11 landscape:w-9 landscape:h-9 rounded-xl object-cover shadow-sm border border-slate-100 dark:border-slate-800" />
-                          <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 landscape:w-2.5 landscape:h-2.5 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+                          <img src={selectedUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}&background=random`} alt={selectedUser.name} className="w-12 h-12 landscape:w-10 landscape:h-10 rounded-2xl object-cover shadow-lg border-2 border-white dark:border-slate-800 transition-transform group-active:scale-95" />
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 landscape:w-3 landscape:h-3 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full shadow-sm"></div>
                         </>
                       )}
                     </div>
                     
                     <div className="min-w-0">
-                      <h3 className="font-bold text-slate-800 dark:text-white text-sm md:text-base landscape:text-xs leading-tight truncate pr-1">{selectedUser.name}</h3>
+                      <h3 className="font-black text-slate-800 dark:text-white text-base md:text-lg landscape:text-sm leading-tight truncate pr-1 tracking-tight">{selectedUser.name}</h3>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         {partnerTyping ? (
                           <div className="flex items-center gap-1">
-                            <span className="text-[10px] md:text-xs landscape:text-[9px] text-indigo-600 dark:text-indigo-400 font-bold animate-pulse uppercase tracking-wider">typing</span>
+                            <span className="text-[10px] md:text-xs landscape:text-[9px] text-indigo-600 dark:text-indigo-400 font-black animate-pulse uppercase tracking-widest">typing</span>
                             <div className="flex gap-0.5">
-                              <div className="w-1 h-1 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                              <div className="w-1 h-1 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                              <div className="w-1 h-1 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-bounce"></div>
+                              <div className="w-1.5 h-1.5 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                              <div className="w-1.5 h-1.5 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                              <div className="w-1.5 h-1.5 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-bounce"></div>
                             </div>
                           </div>
                         ) : (
-                          <span className="text-[10px] md:text-xs landscape:text-[9px] text-slate-400 dark:text-slate-500 font-medium truncate">
-                            {selectedUser.isGroup ? `${selectedUser.members?.length || 0} participants` : (selectedUser.role || "Member")}
+                          <span className="text-[10px] md:text-xs landscape:text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider truncate">
+                            {selectedUser.isGroup ? `${selectedUser.members?.length || 0} participants` : (selectedUser.role || "Active Now")}
                           </span>
                         )}
                       </div>
                     </div>
                   </div>
 
-                <div className="flex items-center gap-1 md:gap-2">
-                  <button className="hidden sm:flex p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-full transition-colors landscape:p-1.5">
-                    <svg className="w-5 h-5 landscape:w-4 landscape:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                  </button>
-                  <button className="hidden sm:flex p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-full transition-colors landscape:p-1.5">
-                    <svg className="w-5 h-5 landscape:w-4 landscape:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                <div className="flex items-center gap-1 md:gap-3">
+                  <button className="hidden sm:flex p-2.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-2xl transition-all active:scale-90">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                   </button>
                   <div className="relative">
                     <button 
                       onClick={() => setShowClearConfirm(!showClearConfirm)}
-                      className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all min-w-[40px] min-h-[40px] landscape:min-w-[32px] landscape:min-h-[32px] flex items-center justify-center"
+                      className="p-2.5 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-all min-w-[48px] min-h-[48px] flex items-center justify-center active:scale-90"
                     >
-                      <svg className="w-5 h-5 landscape:w-4 landscape:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                       </svg>
                     </button>
@@ -860,8 +864,8 @@ const ChatPage = () => {
                                       </svg>
                                     </div>
                                     <div className="min-w-0">
-                                      <span className="block font-bold truncate text-xs">{msg.attachment.originalName || "Document"}</span>
-                                      <span className={`block text-[10px] uppercase font-bold opacity-60 mt-0.5`}>{msg.attachment.fileSize || "1.2 MB"}</span>
+                                      <span className="block font-black truncate text-xs tracking-tight">{msg.attachment.originalName || "Document"}</span>
+                                      <span className={`block text-[10px] uppercase font-black opacity-60 mt-0.5 tracking-widest`}>{msg.attachment.fileSize || "1.2 MB"}</span>
                                     </div>
                                   </a>
                                 )}
@@ -875,38 +879,38 @@ const ChatPage = () => {
                                   autoFocus
                                   value={editingMessage.content}
                                   onChange={(e) => setEditingMessage({...editingMessage, content: e.target.value})}
-                                  className={`w-full bg-transparent border-none focus:ring-0 text-sm p-0 resize-none ${isMe ? 'text-white' : 'text-slate-800 dark:text-white'}`}
+                                  className={`w-full bg-transparent border-none focus:ring-0 text-sm p-0 resize-none ${isMe ? 'text-white placeholder:text-white/50' : 'text-slate-800 dark:text-white placeholder:text-slate-400'}`}
                                   rows={2}
                                 />
                                 <div className="flex justify-end gap-2 mt-2">
-                                  <button type="button" onClick={() => setEditingMessage(null)} className="text-[10px] uppercase font-bold opacity-70 hover:opacity-100">Cancel</button>
-                                  <button type="submit" className="text-[10px] uppercase font-bold bg-white/20 px-2 py-1 rounded hover:bg-white/30">Save</button>
+                                  <button type="button" onClick={() => setEditingMessage(null)} className="text-[10px] uppercase font-black opacity-70 hover:opacity-100 tracking-widest">Cancel</button>
+                                  <button type="submit" className="text-[10px] uppercase font-black bg-white/20 px-3 py-1.5 rounded-lg hover:bg-white/30 transition-colors tracking-widest">Save</button>
                                 </div>
                               </form>
                             ) : (
                               msg.content && (
                                 <div className="space-y-1">
-                                  <p className="leading-relaxed whitespace-pre-wrap break-words font-medium">{msg.content}</p>
-                                  {msg.isEdited && <span className="text-[9px] font-bold opacity-60 uppercase tracking-tighter">(Edited)</span>}
+                                  <p className="leading-relaxed whitespace-pre-wrap break-words font-semibold tracking-tight">{msg.content}</p>
+                                  {msg.isEdited && <span className="text-[9px] font-black opacity-60 uppercase tracking-widest">(Edited)</span>}
                                 </div>
                               )
                             )}
                             
-                            <div className={`text-[10px] mt-1.5 flex justify-end items-center gap-1.5 ${isMe ? 'text-indigo-200' : 'text-slate-400 dark:text-slate-500'} font-bold tabular-nums`}>
+                            <div className={`text-[10px] mt-1.5 flex justify-end items-center gap-1.5 ${isMe ? 'text-indigo-200' : 'text-slate-400 dark:text-slate-500'} font-black tabular-nums tracking-wider uppercase`}>
                               {msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                               {isMe && (
                                 <span className="flex items-center">
                                   {msg.status === 'failed' ? (
-                                    <svg className="w-3.5 h-3.5 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    <svg className="w-3.5 h-3.5 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                   ) : msg.status === 'sending' ? (
                                     <div className="w-3 h-3 border-2 border-indigo-200 border-t-transparent rounded-full animate-spin"></div>
                                   ) : msg.read ? (
-                                    <div className="flex -space-x-1">
-                                      <svg className="w-3.5 h-3.5 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                                      <svg className="w-3.5 h-3.5 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                    <div className="flex -space-x-1.5">
+                                      <svg className="w-4 h-4 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                      <svg className="w-4 h-4 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                                     </div>
                                   ) : (
-                                    <svg className="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                    <svg className="w-4 h-4 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                                   )}
                                 </span>
                               )}
@@ -918,12 +922,12 @@ const ChatPage = () => {
                         <div className={`relative message-menu-container flex items-center transition-all duration-200`}>
                           <button
                             onClick={(e) => toggleMessageMenu(e, msg._id)}
-                            className={`p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-full transition-all min-w-[44px] min-h-[44px] landscape:min-w-[32px] landscape:min-h-[32px] landscape:p-1 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${activeMenu === msg._id ? 'opacity-100 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'opacity-0 group-hover:opacity-100'}`}
+                            className={`p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-2xl transition-all min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${activeMenu === msg._id ? 'opacity-100 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'opacity-100 md:opacity-0 group-hover:opacity-100'}`}
                             aria-haspopup="true"
                             aria-expanded={activeMenu === msg._id}
                             title="Message options"
                           >
-                            <svg className="w-5 h-5 landscape:w-4 landscape:h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
                             </svg>
                           </button>
@@ -1076,7 +1080,7 @@ const ChatPage = () => {
                   </div>
                 )}
                 
-                <form onSubmit={handleSendMessage} className="flex items-end gap-2 bg-slate-50 dark:bg-slate-800 p-2 rounded-[1.75rem] relative border border-slate-200 dark:border-slate-700 focus-within:ring-4 focus-within:ring-indigo-500/10 focus-within:border-indigo-500/30 transition-all shadow-inner landscape:p-1 landscape:rounded-2xl">
+                <form onSubmit={handleSendMessage} className="flex items-end gap-2 bg-slate-100 dark:bg-slate-800/50 p-2 rounded-[2rem] relative border border-transparent focus-within:border-indigo-500/50 focus-within:bg-white dark:focus-within:bg-slate-800 transition-all shadow-inner-sm landscape:p-1.5">
                   <input 
                     type="file" 
                     ref={fileInputRef}
@@ -1085,14 +1089,14 @@ const ChatPage = () => {
                     accept="image/*,.pdf,.doc,.docx,.txt"
                   />
                   
-                  <div className="flex items-center gap-1 pl-1">
+                  <div className="flex items-center gap-0.5">
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="p-2.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-700 rounded-full transition-all min-w-[44px] min-h-[44px] landscape:min-w-[36px] landscape:min-h-[36px] landscape:p-1.5 flex items-center justify-center active:scale-90"
+                      className="p-3 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-700 rounded-full transition-all min-w-[48px] min-h-[48px] flex items-center justify-center active:scale-90"
                       title="Attach file"
                     >
-                      <svg className="w-6 h-6 landscape:w-5 landscape:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                       </svg>
                     </button>
@@ -1100,10 +1104,10 @@ const ChatPage = () => {
                     <button
                       type="button"
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                      className="p-2.5 text-slate-400 hover:text-yellow-500 hover:bg-white dark:hover:bg-slate-700 rounded-full transition-all relative min-w-[44px] min-h-[44px] landscape:min-w-[36px] landscape:min-h-[36px] landscape:p-1.5 flex items-center justify-center active:scale-90"
+                      className="p-3 text-slate-500 dark:text-slate-400 hover:text-yellow-500 dark:hover:text-yellow-400 hover:bg-white dark:hover:bg-slate-700 rounded-full transition-all relative min-w-[48px] min-h-[48px] flex items-center justify-center active:scale-90"
                       title="Add emoji"
                     >
-                      <svg className="w-6 h-6 landscape:w-5 landscape:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </button>
@@ -1125,7 +1129,7 @@ const ChatPage = () => {
                   <textarea
                     value={newMessage}
                     onChange={handleInputChange}
-                    placeholder="Message..."
+                    placeholder="Type a message..."
                     rows="1"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
@@ -1133,34 +1137,41 @@ const ChatPage = () => {
                         handleSendMessage(e);
                       }
                     }}
-                    className="flex-1 bg-transparent border-none focus:ring-0 resize-none max-h-32 text-slate-800 dark:text-white placeholder:text-slate-400 font-medium py-3 px-2 min-h-[44px] text-sm md:text-base landscape:py-1 landscape:min-h-[36px] landscape:text-sm"
+                    className="flex-1 bg-transparent border-none focus:ring-0 resize-none max-h-32 text-slate-800 dark:text-white placeholder:text-slate-400 font-medium py-3.5 px-2 min-h-[52px] text-sm md:text-base landscape:py-2 landscape:min-h-[44px]"
                   />
                   
                   <button 
                     type="submit"
                     disabled={!newMessage.trim() && !attachment}
-                    className="bg-indigo-600 text-white p-3 rounded-2xl hover:bg-indigo-700 disabled:opacity-30 disabled:grayscale transition-all shadow-lg shadow-indigo-200 dark:shadow-none active:scale-95 flex items-center justify-center group landscape:p-2 landscape:rounded-xl"
+                    className="bg-indigo-600 text-white p-3.5 rounded-full hover:bg-indigo-700 disabled:opacity-30 disabled:grayscale transition-all shadow-lg shadow-indigo-200 dark:shadow-none active:scale-90 flex items-center justify-center group"
                   >
-                    <svg className="w-5 h-5 landscape:w-4 landscape:h-4 transform group-active:translate-x-1 group-active:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                    <svg className="w-6 h-6 transform group-active:translate-x-1 group-active:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>
                   </button>
                 </form>
               </div>
-            </>
+              </div>
+            </motion.div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-8">
-              <div className="w-32 h-32 bg-white rounded-[2.5rem] flex items-center justify-center mb-8 text-slate-100 shadow-xl shadow-slate-200/50 border border-slate-50">
+            <motion.div 
+              key="no-chat"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 bg-slate-50/30 dark:bg-slate-950/30"
+            >
+              <div className="w-32 h-32 bg-white dark:bg-slate-900 rounded-[2.5rem] flex items-center justify-center mb-8 text-slate-100 dark:text-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-50 dark:border-slate-800">
                 <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2">Your Conversations</h3>
-              <p className="text-sm text-slate-500 text-center max-w-xs leading-relaxed">Select a teammate from the sidebar or start a new group chat to begin collaborating.</p>
-              <button onClick={() => setShowContacts(true)} className="mt-8 bg-indigo-600 text-white px-8 py-3 rounded-2xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all active:scale-95">New Message</button>
-            </div>
+              <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2 tracking-tight">Your Conversations</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 text-center max-w-xs leading-relaxed font-medium">Select a teammate from the sidebar or start a new group chat to begin collaborating.</p>
+              <button onClick={() => setShowContacts(true)} className="mt-8 bg-indigo-600 text-white px-10 py-4 rounded-2xl font-bold hover:bg-indigo-700 shadow-xl shadow-indigo-200 dark:shadow-none transition-all active:scale-95">New Message</button>
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
       </div>
 
       {/* Delete Confirmation Modal */}
