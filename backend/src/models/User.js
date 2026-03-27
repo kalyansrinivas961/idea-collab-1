@@ -13,13 +13,6 @@ const userSchema = new mongoose.Schema(
       enum: ["Active", "Inactive", "Suspended"], 
       default: "Active" 
     },
-    isOnline: { type: Boolean, default: false },
-    presenceStatus: { 
-      type: String, 
-      enum: ["online", "away", "offline"], 
-      default: "offline" 
-    },
-    lastActive: { type: Date, default: Date.now },
     avatarUrl: { type: String, default: "" },
     headline: { type: String, default: "" }, // Professional headline
     skills: [{ type: String }],

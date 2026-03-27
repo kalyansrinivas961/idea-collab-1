@@ -28,7 +28,6 @@ const ChatPage = () => {
   const [forwardModal, setForwardModal] = useState({ show: false, message: null });
   const [activeMenu, setActiveMenu] = useState(null); // track which message menu is open
   const [menuPlacement, setMenuPlacement] = useState('bottom'); // 'top' or 'bottom'
-  const [userActivityStatus, setUserActivityStatus] = useState({}); // { userId: 'active' | 'inactive' }
   const [newlyArrivedIds, setNewlyArrivedIds] = useState(new Set()); // set of message IDs to highlight
   
   const messagesEndRef = useRef(null);
@@ -189,10 +188,6 @@ const ChatPage = () => {
       );
     };
 
-    const handleUserActivity = ({ userId, status }) => {
-      setUserActivityStatus(prev => ({ ...prev, [userId]: status }));
-    };
-
     socket.on("chat:message", handleMessage);
     socket.on("group:created", handleGroupCreated);
     socket.on("typing", handleTyping);
@@ -200,7 +195,6 @@ const ChatPage = () => {
     socket.on("chat:read", handleRead);
     socket.on("chat:message_deleted", handleMessageDeleted);
     socket.on("chat:message_updated", handleMessageUpdated);
-    socket.on("user_activity", handleUserActivity);
 
     // Close menu on outside click
     const handleClickOutside = (e) => {
@@ -229,7 +223,6 @@ const ChatPage = () => {
       socket.off("chat:read", handleRead);
       socket.off("chat:message_deleted", handleMessageDeleted);
     socket.off("chat:message_updated", handleMessageUpdated);
-    socket.off("user_activity", handleUserActivity);
     window.removeEventListener('mousedown', handleClickOutside);
     window.removeEventListener('keydown', handleKeyDown);
     };
@@ -648,7 +641,6 @@ const ChatPage = () => {
                     >
                       <div className="relative">
                         <img src={contact.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(contact.name)}&background=random`} alt={contact.name} className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm group-hover:scale-105 transition-transform" />
-                        <div className="absolute bottom-0.5 right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-bold text-slate-800 text-sm truncate">{contact.name}</div>
@@ -683,9 +675,6 @@ const ChatPage = () => {
                       ) : (
                         <div className="relative">
                           <img src={conv.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.name)}&background=random`} alt={conv.name} className="w-14 h-14 rounded-2xl object-cover shadow-md border-2 border-white dark:border-slate-800" />
-                          {userActivityStatus[conv._id] && userActivityStatus[conv._id] !== 'offline' && (
-                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 bg-${userActivityStatus[conv._id] === 'online' ? 'green' : 'amber'}-500 border-2 border-white dark:border-slate-900 rounded-full shadow-sm ring-2 ring-${userActivityStatus[conv._id] === 'online' ? 'green' : 'amber'}-500/20 animate-pulse`}></div>
-                          )}
                         </div>
                       )}
                     </div>
@@ -706,17 +695,10 @@ const ChatPage = () => {
                               {conv.lastMessage.content || (conv.lastMessage.attachment ? 'Sent an attachment' : '...')}
                             </>
                           ) : (
-                            <span className={userActivityStatus[conv._id] === 'online' ? 'text-green-600 dark:text-green-400 font-bold' : userActivityStatus[conv._id] === 'away' ? 'text-amber-600 dark:text-amber-400 font-bold' : ''}>
+                            <span>
                               {conv.isGroup 
                                 ? `${conv.members?.length || 0} members` 
-                                : (userActivityStatus[conv._id] === 'online' 
-                                  ? 'Active now' 
-                                  : userActivityStatus[conv._id] === 'away' 
-                                    ? 'Away' 
-                                    : userActivityStatus[conv._id] === 'offline' 
-                                      ? 'Offline' 
-                                      : (conv.headline || "Offline"))
-                              }
+                                : (conv.headline || "Member")}
                             </span>
                           )}
                         </p>
@@ -777,9 +759,6 @@ const ChatPage = () => {
                       ) : (
                         <>
                           <img src={selectedUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}&background=random`} alt={selectedUser.name} className="w-12 h-12 landscape:w-10 landscape:h-10 rounded-2xl object-cover shadow-lg border-2 border-white dark:border-slate-800 transition-transform group-active:scale-95" />
-                          {userActivityStatus[selectedUser._id] && userActivityStatus[selectedUser._id] !== 'offline' && (
-                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 landscape:w-3 landscape:h-3 bg-${userActivityStatus[selectedUser._id] === 'online' ? 'green' : 'amber'}-500 border-2 border-white dark:border-slate-900 rounded-full shadow-sm ring-2 ring-${userActivityStatus[selectedUser._id] === 'online' ? 'green' : 'amber'}-500/20 animate-pulse`}></div>
-                          )}
                         </>
                       )}
                     </div>
@@ -797,16 +776,10 @@ const ChatPage = () => {
                             </div>
                           </div>
                         ) : (
-                          <span className={`text-[10px] md:text-xs landscape:text-[9px] font-bold uppercase tracking-wider truncate ${userActivityStatus[selectedUser._id] === 'online' ? 'text-green-600 dark:text-green-400' : userActivityStatus[selectedUser._id] === 'away' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                          <span className="text-[10px] md:text-xs landscape:text-[9px] font-bold uppercase tracking-wider truncate text-slate-400 dark:text-slate-500">
                             {selectedUser.isGroup 
                               ? `${selectedUser.members?.length || 0} participants` 
-                              : (userActivityStatus[selectedUser._id] === 'online' 
-                                ? 'Active now' 
-                                : userActivityStatus[selectedUser._id] === 'away' 
-                                  ? 'Away' 
-                                  : userActivityStatus[selectedUser._id] === 'offline' 
-                                    ? 'Offline' 
-                                    : (selectedUser.role || "Offline"))
+                              : (selectedUser.role || "Member")
                             }
                           </span>
                         )}

@@ -5,27 +5,6 @@ import api from "../api/client.js";
 import socket from "../api/socket.js";
 
 const UserList = ({ users, type, onRemove }) => {
-  const [userActivityStatus, setUserActivityStatus] = useState({});
-
-  useEffect(() => {
-    // Initialize status from props
-    const initialStatus = {};
-    users.forEach(u => {
-      initialStatus[u._id] = u.presenceStatus || (u.isOnline ? 'online' : 'offline');
-    });
-    setUserActivityStatus(initialStatus);
-
-    const handleUserActivity = ({ userId, status }) => {
-      setUserActivityStatus(prev => ({ ...prev, [userId]: status }));
-    };
-
-    socket.on("user_activity", handleUserActivity);
-
-    return () => {
-      socket.off("user_activity", handleUserActivity);
-    };
-  }, [users]);
-
   const handleAction = async (targetUserId, name) => {
     const actionText = type === "followers" ? "remove this follower" : "unfollow this user";
     if (!window.confirm(`Are you sure you want to ${actionText}?`)) return;
@@ -62,9 +41,6 @@ const UserList = ({ users, type, onRemove }) => {
                 alt={user.name} 
                 className="w-12 h-12 rounded-full object-cover border border-slate-100"
               />
-              {userActivityStatus[user._id] && userActivityStatus[user._id] !== 'offline' && (
-                <div className={`absolute bottom-0 right-0 w-3 h-3 bg-${userActivityStatus[user._id] === 'online' ? 'green' : 'amber'}-500 border-2 border-white rounded-full shadow-sm ring-2 ring-${userActivityStatus[user._id] === 'online' ? 'green' : 'amber'}-500/20 animate-pulse`}></div>
-              )}
             </div>
             <div className="min-w-0">
               <p className="font-bold text-slate-800 truncate">{user.name}</p>

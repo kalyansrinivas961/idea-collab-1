@@ -12,7 +12,6 @@ const UsersPage = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [totalUsers, setTotalUsers] = useState(0);
-  const [userActivityStatus, setUserActivityStatus] = useState({});
   const searchTimeoutRef = useRef(null);
 
   const fetchUsers = async (query = "", pageNum = 1, append = false) => {
@@ -26,13 +25,6 @@ const UsersPage = () => {
       } else {
         setUsers(newUsers);
       }
-
-      // Initialize activity status
-      const initialStatus = {};
-      newUsers.forEach(u => {
-        initialStatus[u._id] = u.presenceStatus || (u.isOnline ? 'online' : 'offline');
-      });
-      setUserActivityStatus(prev => ({ ...prev, ...initialStatus }));
       
       setHasMore(pageNum < pages);
       setTotalUsers(total);
@@ -46,15 +38,8 @@ const UsersPage = () => {
   useEffect(() => {
     fetchUsers();
 
-    const handleUserActivity = ({ userId, status }) => {
-      setUserActivityStatus(prev => ({ ...prev, [userId]: status }));
-    };
-
-    socket.on("user_activity", handleUserActivity);
-
     return () => {
       if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-      socket.off("user_activity", handleUserActivity);
     };
   }, []);
 
@@ -116,16 +101,13 @@ const UsersPage = () => {
               className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-500/5 transition-all flex flex-col items-center text-center group"
             >
               <div className="relative mb-6">
-                <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-slate-50 shadow-inner group-hover:ring-indigo-50 transition-all">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl overflow-hidden shadow-lg border-2 border-white dark:border-slate-800 transition-transform group-hover:scale-95">
                   <img
                     src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`}
                     alt={user.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                 </div>
-                {userActivityStatus[user._id] && userActivityStatus[user._id] !== 'offline' && (
-                  <div className={`absolute bottom-1 right-1 w-5 h-5 bg-${userActivityStatus[user._id] === 'online' ? 'green' : 'amber'}-500 border-4 border-white dark:border-slate-900 rounded-full shadow-lg ring-2 ring-${userActivityStatus[user._id] === 'online' ? 'green' : 'amber'}-500/10 animate-pulse z-10`}></div>
-                )}
                 {user.reputation > 50 && (
                   <div className="absolute -top-1 -right-1 bg-amber-400 text-white p-1.5 rounded-full shadow-lg border-2 border-white" title="High Reputation">
                     <ShieldCheck size={14} />
