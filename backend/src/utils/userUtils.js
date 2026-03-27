@@ -30,6 +30,8 @@ exports.formatUserResponse = (user) => {
     email: user.email,
     role: user.role,
     status: user.status || "Active",
+    isOnline: user.isOnline || false,
+    lastActive: user.lastActive || user.updatedAt,
     avatarUrl: user.avatarUrl,
     headline: user.headline || "",
     skills: user.skills || [],

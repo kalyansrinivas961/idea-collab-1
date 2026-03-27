@@ -44,6 +44,9 @@ const io = new Server(server, {
   cors: corsOptions,
 });
 
+// Track online users: socketId -> userId
+const onlineUsers = new Map();
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
@@ -58,9 +61,22 @@ io.on("connection", (socket) => {
   console.log("Socket connected:", socket.id);
   
   // Join user room for private notifications
-  socket.on("join", (userId) => {
+  socket.on("join", async (userId) => {
     if (userId) {
       socket.join(userId);
+      onlineUsers.set(socket.id, userId);
+      
+      try {
+        const User = require("./models/User");
+        await User.findByIdAndUpdate(userId, { 
+          isOnline: true, 
+          lastActive: new Date() 
+        });
+        io.emit("user_activity", { userId, status: "active" });
+      } catch (err) {
+        console.error("Error updating activity on join:", err);
+      }
+      
       console.log(`User ${userId} joined room`);
     }
   });
@@ -82,10 +98,89 @@ io.on("connection", (socket) => {
     socket.to(receiverId).emit("stop_typing", { senderId });
   });
 
-  socket.on("disconnect", () => {
-    console.log("Socket disconnected:", socket.id);
+  // Real-time activity status
+  socket.on("update_activity_status", async ({ userId, status }) => {
+    try {
+      if (!userId) return;
+      const User = require("./models/User");
+      const isOnline = status === "active";
+      
+      const updatedUser = await User.findByIdAndUpdate(userId, { 
+        isOnline, 
+        lastActive: new Date() 
+      }, { new: true });
+
+      if (updatedUser) {
+        // Broadcast to everyone to update their local state
+        io.emit("user_activity", { userId, status });
+        console.log(`[Status Change] User ${userId} (${updatedUser.name}) updated to: ${status} at ${new Date().toISOString()}`);
+      }
+    } catch (err) {
+      console.error("[Status Change Error]:", err);
+    }
+  });
+
+  socket.on("disconnect", async () => {
+    console.log("[Socket Connection] Socket disconnected:", socket.id);
+    const userId = onlineUsers.get(socket.id);
+    
+    if (userId) {
+      onlineUsers.delete(socket.id);
+      
+      // Check if user has other open sockets
+      const remainingSockets = Array.from(onlineUsers.values()).filter(id => id === userId);
+      
+      if (remainingSockets.length === 0) {
+        try {
+          const User = require("./models/User");
+          const updatedUser = await User.findByIdAndUpdate(userId, { 
+            isOnline: false, 
+            lastActive: new Date() 
+          }, { new: true });
+          
+          if (updatedUser) {
+            io.emit("user_activity", { userId, status: "inactive" });
+            console.log(`[Status Change] User ${userId} (${updatedUser.name}) marked as offline due to disconnection at ${new Date().toISOString()}.`);
+          }
+        } catch (err) {
+          console.error("[Status Change Error on Disconnect]:", err);
+        }
+      }
+    }
   });
 });
+
+// Periodic cleanup: mark users as offline if they've been idle for 30 minutes
+// This runs every 5 minutes and checks the lastActive timestamp
+setInterval(async () => {
+  try {
+    const User = require("./models/User");
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+    
+    // Find users who are online but have been idle for more than 30 minutes
+    const idleUsers = await User.find({ 
+      isOnline: true, 
+      lastActive: { $lt: thirtyMinutesAgo } 
+    });
+    
+    if (idleUsers.length > 0) {
+      console.log(`Cleanup Task: Marking ${idleUsers.length} idle users as offline.`);
+      
+      const userIds = idleUsers.map(u => u._id);
+      
+      await User.updateMany(
+        { _id: { $in: userIds } },
+        { isOnline: false }
+      );
+      
+      userIds.forEach(userId => {
+        io.emit("user_activity", { userId: userId.toString(), status: "inactive" });
+      });
+    }
+  } catch (err) {
+    console.error("Error in idle user cleanup task:", err);
+  }
+}, 5 * 60 * 1000);
 
 // Routes
 app.use("/api/auth", authRoutes);

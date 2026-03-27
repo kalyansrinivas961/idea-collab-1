@@ -1,9 +1,31 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../api/client.js";
+import socket from "../api/socket.js";
 
 const UserList = ({ users, type, onRemove }) => {
+  const [userActivityStatus, setUserActivityStatus] = useState({});
+
+  useEffect(() => {
+    // Initialize status from props
+    const initialStatus = {};
+    users.forEach(u => {
+      initialStatus[u._id] = u.isOnline ? 'active' : 'inactive';
+    });
+    setUserActivityStatus(initialStatus);
+
+    const handleUserActivity = ({ userId, status }) => {
+      setUserActivityStatus(prev => ({ ...prev, [userId]: status }));
+    };
+
+    socket.on("user_activity", handleUserActivity);
+
+    return () => {
+      socket.off("user_activity", handleUserActivity);
+    };
+  }, [users]);
+
   const handleAction = async (targetUserId, name) => {
     const actionText = type === "followers" ? "remove this follower" : "unfollow this user";
     if (!window.confirm(`Are you sure you want to ${actionText}?`)) return;
@@ -34,11 +56,16 @@ const UserList = ({ users, type, onRemove }) => {
       {users.map((user) => (
         <div key={user._id} className="bg-white p-4 rounded-xl shadow-sm border flex items-center justify-between gap-4">
           <Link to={`/users/${user._id}`} className="flex items-center gap-3 flex-1 min-w-0">
-            <img 
-              src={user.avatarUrl || "https://via.placeholder.com/40"} 
-              alt={user.name} 
-              className="w-12 h-12 rounded-full object-cover border border-slate-100"
-            />
+            <div className="relative flex-shrink-0">
+              <img 
+                src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`} 
+                alt={user.name} 
+                className="w-12 h-12 rounded-full object-cover border border-slate-100"
+              />
+              {userActivityStatus[user._id] === 'active' && (
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full shadow-sm ring-2 ring-green-500/10 animate-pulse"></div>
+              )}
+            </div>
             <div className="min-w-0">
               <p className="font-bold text-slate-800 truncate">{user.name}</p>
               <p className="text-xs text-slate-500 truncate">{user.role || "Member"}</p>

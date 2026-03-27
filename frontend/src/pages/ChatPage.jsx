@@ -232,6 +232,16 @@ const ChatPage = () => {
     try {
       const res = await api.get("/messages/conversations");
       setConversations(res.data);
+      
+      // Initialize activity status from fetched data
+      const initialStatus = {};
+      res.data.forEach(conv => {
+        if (!conv.isGroup) {
+          initialStatus[conv._id] = conv.isOnline ? 'active' : 'inactive';
+        }
+      });
+      setUserActivityStatus(prev => ({ ...prev, ...initialStatus }));
+
       // Join all group rooms
       res.data.filter(c => c.isGroup).forEach(group => {
         socket.emit("join:group", group._id);
@@ -1161,7 +1171,6 @@ const ChatPage = () => {
                     </svg>
                   </button>
                 </form>
-              </div>
               </div>
             </motion.div>
           ) : (

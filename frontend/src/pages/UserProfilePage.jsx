@@ -76,6 +76,13 @@ const UserProfilePage = () => {
 
       const normalized = normalizeUser(userRes.data);
       setProfileUser(normalized);
+      
+      // Initialize activity status for the profile user
+      setUserActivityStatus(prev => ({ 
+        ...prev, 
+        [normalized._id]: normalized.isOnline ? 'active' : 'inactive' 
+      }));
+
       setStats(statsRes.data);
       setActivities(activityRes.data);
       setUserIdeas(ideasRes.data);
