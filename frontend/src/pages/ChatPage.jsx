@@ -28,6 +28,7 @@ const ChatPage = () => {
   const [forwardModal, setForwardModal] = useState({ show: false, message: null });
   const [activeMenu, setActiveMenu] = useState(null); // track which message menu is open
   const [menuPlacement, setMenuPlacement] = useState('bottom'); // 'top' or 'bottom'
+  const [userActivityStatus, setUserActivityStatus] = useState({}); // { userId: 'active' | 'inactive' }
   
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -172,6 +173,10 @@ const ChatPage = () => {
       );
     };
 
+    const handleUserActivity = ({ userId, status }) => {
+      setUserActivityStatus(prev => ({ ...prev, [userId]: status }));
+    };
+
     socket.on("chat:message", handleMessage);
     socket.on("group:created", handleGroupCreated);
     socket.on("typing", handleTyping);
@@ -179,6 +184,7 @@ const ChatPage = () => {
     socket.on("chat:read", handleRead);
     socket.on("chat:message_deleted", handleMessageDeleted);
     socket.on("chat:message_updated", handleMessageUpdated);
+    socket.on("user_activity", handleUserActivity);
 
     // Close menu on outside click
     const handleClickOutside = (e) => {
@@ -206,9 +212,10 @@ const ChatPage = () => {
       socket.off("stop_typing", handleStopTyping);
       socket.off("chat:read", handleRead);
       socket.off("chat:message_deleted", handleMessageDeleted);
-      socket.off("chat:message_updated", handleMessageUpdated);
-      window.removeEventListener('mousedown', handleClickOutside);
-      window.removeEventListener('keydown', handleKeyDown);
+    socket.off("chat:message_updated", handleMessageUpdated);
+    socket.off("user_activity", handleUserActivity);
+    window.removeEventListener('mousedown', handleClickOutside);
+    window.removeEventListener('keydown', handleKeyDown);
     };
   }, [selectedUser, activeMenu]);
 
@@ -650,7 +657,9 @@ const ChatPage = () => {
                       ) : (
                         <div className="relative">
                           <img src={conv.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.name)}&background=random`} alt={conv.name} className="w-14 h-14 rounded-2xl object-cover shadow-md border-2 border-white dark:border-slate-800" />
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full shadow-sm"></div>
+                          {userActivityStatus[conv._id] === 'active' && (
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full shadow-sm ring-2 ring-green-500/20 animate-pulse"></div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -731,7 +740,9 @@ const ChatPage = () => {
                       ) : (
                         <>
                           <img src={selectedUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}&background=random`} alt={selectedUser.name} className="w-12 h-12 landscape:w-10 landscape:h-10 rounded-2xl object-cover shadow-lg border-2 border-white dark:border-slate-800 transition-transform group-active:scale-95" />
-                          <div className="absolute -bottom-1 -right-1 w-4 h-4 landscape:w-3 landscape:h-3 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full shadow-sm"></div>
+                          {userActivityStatus[selectedUser._id] === 'active' && (
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 landscape:w-3 landscape:h-3 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full shadow-sm ring-2 ring-green-500/20 animate-pulse"></div>
+                          )}
                         </>
                       )}
                     </div>

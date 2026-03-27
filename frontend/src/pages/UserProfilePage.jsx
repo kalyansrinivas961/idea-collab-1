@@ -20,6 +20,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import Layout from "../components/Layout.jsx";
 import api from "../api/client.js";
+import socket from "../api/socket.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import { normalizeUser, calculateProfileCompletion } from "../utils/user.js";
 import { toast } from "react-hot-toast";
@@ -41,9 +42,20 @@ const UserProfilePage = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isRequested, setIsRequested] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [userActivityStatus, setUserActivityStatus] = useState({});
 
   useEffect(() => {
     fetchProfileData();
+
+    const handleUserActivity = ({ userId, status }) => {
+      setUserActivityStatus(prev => ({ ...prev, [userId]: status }));
+    };
+
+    socket.on("user_activity", handleUserActivity);
+
+    return () => {
+      socket.off("user_activity", handleUserActivity);
+    };
   }, [id]);
 
   useEffect(() => {
@@ -134,12 +146,17 @@ const UserProfilePage = () => {
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full -mr-32 -mt-32 opacity-50 blur-3xl"></div>
           <div className="relative flex flex-col md:flex-row items-center gap-8">
             {/* Avatar Section */}
-            <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden shadow-xl border-4 border-white">
-              <img 
-                src={profileUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(profileUser.name)}&background=random`} 
-                alt={profileUser.name} 
-                className="w-full h-full object-cover"
-              />
+            <div className="relative">
+              <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden shadow-xl border-4 border-white">
+                <img 
+                  src={profileUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(profileUser.name)}&background=random`} 
+                  alt={profileUser.name} 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {userActivityStatus[profileUser._id] === 'active' && (
+                <div className="absolute bottom-2 right-2 md:bottom-4 md:right-4 w-6 h-6 md:w-8 md:h-8 bg-green-500 border-4 border-white dark:border-slate-900 rounded-full shadow-lg ring-4 ring-green-500/20 animate-pulse z-10"></div>
+              )}
             </div>
 
             {/* User Info Header */}

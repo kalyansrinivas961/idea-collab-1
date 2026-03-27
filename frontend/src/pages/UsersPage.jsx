@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Search, User as UserIcon, ShieldCheck, Mail, MapPin } from "lucide-react";
 import Layout from "../components/Layout.jsx";
 import api from "../api/client.js";
+import socket from "../api/socket.js";
 
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
@@ -11,6 +12,7 @@ const UsersPage = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [totalUsers, setTotalUsers] = useState(0);
+  const [userActivityStatus, setUserActivityStatus] = useState({});
   const searchTimeoutRef = useRef(null);
 
   const fetchUsers = async (query = "", pageNum = 1, append = false) => {
@@ -36,8 +38,16 @@ const UsersPage = () => {
 
   useEffect(() => {
     fetchUsers();
+
+    const handleUserActivity = ({ userId, status }) => {
+      setUserActivityStatus(prev => ({ ...prev, [userId]: status }));
+    };
+
+    socket.on("user_activity", handleUserActivity);
+
     return () => {
       if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+      socket.off("user_activity", handleUserActivity);
     };
   }, []);
 
@@ -106,6 +116,9 @@ const UsersPage = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                 </div>
+                {userActivityStatus[user._id] === 'active' && (
+                  <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-4 border-white dark:border-slate-900 rounded-full shadow-lg ring-2 ring-green-500/10 animate-pulse z-10"></div>
+                )}
                 {user.reputation > 50 && (
                   <div className="absolute -top-1 -right-1 bg-amber-400 text-white p-1.5 rounded-full shadow-lg border-2 border-white" title="High Reputation">
                     <ShieldCheck size={14} />
