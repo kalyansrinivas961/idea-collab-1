@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const EmailOtp = require("../models/EmailOtp");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const emailValidator = require("email-validator");
@@ -64,6 +65,106 @@ exports.verifyEmail = async (req, res) => {
       valid: true, 
       message: "Email is valid and available" 
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.sendOtp = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    if (!email || !emailValidator.validate(email)) {
+      return res.status(400).json({ message: "A valid email address is required" });
+    }
+
+    // Rate limiting check (e.g., max 3 requests per 10 mins) - simplified for now
+    const recentOtp = await EmailOtp.findOne({ 
+      email, 
+      createdAt: { $gt: new Date(Date.now() - 60000) } // 1 minute cooldown
+    });
+
+    if (recentOtp) {
+      return res.status(429).json({ message: "Please wait at least 60 seconds before requesting another code." });
+    }
+
+    // Generate 6-digit secure OTP
+    const otp = crypto.randomInt(100000, 1000000).toString();
+
+    // Store in DB (upsert)
+    await EmailOtp.findOneAndUpdate(
+      { email },
+      { otp, createdAt: Date.now() },
+      { upsert: true, new: true }
+    );
+
+    // Professional HTML Email Template
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h1 style="color: #4f46e5; margin: 0;">IdeaCollab</h1>
+          <p style="color: #6b7280; font-size: 14px;">Connect. Create. Collaborate.</p>
+        </div>
+        <div style="background-color: #f9fafb; padding: 30px; border-radius: 8px; text-align: center;">
+          <h2 style="color: #111827; margin-top: 0;">Verification Code</h2>
+          <p style="color: #374151; font-size: 16px; margin-bottom: 24px;">Please use the following code to verify your email address:</p>
+          <div style="font-size: 36px; font-weight: bold; color: #4f46e5; letter-spacing: 5px; margin-bottom: 24px; padding: 15px; background: white; border: 2px dashed #e5e7eb; border-radius: 8px; display: inline-block;">
+            ${otp}
+          </div>
+          <p style="color: #6b7280; font-size: 14px; margin-top: 0;">This code will expire in 10 minutes.</p>
+        </div>
+        <div style="margin-top: 24px; color: #6b7280; font-size: 12px; text-align: center;">
+          <p>If you didn't request this code, you can safely ignore this email.</p>
+          <p>&copy; ${new Date().getFullYear()} IdeaCollab. All rights reserved.</p>
+        </div>
+      </div>
+    `;
+
+    // Send email with fallback logging
+    try {
+      const sent = await sendEmail({
+        email,
+        subject: "Verification Code - IdeaCollab",
+        message: `Your verification code is: ${otp}. It will expire in 10 minutes.`,
+        html: htmlContent
+      });
+      
+      if (!sent) {
+        throw new Error("Email delivery returned false status");
+      }
+
+      console.log(`[OTP GENERATED] Success for ${email}`);
+      res.json({ message: "Verification code sent to your email" });
+    } catch (emailError) {
+      console.error(`[OTP FAILURE] Delivery failed for ${email}:`, emailError.message);
+      
+      // If email fails, we still keep the OTP in DB for 10 mins, 
+      // but inform the user about the delivery failure.
+      res.status(503).json({ 
+        message: "We're having trouble delivering the code. Please try again later or contact support.",
+        technical: emailError.message 
+      });
+    }
+  } catch (error) {
+    console.error(`[OTP CRITICAL] Error in sendOtp for ${email}:`, error);
+    res.status(500).json({ 
+      message: "An internal error occurred. Please try again later."
+    });
+  }
+};
+
+exports.verifyOtp = async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    const otpRecord = await EmailOtp.findOne({ email, otp });
+
+    if (!otpRecord) {
+      return res.status(400).json({ message: "Invalid or expired verification code" });
+    }
+
+    // Success - we'll delete the record later after registration
+    res.json({ message: "Email verified successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -226,7 +327,27 @@ exports.forgotPassword = async (req, res) => {
       return res.status(200).json({ message: "If an account exists with that email, we've sent instructions to reset your password." });
     }
 
-    // Professional HTML Email Template for Password Reset (Simplified)
+    // Rate limiting check
+    const recentOtp = await EmailOtp.findOne({ 
+      email, 
+      createdAt: { $gt: new Date(Date.now() - 60000) } 
+    });
+
+    if (recentOtp) {
+      return res.status(429).json({ message: "Please wait at least 60 seconds before requesting another code." });
+    }
+
+    // Generate 6-digit secure OTP for password reset
+    const otp = crypto.randomInt(100000, 1000000).toString();
+
+    // Store in DB (upsert)
+    await EmailOtp.findOneAndUpdate(
+      { email },
+      { otp, createdAt: Date.now() },
+      { upsert: true, new: true }
+    );
+
+    // Professional HTML Email Template for Password Reset
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
         <div style="text-align: center; margin-bottom: 20px;">
@@ -234,8 +355,12 @@ exports.forgotPassword = async (req, res) => {
           <p style="color: #6b7280; font-size: 14px;">Connect. Create. Collaborate.</p>
         </div>
         <div style="background-color: #f9fafb; padding: 30px; border-radius: 8px; text-align: center;">
-          <h2 style="color: #111827; margin-top: 0;">Password Reset</h2>
-          <p style="color: #374151; font-size: 16px; margin-bottom: 24px;">You requested to reset your password. You can now proceed to set a new password in the application.</p>
+          <h2 style="color: #111827; margin-top: 0;">Password Reset Code</h2>
+          <p style="color: #374151; font-size: 16px; margin-bottom: 24px;">Please use the following code to reset your password:</p>
+          <div style="font-size: 36px; font-weight: bold; color: #dc2626; letter-spacing: 5px; margin-bottom: 24px; padding: 15px; background: white; border: 2px dashed #e5e7eb; border-radius: 8px; display: inline-block;">
+            ${otp}
+          </div>
+          <p style="color: #6b7280; font-size: 14px; margin-top: 0;">This code will expire in 10 minutes.</p>
         </div>
         <div style="margin-top: 24px; color: #6b7280; font-size: 12px; text-align: center;">
           <p>If you didn't request a password reset, please secure your account immediately.</p>
@@ -246,19 +371,24 @@ exports.forgotPassword = async (req, res) => {
 
     // Send email
     try {
-      await sendEmail({
+      const sent = await sendEmail({
         email,
-        subject: "Password Reset - IdeaCollab",
-        message: `You requested a password reset. Please return to the app to set a new password.`,
+        subject: "Password Reset Verification Code - IdeaCollab",
+        message: `Your verification code for password reset is: ${otp}. It will expire in 10 minutes.`,
         html: htmlContent
       });
       
-      console.log(`[PASSWORD RESET REQUEST] Success for ${email}`);
-      res.json({ message: "Instructions sent to your email." });
+      if (!sent) {
+        throw new Error("Email delivery returned false status");
+      }
+      
+      console.log(`[PASSWORD RESET OTP] Success for ${email}`);
+      res.json({ message: "Verification code sent to your email." });
     } catch (emailError) {
-      console.error(`[PASSWORD RESET FAILURE] Delivery failed for ${email}:`, emailError.message);
+      console.error(`[PASSWORD RESET OTP FAILURE] Delivery failed for ${email}:`, emailError.message);
       res.status(503).json({ 
-        message: "We're having trouble sending instructions. Please try again later.",
+        message: "We're having trouble delivering the reset code. Please try again later or contact support.",
+        technical: emailError.message 
       });
     }
   } catch (error) {
@@ -267,17 +397,23 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-exports.resetPassword = async (req, res) => {
-  const { email, newPassword } = req.body;
+exports.resetPasswordWithOtp = async (req, res) => {
+  const { email, otp, newPassword } = req.body;
 
   try {
-    // Find user
+    // 1. Verify OTP
+    const otpRecord = await EmailOtp.findOne({ email, otp });
+    if (!otpRecord) {
+      return res.status(400).json({ message: "Invalid or expired verification code" });
+    }
+
+    // 2. Find user
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Enforce password complexity
+    // 3. Enforce password complexity
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
     if (!passwordRegex.test(newPassword)) {
       return res.status(400).json({
@@ -285,11 +421,14 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
-    // Update password
+    // 4. Update password
     user.password = newPassword;
     await user.save();
 
-    // Send notification email
+    // 5. Cleanup OTP
+    await EmailOtp.deleteOne({ _id: otpRecord._id });
+
+    // 6. Send notification email
     const successHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
         <div style="text-align: center; margin-bottom: 20px;">
