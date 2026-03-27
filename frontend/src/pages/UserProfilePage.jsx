@@ -183,12 +183,11 @@ const UserProfilePage = () => {
                   }`}>
                     {profileUser.status}
                   </span>
-                  {userActivityStatus[profileUser._id] && (
+                  {userActivityStatus[profileUser._id] && userActivityStatus[profileUser._id] !== 'offline' && (
                     <span className={`text-[10px] font-black uppercase tracking-widest ${
-                      userActivityStatus[profileUser._id] === 'online' ? 'text-green-600' : 
-                      userActivityStatus[profileUser._id] === 'away' ? 'text-amber-600' : 'text-slate-400'
+                      userActivityStatus[profileUser._id] === 'online' ? 'text-green-600' : 'text-amber-600'
                     }`}>
-                      • {userActivityStatus[profileUser._id] === 'online' ? 'Active Now' : userActivityStatus[profileUser._id] === 'away' ? 'Away' : 'Offline'}
+                      • {userActivityStatus[profileUser._id] === 'online' ? 'Active Now' : 'Away'}
                     </span>
                   )}
                 </div>
