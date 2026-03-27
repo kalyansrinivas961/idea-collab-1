@@ -30,7 +30,7 @@ const UsersPage = () => {
       // Initialize activity status
       const initialStatus = {};
       newUsers.forEach(u => {
-        initialStatus[u._id] = u.isOnline ? 'active' : 'inactive';
+        initialStatus[u._id] = u.presenceStatus || (u.isOnline ? 'online' : 'offline');
       });
       setUserActivityStatus(prev => ({ ...prev, ...initialStatus }));
       

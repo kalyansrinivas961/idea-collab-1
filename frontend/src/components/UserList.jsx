@@ -11,7 +11,7 @@ const UserList = ({ users, type, onRemove }) => {
     // Initialize status from props
     const initialStatus = {};
     users.forEach(u => {
-      initialStatus[u._id] = u.isOnline ? 'active' : 'inactive';
+      initialStatus[u._id] = u.presenceStatus || (u.isOnline ? 'online' : 'offline');
     });
     setUserActivityStatus(initialStatus);
 

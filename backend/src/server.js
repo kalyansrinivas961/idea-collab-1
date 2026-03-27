@@ -70,9 +70,10 @@ io.on("connection", (socket) => {
         const User = require("./models/User");
         await User.findByIdAndUpdate(userId, { 
           isOnline: true, 
+          presenceStatus: "online",
           lastActive: new Date() 
         });
-        io.emit("user_activity", { userId, status: "active" });
+        io.emit("user_activity", { userId, status: "online" });
       } catch (err) {
         console.error("Error updating activity on join:", err);
       }
@@ -103,8 +104,10 @@ io.on("connection", (socket) => {
     try {
       if (!userId) return;
       const User = require("./models/User");
-      const isOnline = status === "active";
-      const presenceStatus = isOnline ? "online" : "offline";
+      // Map frontend status to backend presence status
+      // frontend sends 'online' or 'away'
+      const presenceStatus = status || "offline";
+      const isOnline = presenceStatus !== "offline";
       
       const updatedUser = await User.findByIdAndUpdate(userId, { 
         isOnline, 
@@ -115,7 +118,7 @@ io.on("connection", (socket) => {
       if (updatedUser) {
         // Broadcast to everyone to update their local state
         io.emit("user_activity", { userId, status: presenceStatus });
-        console.log(`[Status Change] User ${userId} (${updatedUser.name}) updated to: ${presenceStatus} at ${new Date().toISOString()}`);
+        console.log(`[Status Change] User ${userId} updated to: ${presenceStatus}`);
       }
     } catch (err) {
       console.error("[Status Change Error]:", err);

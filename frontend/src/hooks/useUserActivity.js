@@ -19,7 +19,7 @@ export const useUserActivity = (timeout = 15 * 60 * 1000) => {
     if (user?._id) {
       socket.emit("update_activity_status", {
         userId: user._id,
-        status: status ? "active" : "inactive",
+        status: status ? "online" : "away",
       });
     }
   }, [user?._id]);

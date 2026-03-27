@@ -86,7 +86,7 @@ const UserProfilePage = () => {
       // Initialize activity status for the profile user
       setUserActivityStatus(prev => ({ 
         ...prev, 
-        [normalized._id]: normalized.isOnline ? 'active' : 'inactive' 
+        [normalized._id]: normalized.presenceStatus || (normalized.isOnline ? 'online' : 'offline') 
       }));
 
       setStats(statsRes.data);
@@ -176,12 +176,22 @@ const UserProfilePage = () => {
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col md:flex-row items-center gap-3 mb-2">
                 <h1 className="text-3xl font-black text-slate-900">{profileUser.name}</h1>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                  profileUser.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 
-                  profileUser.status === 'Suspended' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'
-                }`}>
-                  {profileUser.status}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                    profileUser.status === 'Active' ? 'bg-emerald-100 text-emerald-700' : 
+                    profileUser.status === 'Suspended' ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'
+                  }`}>
+                    {profileUser.status}
+                  </span>
+                  {userActivityStatus[profileUser._id] && (
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${
+                      userActivityStatus[profileUser._id] === 'online' ? 'text-green-600' : 
+                      userActivityStatus[profileUser._id] === 'away' ? 'text-amber-600' : 'text-slate-400'
+                    }`}>
+                      • {userActivityStatus[profileUser._id] === 'online' ? 'Active Now' : userActivityStatus[profileUser._id] === 'away' ? 'Away' : 'Offline'}
+                    </span>
+                  )}
+                </div>
               </div>
               <p className="text-lg text-indigo-600 font-semibold mb-4">{profileUser.headline || `${profileUser.role} at Idea Collab`}</p>
               

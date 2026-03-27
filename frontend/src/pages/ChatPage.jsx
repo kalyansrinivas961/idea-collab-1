@@ -253,7 +253,7 @@ const ChatPage = () => {
       const initialStatus = {};
       res.data.forEach(conv => {
         if (!conv.isGroup) {
-          initialStatus[conv._id] = conv.isOnline ? 'active' : 'inactive';
+          initialStatus[conv._id] = conv.presenceStatus || (conv.isOnline ? 'online' : 'offline');
         }
       });
       setUserActivityStatus(prev => ({ ...prev, ...initialStatus }));
@@ -707,7 +707,16 @@ const ChatPage = () => {
                             </>
                           ) : (
                             <span className={userActivityStatus[conv._id] === 'online' ? 'text-green-600 dark:text-green-400 font-bold' : userActivityStatus[conv._id] === 'away' ? 'text-amber-600 dark:text-amber-400 font-bold' : ''}>
-                              {conv.isGroup ? `${conv.members?.length || 0} members` : (userActivityStatus[conv._id] || conv.headline || "Offline")}
+                              {conv.isGroup 
+                                ? `${conv.members?.length || 0} members` 
+                                : (userActivityStatus[conv._id] === 'online' 
+                                  ? 'Active now' 
+                                  : userActivityStatus[conv._id] === 'away' 
+                                    ? 'Away' 
+                                    : userActivityStatus[conv._id] === 'offline' 
+                                      ? 'Offline' 
+                                      : (conv.headline || "Offline"))
+                              }
                             </span>
                           )}
                         </p>
@@ -789,7 +798,16 @@ const ChatPage = () => {
                           </div>
                         ) : (
                           <span className={`text-[10px] md:text-xs landscape:text-[9px] font-bold uppercase tracking-wider truncate ${userActivityStatus[selectedUser._id] === 'online' ? 'text-green-600 dark:text-green-400' : userActivityStatus[selectedUser._id] === 'away' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-400 dark:text-slate-500'}`}>
-                            {selectedUser.isGroup ? `${selectedUser.members?.length || 0} participants` : (userActivityStatus[selectedUser._id] || selectedUser.role || "Offline")}
+                            {selectedUser.isGroup 
+                              ? `${selectedUser.members?.length || 0} participants` 
+                              : (userActivityStatus[selectedUser._id] === 'online' 
+                                ? 'Active now' 
+                                : userActivityStatus[selectedUser._id] === 'away' 
+                                  ? 'Away' 
+                                  : userActivityStatus[selectedUser._id] === 'offline' 
+                                    ? 'Offline' 
+                                    : (selectedUser.role || "Offline"))
+                            }
                           </span>
                         )}
                       </div>
