@@ -810,7 +810,7 @@ const ChatPage = () => {
                           </span>
                         </div>
                       )}
-                      <div className={`flex ${isMe ? 'justify-end' : 'justify-start'} items-end gap-2 group relative animate-fade-in-up`}>
+                      <div className={`flex ${isMe ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 group relative animate-fade-in-up`}>
                         {!isMe && selectedUser.isGroup && (
                           <img src={msg.sender.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.sender.name)}&background=random`} alt="" className="w-6 h-6 rounded-full border border-white dark:border-slate-800 shadow-sm mb-1" />
                         )}
@@ -915,7 +915,7 @@ const ChatPage = () => {
                         </div>
 
                         {/* Action Menu Trigger (⋮) */}
-                        <div className={`relative message-menu-container flex items-center transition-all duration-200 ${isMe ? 'mr-1 flex-row-reverse' : 'ml-1 flex-row'}`}>
+                        <div className={`relative message-menu-container flex items-center transition-all duration-200`}>
                           <button
                             onClick={(e) => toggleMessageMenu(e, msg._id)}
                             className={`p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-full transition-all min-w-[44px] min-h-[44px] landscape:min-w-[32px] landscape:min-h-[32px] landscape:p-1 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${activeMenu === msg._id ? 'opacity-100 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'opacity-0 group-hover:opacity-100'}`}
