@@ -523,25 +523,25 @@ const ChatPage = () => {
 
   return (
     <Layout>
-      <div className="bg-white md:rounded-xl shadow-sm border-0 md:border overflow-hidden h-[calc(100vh-64px)] md:h-[calc(100vh-140px)] flex flex-col md:flex-row -mx-4 md:mx-0">
-        {/* Sidebar */}
-        <div className={`w-full md:w-1/3 lg:w-1/4 border-r flex-col ${selectedUser ? 'hidden md:flex' : 'flex'} h-full bg-white`}>
-          <div className="p-4 border-b flex justify-between items-center bg-slate-50/50 backdrop-blur-sm sticky top-0 z-20 min-h-[64px]">
-            <h2 className="text-lg font-bold text-slate-800">Messages</h2>
+      <div className="bg-white dark:bg-slate-900 md:rounded-xl shadow-sm border-0 md:border overflow-hidden h-[calc(100vh-64px-56px)] md:h-[calc(100vh-140px)] landscape:h-[calc(100vh-64px)] flex flex-col md:flex-row -mx-4 md:mx-0 transition-colors duration-300">
+        {/* Sidebar (Conversation List) */}
+        <div className={`w-full md:w-1/3 lg:w-1/4 border-r dark:border-slate-800 flex-col ${selectedUser ? 'hidden md:flex' : 'flex'} h-full bg-white dark:bg-slate-900 transition-colors`}>
+          <div className="p-4 border-b dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50 backdrop-blur-sm sticky top-0 z-20 min-h-[64px] landscape:min-h-[50px] landscape:py-2">
+            <h2 className="text-lg font-bold text-slate-800 dark:text-white landscape:text-base">Messages</h2>
             <div className="flex gap-1.5">
               <button 
                 onClick={() => setShowCreateGroup(true)}
-                className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-full transition min-w-[40px] min-h-[40px] flex items-center justify-center border border-indigo-100 bg-white shadow-sm"
+                className="p-2 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-full transition min-w-[40px] min-h-[40px] landscape:min-w-[32px] landscape:min-h-[32px] flex items-center justify-center border border-indigo-100 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm"
                 title="Create Group"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                <svg className="w-5 h-5 landscape:w-4 landscape:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
               </button>
               <button 
                 onClick={() => setShowContacts(!showContacts)}
-                className="p-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-full transition min-w-[40px] min-h-[40px] flex items-center justify-center shadow-md"
+                className="p-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-full transition min-w-[40px] min-h-[40px] landscape:min-w-[32px] landscape:min-h-[32px] flex items-center justify-center shadow-md"
                 title="New Chat"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                <svg className="w-5 h-5 landscape:w-4 landscape:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
               </button>
             </div>
           </div>
@@ -656,15 +656,15 @@ const ChatPage = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-baseline mb-0.5">
-                        <h3 className={`text-sm md:text-base truncate pr-2 ${conv.unreadCount > 0 || conv.isNew ? 'font-black text-indigo-900' : 'font-bold text-slate-800'}`}>
+                        <h3 className={`text-sm md:text-base landscape:text-xs truncate pr-2 ${conv.unreadCount > 0 || conv.isNew ? 'font-black text-indigo-900' : 'font-bold text-slate-800'}`}>
                           {conv.name}
                         </h3>
-                        <span className={`text-[10px] whitespace-nowrap ${conv.unreadCount > 0 || conv.isNew ? 'text-indigo-600 font-bold' : 'text-slate-400 font-medium'}`}>
+                        <span className={`text-[10px] landscape:text-[9px] whitespace-nowrap ${conv.unreadCount > 0 || conv.isNew ? 'text-indigo-600 font-bold' : 'text-slate-400 font-medium'}`}>
                           {conv.lastMessage ? new Date(conv.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '12:45 PM'}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <p className={`text-xs truncate leading-relaxed ${conv.unreadCount > 0 || conv.isNew ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}>
+                        <p className={`text-xs landscape:text-[10px] truncate leading-relaxed ${conv.unreadCount > 0 || conv.isNew ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}>
                           {conv.lastMessage ? (
                             <>
                               {conv.lastMessage.sender._id === user._id ? 'You: ' : ''}
@@ -701,48 +701,48 @@ const ChatPage = () => {
         </div>
 
         {/* Chat Area */}
-        <div className={`flex-1 flex flex-col bg-slate-50/30 ${selectedUser ? 'flex fixed inset-0 z-50 md:relative' : 'hidden md:flex'} h-full transition-all duration-300`}>
+        <div className={`flex-1 flex flex-col bg-slate-50/30 dark:bg-slate-950/30 ${selectedUser ? 'fixed inset-0 z-[70] md:relative md:z-auto' : 'hidden md:flex'} h-full transition-all duration-300`}>
           {selectedUser ? (
             <>
               {/* Header */}
-              <div className="p-3 bg-white/80 backdrop-blur-md border-b flex items-center justify-between shadow-sm z-20 sticky top-0 min-h-[64px]">
+              <div className="p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b dark:border-slate-800 flex items-center justify-between shadow-sm z-20 sticky top-0 min-h-[64px] landscape:min-h-[50px] landscape:py-1.5">
                 <div className="flex items-center gap-3 min-w-0">
                     <button 
                       onClick={() => setSelectedUser(null)}
-                      className="md:hidden text-slate-500 hover:text-indigo-600 p-2 -ml-1 min-w-[44px] min-h-[44px] flex items-center justify-center bg-slate-100 rounded-full transition-colors"
+                      className="md:hidden text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 p-2 -ml-1 min-w-[44px] min-h-[44px] landscape:min-w-[36px] landscape:min-h-[36px] flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-full transition-colors"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                      <svg className="w-5 h-5 landscape:w-4 landscape:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
                     
                     <div className="relative flex-shrink-0">
                       {selectedUser.isGroup ? (
-                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-sm">
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        <div className="w-11 h-11 landscape:w-9 landscape:h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-sm">
+                          <svg className="w-6 h-6 landscape:w-5 landscape:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                         </div>
                       ) : (
                         <>
-                          <img src={selectedUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}&background=random`} alt={selectedUser.name} className="w-11 h-11 rounded-xl object-cover shadow-sm border border-slate-100" />
-                          <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full"></div>
+                          <img src={selectedUser.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.name)}&background=random`} alt={selectedUser.name} className="w-11 h-11 landscape:w-9 landscape:h-9 rounded-xl object-cover shadow-sm border border-slate-100 dark:border-slate-800" />
+                          <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 landscape:w-2.5 landscape:h-2.5 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
                         </>
                       )}
                     </div>
                     
                     <div className="min-w-0">
-                      <h3 className="font-bold text-slate-800 text-sm md:text-base leading-tight truncate pr-1">{selectedUser.name}</h3>
+                      <h3 className="font-bold text-slate-800 dark:text-white text-sm md:text-base landscape:text-xs leading-tight truncate pr-1">{selectedUser.name}</h3>
                       <div className="flex items-center gap-1.5 mt-0.5">
                         {partnerTyping ? (
                           <div className="flex items-center gap-1">
-                            <span className="text-[10px] md:text-xs text-indigo-600 font-bold animate-pulse uppercase tracking-wider">typing</span>
+                            <span className="text-[10px] md:text-xs landscape:text-[9px] text-indigo-600 dark:text-indigo-400 font-bold animate-pulse uppercase tracking-wider">typing</span>
                             <div className="flex gap-0.5">
-                              <div className="w-1 h-1 bg-indigo-600 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                              <div className="w-1 h-1 bg-indigo-600 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                              <div className="w-1 h-1 bg-indigo-600 rounded-full animate-bounce"></div>
+                              <div className="w-1 h-1 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                              <div className="w-1 h-1 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                              <div className="w-1 h-1 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-bounce"></div>
                             </div>
                           </div>
                         ) : (
-                          <span className="text-[10px] md:text-xs text-slate-400 font-medium truncate">
+                          <span className="text-[10px] md:text-xs landscape:text-[9px] text-slate-400 dark:text-slate-500 font-medium truncate">
                             {selectedUser.isGroup ? `${selectedUser.members?.length || 0} participants` : (selectedUser.role || "Member")}
                           </span>
                         )}
@@ -751,35 +751,35 @@ const ChatPage = () => {
                   </div>
 
                 <div className="flex items-center gap-1 md:gap-2">
-                  <button className="hidden sm:flex p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                  <button className="hidden sm:flex p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-full transition-colors landscape:p-1.5">
+                    <svg className="w-5 h-5 landscape:w-4 landscape:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
                   </button>
-                  <button className="hidden sm:flex p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                  <button className="hidden sm:flex p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-full transition-colors landscape:p-1.5">
+                    <svg className="w-5 h-5 landscape:w-4 landscape:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                   </button>
                   <div className="relative">
                     <button 
                       onClick={() => setShowClearConfirm(!showClearConfirm)}
-                      className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-all min-w-[40px] min-h-[40px] flex items-center justify-center"
+                      className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all min-w-[40px] min-h-[40px] landscape:min-w-[32px] landscape:min-h-[32px] flex items-center justify-center"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                      <svg className="w-5 h-5 landscape:w-4 landscape:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                       </svg>
                     </button>
                     
                     {showClearConfirm && (
-                      <div className="absolute right-0 top-12 w-56 bg-white border border-slate-100 rounded-2xl shadow-xl z-50 py-2 animate-fade-in-up">
+                      <div className="absolute right-0 top-12 w-56 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-xl z-50 py-2 animate-fade-in-up">
                         <button 
                           onClick={handleClearChat}
-                          className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 font-bold transition-colors"
+                          className="w-full text-left px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 font-bold transition-colors"
                         >
-                          <div className="p-1.5 bg-red-100 rounded-lg">
+                          <div className="p-1.5 bg-red-100 dark:bg-red-900/30 rounded-lg">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                           </div>
                           Clear Entire Chat
                         </button>
-                        <button className="w-full text-left px-4 py-3 text-sm text-slate-600 hover:bg-slate-50 flex items-center gap-3 font-semibold transition-colors">
-                          <div className="p-1.5 bg-slate-100 rounded-lg">
+                        <button className="w-full text-left px-4 py-3 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-3 font-semibold transition-colors">
+                          <div className="p-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                           </div>
                           View Profile
@@ -791,7 +791,7 @@ const ChatPage = () => {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 bg-slate-50/50 scroll-smooth">
+              <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 bg-slate-50/50 dark:bg-slate-950/50 scroll-smooth landscape:p-3 landscape:space-y-4">
                 {messages.map((msg, index) => {
                   const isMe = msg.sender._id === user._id || msg.sender === user._id;
                   const msgDate = new Date(msg.createdAt);
@@ -812,17 +812,17 @@ const ChatPage = () => {
                       )}
                       <div className={`flex ${isMe ? 'justify-end' : 'justify-start'} items-end gap-2 group relative animate-fade-in-up`}>
                         {!isMe && selectedUser.isGroup && (
-                          <img src={msg.sender.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.sender.name)}&background=random`} alt="" className="w-6 h-6 rounded-full border border-white shadow-sm mb-1" />
+                          <img src={msg.sender.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.sender.name)}&background=random`} alt="" className="w-6 h-6 rounded-full border border-white dark:border-slate-800 shadow-sm mb-1" />
                         )}
                         
-                          <div className={`relative flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%]`}>
+                          <div className={`relative flex flex-col ${isMe ? 'items-end' : 'items-start'} max-w-[85%] md:max-w-[70%] landscape:max-w-[90%]`}>
                             {selectedUser.isGroup && !isMe && (
-                               <span className="text-[10px] font-bold text-slate-500 mb-1 ml-1 uppercase tracking-tight">{msg.sender.name}</span>
+                               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 ml-1 uppercase tracking-tight landscape:text-[9px]">{msg.sender.name}</span>
                             )}
                             
                             {/* Reply Context */}
                             {msg.replyTo && (
-                              <div className={`mb-1 px-3 py-1.5 rounded-xl text-[11px] border-l-4 ${isMe ? 'bg-indigo-700/50 border-indigo-300' : 'bg-slate-100 border-slate-300'} italic max-w-full truncate opacity-80 cursor-pointer`}
+                              <div className={`mb-1 px-3 py-1.5 rounded-xl text-[11px] border-l-4 ${isMe ? 'bg-indigo-700/50 border-indigo-300' : 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-600'} italic max-w-full truncate opacity-80 cursor-pointer landscape:text-[10px] landscape:py-1`}
                                 onClick={() => {
                                   const element = document.getElementById(`msg-${msg.replyTo._id}`);
                                   if (element) {
@@ -832,15 +832,15 @@ const ChatPage = () => {
                                   }
                                 }}
                               >
-                                <span className="block font-bold text-[10px] uppercase opacity-60">Replying to {msg.replyTo.sender?.name || "User"}</span>
+                                <span className="block font-bold text-[10px] uppercase opacity-60 landscape:text-[8px]">Replying to {msg.replyTo.sender?.name || "User"}</span>
                                 {msg.replyTo.content}
                               </div>
                             )}
                             
-                            <div id={`msg-${msg._id}`} className={`relative rounded-2xl px-4 py-3 text-sm shadow-sm transition-all hover:shadow-md ${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white text-slate-800 border border-slate-100 rounded-bl-none'}`}>
+                            <div id={`msg-${msg._id}`} className={`relative rounded-2xl px-4 py-3 text-sm shadow-sm transition-all hover:shadow-md ${isMe ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-700 rounded-bl-none'} landscape:px-3 landscape:py-2 landscape:text-xs`}>
                               {/* Attachment Display */}
                             {msg.attachment && (
-                              <div className="mb-3 rounded-xl overflow-hidden bg-black/5 ring-1 ring-black/5">
+                              <div className="mb-3 rounded-xl overflow-hidden bg-black/5 dark:bg-black/20 ring-1 ring-black/5 dark:ring-white/5">
                                 {msg.attachment.fileType === 'image' ? (
                                   <img 
                                     src={msg.attachment.isLocal ? msg.attachment.url : (msg.attachment.url.startsWith('http') ? msg.attachment.url : `${SERVER_URL}${msg.attachment.url}`)} 
@@ -852,9 +852,9 @@ const ChatPage = () => {
                                     href={msg.attachment.isLocal ? msg.attachment.url : (msg.attachment.url.startsWith('http') ? msg.attachment.url : `${SERVER_URL}${msg.attachment.url}`)}
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    className={`flex items-center gap-3 p-4 transition-colors ${isMe ? 'text-white hover:bg-white/10' : 'text-indigo-600 hover:bg-slate-50'}`}
+                                    className={`flex items-center gap-3 p-4 transition-colors ${isMe ? 'text-white hover:bg-white/10' : 'text-indigo-600 dark:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-900'}`}
                                   >
-                                    <div className={`p-2.5 rounded-xl ${isMe ? 'bg-white/20' : 'bg-indigo-50 border border-indigo-100'}`}>
+                                    <div className={`p-2.5 rounded-xl ${isMe ? 'bg-white/20' : 'bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800'}`}>
                                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                       </svg>
@@ -875,7 +875,7 @@ const ChatPage = () => {
                                   autoFocus
                                   value={editingMessage.content}
                                   onChange={(e) => setEditingMessage({...editingMessage, content: e.target.value})}
-                                  className={`w-full bg-transparent border-none focus:ring-0 text-sm p-0 resize-none ${isMe ? 'text-white' : 'text-slate-800'}`}
+                                  className={`w-full bg-transparent border-none focus:ring-0 text-sm p-0 resize-none ${isMe ? 'text-white' : 'text-slate-800 dark:text-white'}`}
                                   rows={2}
                                 />
                                 <div className="flex justify-end gap-2 mt-2">
@@ -892,7 +892,7 @@ const ChatPage = () => {
                               )
                             )}
                             
-                            <div className={`text-[10px] mt-1.5 flex justify-end items-center gap-1.5 ${isMe ? 'text-indigo-200' : 'text-slate-400'} font-bold tabular-nums`}>
+                            <div className={`text-[10px] mt-1.5 flex justify-end items-center gap-1.5 ${isMe ? 'text-indigo-200' : 'text-slate-400 dark:text-slate-500'} font-bold tabular-nums`}>
                               {msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                               {isMe && (
                                 <span className="flex items-center">
@@ -918,12 +918,12 @@ const ChatPage = () => {
                         <div className={`relative message-menu-container flex items-center transition-all duration-200 ${isMe ? 'mr-1 flex-row-reverse' : 'ml-1 flex-row'}`}>
                           <button
                             onClick={(e) => toggleMessageMenu(e, msg._id)}
-                            className={`p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${activeMenu === msg._id ? 'opacity-100 bg-indigo-50 text-indigo-600' : 'opacity-0 group-hover:opacity-100'}`}
+                            className={`p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-full transition-all min-w-[44px] min-h-[44px] landscape:min-w-[32px] landscape:min-h-[32px] landscape:p-1 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-indigo-500/20 ${activeMenu === msg._id ? 'opacity-100 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'opacity-0 group-hover:opacity-100'}`}
                             aria-haspopup="true"
                             aria-expanded={activeMenu === msg._id}
                             title="Message options"
                           >
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 landscape:w-4 landscape:h-4" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
                             </svg>
                           </button>
@@ -936,7 +936,7 @@ const ChatPage = () => {
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
                                 transition={{ duration: 0.15 }}
-                                className={`absolute z-[100] min-w-[160px] bg-white border border-slate-100 rounded-2xl shadow-xl py-2 overflow-hidden ${isMe ? 'right-0' : 'left-0'} ${menuPlacement === 'top' ? 'bottom-12' : 'top-12'} ${isMe ? (menuPlacement === 'top' ? 'origin-bottom-right' : 'origin-top-right') : (menuPlacement === 'top' ? 'origin-bottom-left' : 'origin-top-left')}`}
+                                className={`absolute z-[100] min-w-[160px] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-xl py-2 overflow-hidden ${isMe ? 'right-0' : 'left-0'} ${menuPlacement === 'top' ? 'bottom-12' : 'top-12'} ${isMe ? (menuPlacement === 'top' ? 'origin-bottom-right' : 'origin-top-right') : (menuPlacement === 'top' ? 'origin-bottom-left' : 'origin-top-left')}`}
                                 role="menu"
                                 aria-orientation="vertical"
                                 onKeyDown={(e) => {
@@ -953,7 +953,7 @@ const ChatPage = () => {
                               >
                                 <button
                                   onClick={() => { setReplyingTo(msg); setActiveMenu(null); }}
-                                  className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors group/item"
+                                  className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-3 transition-colors group/item"
                                   role="menuitem"
                                 >
                                   <svg className="w-4 h-4 text-slate-400 group-hover/item:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l5 5m-5-5l5-5" /></svg>
@@ -963,7 +963,7 @@ const ChatPage = () => {
                                 {isMe && !msg.attachment && (
                                   <button
                                     onClick={() => { setEditingMessage({ _id: msg._id, content: msg.content }); setActiveMenu(null); }}
-                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors group/item"
+                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-3 transition-colors group/item"
                                     role="menuitem"
                                   >
                                     <svg className="w-4 h-4 text-slate-400 group-hover/item:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
@@ -973,7 +973,7 @@ const ChatPage = () => {
 
                                 <button
                                   onClick={() => { copyToClipboard(msg.content); setActiveMenu(null); }}
-                                  className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors group/item"
+                                  className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-3 transition-colors group/item"
                                   role="menuitem"
                                 >
                                   <svg className="w-4 h-4 text-slate-400 group-hover/item:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
@@ -983,7 +983,7 @@ const ChatPage = () => {
                                 {msg.content && (
                                   <button
                                     onClick={() => { setTranslationModal({ show: true, messageId: msg._id, content: msg.content }); setActiveMenu(null); }}
-                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors group/item"
+                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-3 transition-colors group/item"
                                     role="menuitem"
                                   >
                                     <svg className="w-4 h-4 text-slate-400 group-hover/item:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
@@ -994,7 +994,7 @@ const ChatPage = () => {
                                 {msg.content && (
                                   <button
                                     onClick={() => { setForwardModal({ show: true, message: msg }); setActiveMenu(null); }}
-                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-3 transition-colors group/item"
+                                    className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-3 transition-colors group/item"
                                     role="menuitem"
                                   >
                                     <svg className="w-4 h-4 text-slate-400 group-hover/item:text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
@@ -1024,10 +1024,10 @@ const ChatPage = () => {
               </div>
 
               {/* Input Area */}
-              <div className="p-4 bg-white border-t sticky bottom-0 z-20">
+              <div className="p-4 bg-white dark:bg-slate-900 border-t dark:border-slate-800 sticky bottom-0 z-20 landscape:p-2">
                 {/* Replying To Preview */}
                 {replyingTo && (
-                  <div className="mb-3 flex items-center justify-between bg-indigo-50/80 backdrop-blur-sm p-3 rounded-2xl border border-indigo-100 shadow-sm animate-fade-in-up">
+                  <div className="mb-3 flex items-center justify-between bg-indigo-50/80 dark:bg-indigo-900/30 backdrop-blur-sm p-3 rounded-2xl border border-indigo-100 dark:border-indigo-800 shadow-sm animate-fade-in-up">
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="bg-indigo-600 p-2 rounded-xl shadow-md">
                         <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
@@ -1035,13 +1035,13 @@ const ChatPage = () => {
                         </svg>
                       </div>
                       <div className="min-w-0">
-                        <span className="block text-[10px] text-indigo-400 font-bold uppercase tracking-wider">Replying to {replyingTo.sender?.name || "User"}</span>
-                        <span className="block text-xs text-indigo-900 truncate max-w-[300px] font-medium italic">"{replyingTo.content}"</span>
+                        <span className="block text-[10px] text-indigo-400 dark:text-indigo-300 font-bold uppercase tracking-wider">Replying to {replyingTo.sender?.name || "User"}</span>
+                        <span className="block text-xs text-indigo-900 dark:text-indigo-100 truncate max-w-[300px] font-medium italic">"{replyingTo.content}"</span>
                       </div>
                     </div>
                     <button 
                       onClick={() => setReplyingTo(null)}
-                      className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-white rounded-full transition-colors"
+                      className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-white dark:hover:bg-slate-800 rounded-full transition-colors"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -1052,22 +1052,22 @@ const ChatPage = () => {
 
                 {/* Attachment Preview */}
                 {attachment && (
-                  <div className="mb-3 flex items-center gap-3 bg-indigo-50/80 backdrop-blur-sm p-2.5 rounded-2xl w-fit border border-indigo-100 shadow-sm animate-fade-in-up">
+                  <div className="mb-3 flex items-center gap-3 bg-indigo-50/80 dark:bg-indigo-900/30 backdrop-blur-sm p-2.5 rounded-2xl w-fit border border-indigo-100 dark:border-indigo-800 shadow-sm animate-fade-in-up">
                     <div className="bg-indigo-600 p-2 rounded-xl shadow-md shadow-indigo-200">
                       <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                       </svg>
                     </div>
                     <div className="min-w-0 pr-2">
-                      <span className="block text-xs text-indigo-900 truncate max-w-[180px] font-bold">{attachment.name}</span>
-                      <span className="block text-[10px] text-indigo-400 font-bold uppercase">Ready to send</span>
+                      <span className="block text-xs text-indigo-900 dark:text-indigo-100 truncate max-w-[180px] font-bold">{attachment.name}</span>
+                      <span className="block text-[10px] text-indigo-400 dark:text-indigo-300 font-bold uppercase">Ready to send</span>
                     </div>
                     <button 
                       onClick={() => {
                         setAttachment(null);
                         if (fileInputRef.current) fileInputRef.current.value = "";
                       }}
-                      className="p-1 text-slate-400 hover:text-red-500 hover:bg-white rounded-full transition-colors"
+                      className="p-1 text-slate-400 hover:text-red-500 hover:bg-white dark:hover:bg-slate-800 rounded-full transition-colors"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -1076,7 +1076,7 @@ const ChatPage = () => {
                   </div>
                 )}
                 
-                <form onSubmit={handleSendMessage} className="flex items-end gap-2 bg-slate-50 p-2 rounded-[1.75rem] relative border border-slate-200 focus-within:ring-4 focus-within:ring-indigo-500/10 focus-within:border-indigo-500/30 transition-all shadow-inner">
+                <form onSubmit={handleSendMessage} className="flex items-end gap-2 bg-slate-50 dark:bg-slate-800 p-2 rounded-[1.75rem] relative border border-slate-200 dark:border-slate-700 focus-within:ring-4 focus-within:ring-indigo-500/10 focus-within:border-indigo-500/30 transition-all shadow-inner landscape:p-1 landscape:rounded-2xl">
                   <input 
                     type="file" 
                     ref={fileInputRef}
@@ -1089,10 +1089,10 @@ const ChatPage = () => {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-white rounded-full transition-all min-w-[44px] min-h-[44px] flex items-center justify-center active:scale-90"
+                      className="p-2.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-700 rounded-full transition-all min-w-[44px] min-h-[44px] landscape:min-w-[36px] landscape:min-h-[36px] landscape:p-1.5 flex items-center justify-center active:scale-90"
                       title="Attach file"
                     >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                      <svg className="w-6 h-6 landscape:w-5 landscape:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                       </svg>
                     </button>
@@ -1100,19 +1100,20 @@ const ChatPage = () => {
                     <button
                       type="button"
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                      className="p-2.5 text-slate-400 hover:text-yellow-500 hover:bg-white rounded-full transition-all relative min-w-[44px] min-h-[44px] flex items-center justify-center active:scale-90"
+                      className="p-2.5 text-slate-400 hover:text-yellow-500 hover:bg-white dark:hover:bg-slate-700 rounded-full transition-all relative min-w-[44px] min-h-[44px] landscape:min-w-[36px] landscape:min-h-[36px] landscape:p-1.5 flex items-center justify-center active:scale-90"
                       title="Add emoji"
                     >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                      <svg className="w-6 h-6 landscape:w-5 landscape:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </button>
                   </div>
 
                   {showEmojiPicker && (
-                    <div className="absolute bottom-full left-0 mb-6 z-50 shadow-2xl rounded-3xl overflow-hidden border border-slate-100 animate-fade-in-up">
+                    <div className="absolute bottom-full left-0 mb-6 z-50 shadow-2xl rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800 animate-fade-in-up">
                       <EmojiPicker 
                         onEmojiClick={handleEmojiClick} 
+                        theme={localStorage.getItem("theme") === "dark" ? "dark" : "light"}
                         width={320} 
                         height={400} 
                         previewConfig={{ showPreview: false }}
@@ -1132,15 +1133,15 @@ const ChatPage = () => {
                         handleSendMessage(e);
                       }
                     }}
-                    className="flex-1 bg-transparent border-none focus:ring-0 resize-none max-h-32 text-slate-800 placeholder:text-slate-400 font-medium py-3 px-2 min-h-[44px] text-sm md:text-base"
+                    className="flex-1 bg-transparent border-none focus:ring-0 resize-none max-h-32 text-slate-800 dark:text-white placeholder:text-slate-400 font-medium py-3 px-2 min-h-[44px] text-sm md:text-base landscape:py-1 landscape:min-h-[36px] landscape:text-sm"
                   />
                   
                   <button 
                     type="submit"
                     disabled={!newMessage.trim() && !attachment}
-                    className="bg-indigo-600 text-white p-3 rounded-2xl hover:bg-indigo-700 disabled:opacity-30 disabled:grayscale transition-all shadow-lg shadow-indigo-200 active:scale-95 flex items-center justify-center group"
+                    className="bg-indigo-600 text-white p-3 rounded-2xl hover:bg-indigo-700 disabled:opacity-30 disabled:grayscale transition-all shadow-lg shadow-indigo-200 dark:shadow-none active:scale-95 flex items-center justify-center group landscape:p-2 landscape:rounded-xl"
                   >
-                    <svg className="w-5 h-5 transform group-active:translate-x-1 group-active:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+                    <svg className="w-5 h-5 landscape:w-4 landscape:h-4 transform group-active:translate-x-1 group-active:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>
                   </button>
