@@ -4,14 +4,27 @@ const User = require("../models/User");
 const EmailOtp = require("../models/EmailOtp");
 const mongoose = require("mongoose");
 
-// Mock SendGrid
-jest.mock("@sendgrid/mail", () => ({
-  setApiKey: jest.fn(),
-  send: jest.fn().mockResolvedValue(true),
+// Mock Nodemailer
+jest.mock("nodemailer", () => ({
+  createTransport: jest.fn().mockReturnValue({
+    sendMail: jest.fn().mockResolvedValue({ messageId: "test-id" }),
+  }),
+}));
+
+// Mock rate limiter to avoid blocking tests
+jest.mock("../middleware/rateLimiter", () => ({
+  passwordChangeLimiter: (req, res, next) => next(),
+  relationshipLimiter: (req, res, next) => next(),
+  otpLimiter: (req, res, next) => next(),
 }));
 
 describe("OTP Workflow", () => {
   const testEmail = "otp-test@example.com";
+
+  beforeAll(() => {
+    process.env.BREVO_API_KEY = "test-key";
+    process.env.BREVO_SMTP_USER = "test@example.com";
+  });
 
   beforeEach(async () => {
     await User.deleteMany({});
@@ -41,11 +54,11 @@ describe("OTP Workflow", () => {
       expect(res.body.message).toContain("valid email address is required");
     });
 
-    it("should enforce rate limiting (1 minute cooldown)", async () => {
+    it("should enforce rate limiting (1 minute cooldown per email)", async () => {
       // First request
       await request(app).post("/api/auth/send-otp").send({ email: testEmail });
       
-      // Immediate second request
+      // Immediate second request for same email
       const res = await request(app)
         .post("/api/auth/send-otp")
         .send({ email: testEmail });

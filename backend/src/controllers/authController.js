@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
 const emailValidator = require("email-validator");
 const dns = require("dns").promises;
+const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
 const { createNotification } = require("./notificationController");
 const { formatUserResponse } = require("../utils/userUtils");
@@ -87,8 +88,8 @@ exports.sendOtp = async (req, res) => {
       return res.status(429).json({ message: "Please wait at least 60 seconds before requesting another code." });
     }
 
-    // Generate 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate 6-digit secure OTP
+    const otp = crypto.randomInt(100000, 1000000).toString();
 
     // Store in DB (upsert)
     await EmailOtp.findOneAndUpdate(
@@ -97,14 +98,41 @@ exports.sendOtp = async (req, res) => {
       { upsert: true, new: true }
     );
 
+    // Professional HTML Email Template
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h1 style="color: #4f46e5; margin: 0;">IdeaCollab</h1>
+          <p style="color: #6b7280; font-size: 14px;">Connect. Create. Collaborate.</p>
+        </div>
+        <div style="background-color: #f9fafb; padding: 30px; border-radius: 8px; text-align: center;">
+          <h2 style="color: #111827; margin-top: 0;">Verification Code</h2>
+          <p style="color: #374151; font-size: 16px; margin-bottom: 24px;">Please use the following code to verify your email address:</p>
+          <div style="font-size: 36px; font-weight: bold; color: #4f46e5; letter-spacing: 5px; margin-bottom: 24px; padding: 15px; background: white; border: 2px dashed #e5e7eb; border-radius: 8px; display: inline-block;">
+            ${otp}
+          </div>
+          <p style="color: #6b7280; font-size: 14px; margin-top: 0;">This code will expire in 10 minutes.</p>
+        </div>
+        <div style="margin-top: 24px; color: #6b7280; font-size: 12px; text-align: center;">
+          <p>If you didn't request this code, you can safely ignore this email.</p>
+          <p>&copy; ${new Date().getFullYear()} IdeaCollab. All rights reserved.</p>
+        </div>
+      </div>
+    `;
+
     // Send email with fallback logging
     try {
-      await sendEmail({
+      const sent = await sendEmail({
         email,
-        subject: "Verification Code - Idea Collab",
+        subject: "Verification Code - IdeaCollab",
         message: `Your verification code is: ${otp}. It will expire in 10 minutes.`,
+        html: htmlContent
       });
       
+      if (!sent) {
+        throw new Error("Email delivery returned false status");
+      }
+
       console.log(`[OTP GENERATED] Success for ${email}`);
       res.json({ message: "Verification code sent to your email" });
     } catch (emailError) {
@@ -309,8 +337,8 @@ exports.forgotPassword = async (req, res) => {
       return res.status(429).json({ message: "Please wait at least 60 seconds before requesting another code." });
     }
 
-    // Generate 6-digit OTP for password reset
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    // Generate 6-digit secure OTP for password reset
+    const otp = crypto.randomInt(100000, 1000000).toString();
 
     // Store in DB (upsert)
     await EmailOtp.findOneAndUpdate(
@@ -319,13 +347,40 @@ exports.forgotPassword = async (req, res) => {
       { upsert: true, new: true }
     );
 
+    // Professional HTML Email Template for Password Reset
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h1 style="color: #4f46e5; margin: 0;">IdeaCollab</h1>
+          <p style="color: #6b7280; font-size: 14px;">Connect. Create. Collaborate.</p>
+        </div>
+        <div style="background-color: #f9fafb; padding: 30px; border-radius: 8px; text-align: center;">
+          <h2 style="color: #111827; margin-top: 0;">Password Reset Code</h2>
+          <p style="color: #374151; font-size: 16px; margin-bottom: 24px;">Please use the following code to reset your password:</p>
+          <div style="font-size: 36px; font-weight: bold; color: #dc2626; letter-spacing: 5px; margin-bottom: 24px; padding: 15px; background: white; border: 2px dashed #e5e7eb; border-radius: 8px; display: inline-block;">
+            ${otp}
+          </div>
+          <p style="color: #6b7280; font-size: 14px; margin-top: 0;">This code will expire in 10 minutes.</p>
+        </div>
+        <div style="margin-top: 24px; color: #6b7280; font-size: 12px; text-align: center;">
+          <p>If you didn't request a password reset, please secure your account immediately.</p>
+          <p>&copy; ${new Date().getFullYear()} IdeaCollab. All rights reserved.</p>
+        </div>
+      </div>
+    `;
+
     // Send email with fallback logging
     try {
-      await sendEmail({
+      const sent = await sendEmail({
         email,
-        subject: "Password Reset Verification Code - Idea Collab",
+        subject: "Password Reset Verification Code - IdeaCollab",
         message: `Your verification code for password reset is: ${otp}. It will expire in 10 minutes.`,
+        html: htmlContent
       });
+      
+      if (!sent) {
+        throw new Error("Email delivery returned false status");
+      }
       
       console.log(`[PASSWORD RESET OTP] Success for ${email}`);
       res.json({ message: "Verification code sent to your email." });
@@ -374,11 +429,29 @@ exports.resetPasswordWithOtp = async (req, res) => {
     await EmailOtp.deleteOne({ _id: otpRecord._id });
 
     // 6. Send notification email
+    const successHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h1 style="color: #4f46e5; margin: 0;">IdeaCollab</h1>
+        </div>
+        <div style="background-color: #f9fafb; padding: 30px; border-radius: 8px;">
+          <h2 style="color: #111827; margin-top: 0;">Password Reset Successful</h2>
+          <p style="color: #374151; font-size: 16px;">Hello ${user.name},</p>
+          <p style="color: #374151; font-size: 16px;">Your password has been successfully reset. You can now log in with your new password.</p>
+          <p style="color: #6b7280; font-size: 14px; margin-top: 20px;">If you did not perform this action, please contact our support team immediately.</p>
+        </div>
+        <div style="margin-top: 24px; color: #6b7280; font-size: 12px; text-align: center;">
+          <p>&copy; ${new Date().getFullYear()} IdeaCollab. All rights reserved.</p>
+        </div>
+      </div>
+    `;
+
     try {
       await sendEmail({
         email: user.email,
-        subject: "Password Reset Successful - Idea Collab",
-        message: `Hello ${user.name},\n\nYour password has been successfully reset. If you did not perform this action, please contact support immediately.\n\nBest regards,\nIdea Collab Team`,
+        subject: "Password Reset Successful - IdeaCollab",
+        message: `Hello ${user.name},\n\nYour password has been successfully reset. If you did not perform this action, please contact support immediately.\n\nBest regards,\nIdeaCollab Team`,
+        html: successHtml
       });
     } catch (emailError) {
       console.error("Failed to send password reset success email:", emailError);
