@@ -156,7 +156,8 @@ const ProblemDetailPage = () => {
     </Layout>
   );
 
-  const isAuthor = currentUser?._id === problem.author._id;
+  const problemAuthorId = problem.author?._id || problem.author;
+  const isAuthor = currentUser?._id === problemAuthorId;
 
   // Group solutions by parentReply to support threading
   const topLevelSolutions = solutions.filter(s => !s.parentReply);
@@ -474,69 +475,7 @@ const ProblemDetailPage = () => {
             ))}
           </div>
         </div>
-
-        {/* Post Solution Section */}
-        {!isAuthor ? (
-          <div className="bg-white border border-slate-100 rounded-2xl p-8 shadow-sm">
-            <h2 className="text-xl font-bold text-slate-800 mb-2">Your Solution</h2>
-            <p className="text-slate-500 font-medium mb-8">Share your expertise and help resolve this challenge.</p>
-            
-            <form onSubmit={(e) => handleSubmitSolution(e, false)} className="space-y-6">
-              <textarea
-                placeholder="Explain your approach clearly..."
-                value={newSolution}
-                onChange={(e) => setNewMessage(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-6 py-4 focus:outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium min-h-[150px] text-sm"
-                required
-              />
-              
-              <div className="bg-slate-50 border border-slate-100 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Code Snippet (Optional)</label>
-                  <select
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                    className="bg-white border border-slate-200 text-[10px] font-bold rounded-lg px-2 py-1 outline-none"
-                  >
-                    <option value="javascript">JS</option>
-                    <option value="python">PY</option>
-                    <option value="html">HTML</option>
-                    <option value="css">CSS</option>
-                  </select>
-                </div>
-                <textarea
-                  placeholder="// Paste code here..."
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  className="w-full bg-slate-900 border-none rounded-lg px-4 py-3 focus:ring-2 focus:ring-indigo-500 font-mono text-sm min-h-[120px] text-indigo-300"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 shadow-sm"
-              >
-                {submitting ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                ) : (
-                  <>
-                    Submit Solution
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-8 text-center">
-            <h3 className="text-indigo-800 font-bold mb-2">You are the author of this question</h3>
-            <p className="text-indigo-600 text-sm font-medium">
-              You cannot reply to your own question directly. However, you can reply to other users' solutions to discuss their approach.
-            </p>
-          </div>
-         )}
-       </div>
+      </div>
        
        <ConfirmationModal
          isOpen={isDeleteModalOpen}

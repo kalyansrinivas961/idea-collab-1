@@ -237,27 +237,34 @@ exports.updateProblemStatus = async (req, res) => {
 
   try {
     const problem = await Problem.findById(id);
-    if (!problem) return res.status(404).json({ message: "Problem not found" });
+    if (!problem) {
+      console.error(`[STATUS UPDATE ERROR] Problem not found: ${id}`);
+      return res.status(404).json({ message: "Problem not found" });
+    }
 
     // Permission Check: Only author can update status
-    if (problem.author.toString() !== req.user?._id?.toString()) {
-      console.warn(`[SECURITY] Unauthorized status update attempt by user ${req.user?._id} on problem ${id}`);
+    const authorId = problem.author._id || problem.author;
+    const currentUserId = req.user?._id;
+
+    if (authorId.toString() !== currentUserId?.toString()) {
+      console.warn(`[SECURITY] Unauthorized status update attempt by user ${currentUserId} on problem ${id}`);
       return res.status(403).json({ message: "Not authorized to update status" });
     }
 
     if (!["open", "solved"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status value" });
+      return res.status(400).json({ message: "Invalid status value. Allowed: 'open', 'solved'." });
     }
 
     problem.status = status;
     problem.isResolved = status === "solved";
     await problem.save();
 
-    await logActivity(req.user?._id || "system", "update_problem_status", { problemId: id, status });
+    await logActivity(currentUserId || "system", "update_problem_status", { problemId: id, status });
 
     res.json(problem);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(`[STATUS UPDATE CRITICAL] Error updating status for ${id}:`, error);
+    res.status(500).json({ message: "Failed to update status due to internal error" });
   }
 };
 
@@ -265,19 +272,30 @@ exports.updateProblemStatus = async (req, res) => {
  * Submit a solution
  */
 exports.createSolution = async (req, res) => {
-  const { problemId, content, codeSnippets, parentReply } = req.body;
+  const { content, codeSnippets, parentReply } = req.body;
+  const problemId = req.body.problemId || req.params.problemId;
 
   try {
     if (!content || !content.trim()) {
       return res.status(400).json({ message: "Solution content is required" });
     }
 
+    if (!problemId) {
+      return res.status(400).json({ message: "Problem ID is required" });
+    }
+
     const problem = await Problem.findById(problemId);
-    if (!problem) return res.status(404).json({ message: "Problem not found" });
+    if (!problem) {
+      console.error(`[SOLUTION ERROR] Problem not found: ${problemId}`);
+      return res.status(404).json({ message: "Problem not found" });
+    }
 
     // Self-Reply Restriction: Prevent author from replying to their own question
     // This applies only if it's a top-level reply (parentReply is null)
-    if (!parentReply && problem.author.toString() === req.user?._id?.toString()) {
+    const currentUserId = req.user?._id;
+    const authorId = problem.author._id || problem.author;
+
+    if (!parentReply && authorId.toString() === currentUserId?.toString()) {
       return res.status(403).json({ message: "You cannot reply to your own question. Use the edit feature for updates." });
     }
 
@@ -288,7 +306,8 @@ exports.createSolution = async (req, res) => {
       if (!parentSolution) return res.status(404).json({ message: "Parent reply not found" });
       
       // Prevent replying to own solutions/replies
-      if (parentSolution.author.toString() === req.user?._id?.toString()) {
+      const parentAuthorId = parentSolution.author._id || parentSolution.author;
+      if (parentAuthorId.toString() === currentUserId?.toString()) {
         return res.status(403).json({ message: "You cannot reply to your own response." });
       }
     }
@@ -298,19 +317,13 @@ exports.createSolution = async (req, res) => {
       content,
       codeSnippets,
       parentReply,
-      author: req.user?._id,
-    });
-
-    await logActivity(req.user?._id || "system", "create_solution", { 
-      problemId, 
-      solutionId: solution._id,
-      isNested: !!parentReply 
+      author: currentUserId,
     });
 
     // Create notification for problem author (if not the one replying)
-    if (problem.author.toString() !== req.user?._id?.toString()) {
+    if (authorId.toString() !== currentUserId?.toString()) {
       await createNotification(req, {
-        recipient: problem.author,
+        recipient: authorId,
         type: "info",
         title: parentReply ? "New Reply" : "New Solution",
         message: parentReply 
@@ -324,21 +337,31 @@ exports.createSolution = async (req, res) => {
     // If it's a reply to someone's solution, notify the solution author
     if (parentReply) {
       const parentSolution = await Solution.findById(parentReply);
-      if (parentSolution && parentSolution.author.toString() !== req.user?._id?.toString()) {
-        await createNotification(req, {
-          recipient: parentSolution.author,
-          type: "info",
-          title: "New Reply",
-          message: `${req.user?.name || "Someone"} replied to your solution on: ${problem.title}`,
-          relatedId: problem._id,
-          relatedModel: "Problem",
-        });
+      if (parentSolution) {
+        const parentAuthorId = parentSolution.author._id || parentSolution.author;
+        if (parentAuthorId.toString() !== currentUserId?.toString()) {
+          await createNotification(req, {
+            recipient: parentAuthorId,
+            type: "info",
+            title: "New Reply",
+            message: `${req.user?.name || "Someone"} replied to your solution on: ${problem.title}`,
+            relatedId: problem._id,
+            relatedModel: "Problem",
+          });
+        }
       }
     }
 
+    await logActivity(currentUserId || "system", "create_solution", { 
+      problemId, 
+      solutionId: solution._id,
+      isNested: !!parentReply 
+    });
+
     res.status(201).json(solution);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(`[SOLUTION CRITICAL] Error creating solution for ${problemId}:`, error);
+    res.status(500).json({ message: "Failed to post solution due to internal error" });
   }
 };
 
