@@ -18,6 +18,7 @@ const ProblemDetailPage = () => {
   const [language, setLanguage] = useState("javascript");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubloading] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
   const [replyTo, setReplyTo] = useState(null); // ID of solution being replied to
   const [replyText, setReplyText] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -51,6 +52,21 @@ const ProblemDetailPage = () => {
       toast.error(err.response?.data?.message || "Failed to delete question");
       setIsDeleting(false);
       setIsDeleteModalOpen(false);
+    }
+  };
+
+  const handleToggleStatus = async () => {
+    if (!isAuthor) return;
+    const newStatus = problem.status === "solved" ? "open" : "solved";
+    setUpdatingStatus(true);
+    try {
+      const res = await api.patch(`/qa/problems/${id}/status`, { status: newStatus });
+      setProblem(res.data);
+      toast.success(`Question marked as ${newStatus === "solved" ? "Solved" : "Still Looking"}`);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to update status");
+    } finally {
+      setUpdatingStatus(false);
     }
   };
 
@@ -92,6 +108,10 @@ const ProblemDetailPage = () => {
     const content = isReply ? replyText : newSolution;
     if (!content.trim()) return toast.error("Please provide a solution");
 
+    if (!isReply && isAuthor) {
+      return toast.error("You cannot post a solution to your own question. Use replies to respond to others.");
+    }
+
     setSubloading(true);
     try {
       const res = await api.post(`/qa/problems/${id}/solutions`, {
@@ -111,9 +131,9 @@ const ProblemDetailPage = () => {
         setNewMessage("");
         setCode("");
       }
-      toast.success(isReply ? "Reply submitted!" : "Solution submitted!");
+      toast.success(isReply ? "Reply posted!" : "Solution posted!");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to submit solution");
+      toast.error(err.response?.data?.message || "Failed to post response");
     } finally {
       setSubloading(false);
     }
@@ -152,15 +172,43 @@ const ProblemDetailPage = () => {
             Back to Q&A
           </Link>
           
-          {isAuthor && (
-            <button 
-              onClick={() => setIsDeleteModalOpen(true)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-bold transition-all border border-red-100"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              Delete Question
-            </button>
-          )}
+          <div className="flex items-center gap-4">
+            {isAuthor && (
+              <div className="flex items-center gap-3 pr-4 border-r border-slate-200">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Question Status</span>
+                <button
+                  onClick={handleToggleStatus}
+                  disabled={updatingStatus}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${
+                    problem.status === "solved" ? "bg-emerald-500" : "bg-slate-200"
+                  }`}
+                  role="switch"
+                  aria-checked={problem.status === "solved"}
+                >
+                  <span className="sr-only">Mark as Solved</span>
+                  <span
+                    aria-hidden="true"
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                      problem.status === "solved" ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+                <span className={`text-[10px] font-bold uppercase tracking-widest ${problem.status === "solved" ? 'text-emerald-600' : 'text-slate-400'}`}>
+                  {problem.status === "solved" ? 'Marked as Solved' : 'Still Looking'}
+                </span>
+              </div>
+            )}
+
+            {isAuthor && (
+              <button 
+                onClick={() => setIsDeleteModalOpen(true)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-bold transition-all border border-red-100"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Delete Question
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Problem Section */}
@@ -184,8 +232,20 @@ const ProblemDetailPage = () => {
 
           <div className="flex-1 bg-white border border-slate-100 rounded-2xl p-8 shadow-sm">
             <div className="flex items-center gap-3 mb-4">
-              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider ${problem.isResolved ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'}`}>
-                {problem.isResolved ? 'Resolved' : 'Open'}
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider flex items-center gap-1.5 ${
+                problem.status === "solved" ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+              }`}>
+                {problem.status === "solved" ? (
+                  <>
+                    <Check className="w-3 h-3" strokeWidth={3} />
+                    Solved
+                  </>
+                ) : (
+                  <>
+                    <div className="w-1.5 h-1.5 bg-indigo-600 rounded-full animate-pulse" />
+                    Still Looking
+                  </>
+                )}
               </span>
               <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">{problem.category}</span>
             </div>
@@ -233,14 +293,69 @@ const ProblemDetailPage = () => {
         </div>
 
         {/* Solutions Section */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
-              <MessageSquare size={20} className="text-indigo-600" />
-              {topLevelSolutions.length} Solutions
-            </h2>
-            <div className="h-px flex-1 bg-slate-100 mx-6"></div>
+        <div className="mb-12 space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-slate-800">
+              {solutions.length} {solutions.length === 1 ? 'Solution' : 'Solutions'}
+            </h3>
           </div>
+
+          {/* Post Solution Form (Hidden for author unless replying) */}
+          {(!isAuthor || replyTo) ? (
+            <div id="response-form" className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm mb-8">
+              <div className="flex items-center gap-2 mb-4 text-indigo-600">
+                <MessageSquare size={18} />
+                <h4 className="text-sm font-bold uppercase tracking-wider">
+                  {replyTo ? "Post a Reply" : "Post a Solution"}
+                </h4>
+              </div>
+              
+              {replyTo && (
+                <div className="mb-4 p-3 bg-indigo-50 border border-indigo-100 rounded-lg flex items-center justify-between">
+                  <p className="text-xs text-indigo-700 font-medium">
+                    Replying to {solutions.find(s => s._id === replyTo)?.author?.name}'s solution
+                  </p>
+                  <button 
+                    onClick={() => setReplyTo(null)}
+                    className="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 uppercase tracking-widest"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+
+              <form onSubmit={(e) => handleSubmitSolution(e, !!replyTo)} className="space-y-4">
+                <textarea
+                  value={replyTo ? replyText : newSolution}
+                  onChange={(e) => replyTo ? setReplyText(e.target.value) : setNewMessage(e.target.value)}
+                  placeholder={replyTo ? "Type your reply..." : "Explain your solution in detail..."}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all text-sm min-h-[120px] resize-none"
+                  required
+                />
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 disabled:opacity-50"
+                  >
+                    {submitting ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Reply className="w-4 h-4" />
+                    )}
+                    {replyTo ? "Post Reply" : "Post Solution"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          ) : (
+            <div className="bg-slate-50 border border-dashed border-slate-200 rounded-2xl p-8 text-center mb-8">
+              <p className="text-sm text-slate-500 font-medium">
+                As the author, you cannot post a solution to your own question. 
+                <br />You can still reply to solutions provided by others.
+              </p>
+            </div>
+          )}
 
           <div className="space-y-8">
             {topLevelSolutions.map((solution) => (

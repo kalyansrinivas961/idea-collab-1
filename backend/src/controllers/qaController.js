@@ -47,10 +47,11 @@ exports.createProblem = async (req, res) => {
       author: req.user._id,
     });
 
-    await logActivity(req.user._id, "create_problem", { problemId: problem._id });
+    await logActivity(req.user?._id || "system", "create_problem", { problemId: problem._id });
 
     res.status(201).json(problem);
   } catch (error) {
+    console.error("Error in updateProblemStatus:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -66,7 +67,7 @@ exports.deleteProblem = async (req, res) => {
     if (!problem) return res.status(404).json({ message: "Problem not found" });
 
     // Deletion Rights: Only author can delete
-    if (problem.author.toString() !== req.user._id.toString()) {
+    if (problem.author.toString() !== req.user?._id?.toString()) {
       return res.status(403).json({ message: "Not authorized to delete this problem" });
     }
 
@@ -82,13 +83,46 @@ exports.deleteProblem = async (req, res) => {
     );
 
     // Audit logging
-    await logActivity(req.user._id, "delete_problem", { 
+    await logActivity(req.user?._id || "system", "delete_problem", {
       problemId: id,
       deletedAt: problem.deletedAt,
       title: problem.title
     });
 
     res.json({ message: "Problem and associated solutions deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Delete a solution (Soft-delete with audit logging)
+ */
+exports.deleteSolution = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const solution = await Solution.findById(id);
+    if (!solution) return res.status(404).json({ message: "Solution not found" });
+
+    // Deletion Rights: Only author can delete
+    if (solution.author.toString() !== req.user?._id?.toString()) {
+      return res.status(403).json({ message: "Not authorized to delete this solution" });
+    }
+
+    // Soft-delete solution
+    solution.isDeleted = true;
+    solution.deletedAt = new Date();
+    await solution.save();
+
+    // Audit logging
+    await logActivity(req.user?._id || "system", "delete_solution", {
+      solutionId: id,
+      deletedAt: solution.deletedAt,
+      content: solution.content.substring(0, 50)
+    });
+
+    res.json({ message: "Solution deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -196,18 +230,55 @@ exports.voteProblem = async (req, res) => {
 };
 
 /**
+ * Update problem status (Mark as Solved / Still Looking)
+ */
+exports.updateProblemStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const problem = await Problem.findById(id);
+    if (!problem) return res.status(404).json({ message: "Problem not found" });
+
+    // Permission Check: Only author can update status
+    if (problem.author.toString() !== req.user?._id?.toString()) {
+      console.warn(`[SECURITY] Unauthorized status update attempt by user ${req.user?._id} on problem ${id}`);
+      return res.status(403).json({ message: "Not authorized to update status" });
+    }
+
+    if (!["open", "solved"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    problem.status = status;
+    problem.isResolved = status === "solved";
+    await problem.save();
+
+    await logActivity(req.user?._id || "system", "update_problem_status", { problemId: id, status });
+
+    res.json(problem);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
  * Submit a solution
  */
 exports.createSolution = async (req, res) => {
   const { problemId, content, codeSnippets, parentReply } = req.body;
 
   try {
+    if (!content || !content.trim()) {
+      return res.status(400).json({ message: "Solution content is required" });
+    }
+
     const problem = await Problem.findById(problemId);
     if (!problem) return res.status(404).json({ message: "Problem not found" });
 
     // Self-Reply Restriction: Prevent author from replying to their own question
     // This applies only if it's a top-level reply (parentReply is null)
-    if (!parentReply && problem.author.toString() === req.user._id.toString()) {
+    if (!parentReply && problem.author.toString() === req.user?._id?.toString()) {
       return res.status(403).json({ message: "You cannot reply to your own question. Use the edit feature for updates." });
     }
 
@@ -218,7 +289,7 @@ exports.createSolution = async (req, res) => {
       if (!parentSolution) return res.status(404).json({ message: "Parent reply not found" });
       
       // Prevent replying to own solutions/replies
-      if (parentSolution.author.toString() === req.user._id.toString()) {
+      if (parentSolution.author.toString() === req.user?._id?.toString()) {
         return res.status(403).json({ message: "You cannot reply to your own response." });
       }
     }
@@ -228,22 +299,22 @@ exports.createSolution = async (req, res) => {
       content,
       codeSnippets,
       parentReply,
-      author: req.user._id,
+      author: req.user?._id,
     });
 
-    await logActivity(req.user._id, "create_solution", { 
+    await logActivity(req.user?._id || "system", "create_solution", { 
       problemId, 
       solutionId: solution._id,
       isNested: !!parentReply 
     });
 
     // Create notification for problem author (if not the one replying)
-    if (problem.author.toString() !== req.user._id.toString()) {
+    if (problem.author.toString() !== req.user?._id?.toString()) {
       await createNotification(req, {
         recipient: problem.author,
         type: "info",
         title: "New Solution",
-        message: `${req.user.name} submitted a solution to your problem: ${problem.title}`,
+        message: `${req.user?.name || "Someone"} submitted a solution to your problem: ${problem.title}`,
         relatedId: problem._id,
         relatedModel: "Problem",
       });
@@ -252,12 +323,12 @@ exports.createSolution = async (req, res) => {
     // If it's a reply to someone's solution, notify the solution author
     if (parentReply) {
       const parentSolution = await Solution.findById(parentReply);
-      if (parentSolution && parentSolution.author.toString() !== req.user._id.toString()) {
+      if (parentSolution && parentSolution.author.toString() !== req.user?._id?.toString()) {
         await createNotification(req, {
           recipient: parentSolution.author,
           type: "info",
           title: "New Reply",
-          message: `${req.user.name} replied to your solution`,
+          message: `${req.user?.name || "Someone"} replied to your solution`,
           relatedId: problem._id,
           relatedModel: "Problem",
         });
@@ -346,8 +417,10 @@ exports.acceptSolution = async (req, res) => {
     if (solution.isAccepted) {
       solution.isAccepted = false;
       problem.isResolved = false;
+      problem.status = "open";
       problem.acceptedSolution = undefined;
       await updateReputation(solution.author, -REPUTATION_ACCEPT_SOLUTION);
+      await logActivity(req.user?._id || "system", "revoke_solution", { solutionId: id, problemId: problem._id });
     } else {
       // Un-accept previous solution if any
       if (problem.acceptedSolution) {
@@ -361,18 +434,20 @@ exports.acceptSolution = async (req, res) => {
 
       solution.isAccepted = true;
       problem.isResolved = true;
+      problem.status = "solved";
       problem.acceptedSolution = solution._id;
       await updateReputation(solution.author, REPUTATION_ACCEPT_SOLUTION);
+      await logActivity(req.user?._id || "system", "accept_solution", { solutionId: id, problemId: problem._id });
 
       // Notify solution author
-      await createNotification(
-        solution.author,
-        "Solution Accepted!",
-        `Your solution was accepted for: ${problem.title}`,
-        "success",
-        "Problem",
-        problem._id
-      );
+      await createNotification(req, {
+        recipient: solution.author,
+        type: "success",
+        title: "Solution Accepted!",
+        message: `Your solution was accepted for: ${problem.title}`,
+        relatedId: problem._id,
+        relatedModel: "Problem",
+      });
     }
 
     await solution.save();

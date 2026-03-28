@@ -27,7 +27,7 @@ const problemSchema = new mongoose.Schema(
     acceptedSolution: { type: mongoose.Schema.Types.ObjectId, ref: "Solution" },
     status: {
       type: String,
-      enum: ["open", "closed", "moderated"],
+      enum: ["open", "solved", "closed", "moderated"],
       default: "open",
     },
     isDeleted: { type: Boolean, default: false },
