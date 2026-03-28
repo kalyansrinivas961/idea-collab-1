@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Send, Code } from "lucide-react";
+import { Send, Code, Sparkles, ChevronDown, RotateCcw } from "lucide-react";
 import Layout from "../components/Layout.jsx";
 import api from "../api/client.js";
 import toast from "react-hot-toast";
@@ -16,6 +16,52 @@ const PostProblemPage = () => {
     code: "",
     language: "javascript",
   });
+
+  // AI Assistance States
+  const [isAIProcessing, setIsAIProcessing] = useState(false);
+  const [showAIMenu, setShowAIMenu] = useState(false);
+  const [descriptionHistory, setDescriptionHistory] = useState([]);
+  const menuRef = useRef(null);
+
+  const handleEnhance = async (mode) => {
+    if (!formData.description && mode !== "generate") {
+      return toast.error("Please enter a brief description first");
+    }
+
+    setIsAIProcessing(true);
+    setShowAIMenu(false);
+
+    try {
+      const res = await api.post("/ai/enhance-description", {
+        text: formData.description,
+        mode,
+        title: formData.title,
+        category: formData.category
+      });
+
+      const enhancedText = res.data.enhancedText;
+      
+      // Save history for revert
+      setDescriptionHistory(prev => [...prev, formData.description]);
+      
+      setFormData(prev => ({ ...prev, description: enhancedText }));
+      toast.success(`Content ${mode === 'expand' ? 'expanded' : 'refined'} by AI!`);
+    } catch (err) {
+      console.error("AI assistance failed:", err);
+      toast.error("AI assistance failed. Please try again.");
+    } finally {
+      setIsAIProcessing(false);
+    }
+  };
+
+  const handleRevert = () => {
+    if (descriptionHistory.length > 0) {
+      const lastDescription = descriptionHistory[descriptionHistory.length - 1];
+      setFormData(prev => ({ ...prev, description: lastDescription }));
+      setDescriptionHistory(prev => prev.slice(0, -1));
+      toast.success("Reverted to previous version");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,14 +136,84 @@ const PostProblemPage = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2 uppercase tracking-wider">Detailed Description</label>
-            <textarea
-              placeholder="Describe your problem in detail..."
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium min-h-[200px] text-sm resize-none"
-              required
-            />
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-slate-700 uppercase tracking-wider">Detailed Description</label>
+              
+              <div className="flex items-center gap-2">
+                {descriptionHistory.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleRevert}
+                    className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                    title="Revert to previous version"
+                  >
+                    <RotateCcw size={16} />
+                  </button>
+                )}
+                
+                <div className="relative" ref={menuRef}>
+                  <button
+                    type="button"
+                    onClick={() => setShowAIMenu(!showAIMenu)}
+                    disabled={isAIProcessing}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-xl border transition-all ${
+                      isAIProcessing 
+                      ? "bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed" 
+                      : "bg-indigo-50 text-indigo-700 border-indigo-100 hover:border-indigo-300 hover:bg-indigo-100/50"
+                    }`}
+                  >
+                    {isAIProcessing ? (
+                      <div className="w-3.5 h-3.5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Sparkles size={14} className="text-indigo-600" />
+                    )}
+                    AI NARRATE
+                    <ChevronDown size={12} className={`transition-transform duration-200 ${showAIMenu ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {showAIMenu && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-100 rounded-2xl shadow-xl z-30 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50 mb-1">
+                        AI Transformation
+                      </div>
+                      <button 
+                        type="button" 
+                        onClick={() => handleEnhance("expand")} 
+                        className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-indigo-50 text-slate-700 transition flex items-center justify-between group"
+                      >
+                        Expand to Narrative
+                        <span className="text-[10px] text-indigo-500 opacity-0 group-hover:opacity-100 transition">Recommended</span>
+                      </button>
+                      <button type="button" onClick={() => handleEnhance("professional")} className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-indigo-50 text-slate-700 transition">Make Professional</button>
+                      <button type="button" onClick={() => handleEnhance("creative")} className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-indigo-50 text-slate-700 transition">Make Creative</button>
+                      <button type="button" onClick={() => handleEnhance("concise")} className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-indigo-50 text-slate-700 transition">Make Concise</button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <div className="relative group">
+              <textarea
+                placeholder="Describe your problem in detail... (Hint: Write a brief summary and use AI Narrate to expand it!)"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all font-medium min-h-[220px] text-sm resize-none ${
+                  isAIProcessing ? "opacity-60 grayscale-[0.5]" : ""
+                }`}
+                required
+              />
+              {isAIProcessing && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/40 backdrop-blur-[1px] rounded-xl z-10">
+                  <div className="flex gap-1.5 mb-2">
+                    <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" />
+                    <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce [animation-delay:0.2s]" />
+                    <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce [animation-delay:0.4s]" />
+                  </div>
+                  <span className="text-xs font-bold text-indigo-700 animate-pulse tracking-tight">AI is crafting your narrative...</span>
+                </div>
+              )}
+            </div>
           </div>
 
           <div>

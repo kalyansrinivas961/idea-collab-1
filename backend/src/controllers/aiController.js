@@ -99,7 +99,12 @@ const enhanceDescription = async (req, res) => {
         userPrompt = `Make this startup idea description more concise and punchy, while keeping all key information: "${text}"`;
         break;
       case "expand":
-        userPrompt = `Expand this brief idea into a comprehensive and detailed narrative description. Title: ${title || "N/A"}, Category: ${category || "N/A"}. Brief description: "${text}"`;
+        userPrompt = `Expand this brief startup idea or problem description into a comprehensive, engaging narrative. 
+        Provide detailed context, potential use cases, and elaborate on the core value proposition. 
+        The original text is: "${text}". 
+        Title: "${title || "N/A"}". 
+        Category: "${category || "N/A"}". 
+        Return ONLY the expanded description, no conversational text.`;
         break;
       case "grammar":
         userPrompt = `Correct the grammar, spelling, and punctuation of this description without changing its meaning: "${text}"`;
