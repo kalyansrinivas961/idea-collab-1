@@ -51,7 +51,6 @@ exports.createProblem = async (req, res) => {
 
     res.status(201).json(problem);
   } catch (error) {
-    console.error("Error in updateProblemStatus:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -313,8 +312,10 @@ exports.createSolution = async (req, res) => {
       await createNotification(req, {
         recipient: problem.author,
         type: "info",
-        title: "New Solution",
-        message: `${req.user?.name || "Someone"} submitted a solution to your problem: ${problem.title}`,
+        title: parentReply ? "New Reply" : "New Solution",
+        message: parentReply 
+          ? `${req.user?.name || "Someone"} replied to a solution on your problem: ${problem.title}`
+          : `${req.user?.name || "Someone"} submitted a solution to your problem: ${problem.title}`,
         relatedId: problem._id,
         relatedModel: "Problem",
       });
@@ -328,7 +329,7 @@ exports.createSolution = async (req, res) => {
           recipient: parentSolution.author,
           type: "info",
           title: "New Reply",
-          message: `${req.user?.name || "Someone"} replied to your solution`,
+          message: `${req.user?.name || "Someone"} replied to your solution on: ${problem.title}`,
           relatedId: problem._id,
           relatedModel: "Problem",
         });
