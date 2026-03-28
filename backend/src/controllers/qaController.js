@@ -131,7 +131,7 @@ exports.deleteSolution = async (req, res) => {
  * Get all problems with search and filters
  */
 exports.getProblems = async (req, res) => {
-  const { search, tags, category, status, sort } = req.query;
+  const { search, tags, category, sort } = req.query;
   const query = {};
 
   if (search) {
@@ -142,9 +142,6 @@ exports.getProblems = async (req, res) => {
   }
   if (category) {
     query.category = category;
-  }
-  if (status) {
-    query.status = status;
   }
 
   let sortQuery = { createdAt: -1 };
@@ -225,46 +222,6 @@ exports.voteProblem = async (req, res) => {
     res.json(problem);
   } catch (error) {
     res.status(500).json({ message: error.message });
-  }
-};
-
-/**
- * Update problem status (Mark as Solved / Still Looking)
- */
-exports.updateProblemStatus = async (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-
-  try {
-    const problem = await Problem.findById(id);
-    if (!problem) {
-      console.error(`[STATUS UPDATE ERROR] Problem not found: ${id}`);
-      return res.status(404).json({ message: "Problem not found" });
-    }
-
-    // Permission Check: Only author can update status
-    const authorId = problem.author._id || problem.author;
-    const currentUserId = req.user?._id;
-
-    if (authorId.toString() !== currentUserId?.toString()) {
-      console.warn(`[SECURITY] Unauthorized status update attempt by user ${currentUserId} on problem ${id}`);
-      return res.status(403).json({ message: "Not authorized to update status" });
-    }
-
-    if (!["open", "solved"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status value. Allowed: 'open', 'solved'." });
-    }
-
-    problem.status = status;
-    problem.isResolved = status === "solved";
-    await problem.save();
-
-    await logActivity(currentUserId || "system", "update_problem_status", { problemId: id, status });
-
-    res.json(problem);
-  } catch (error) {
-    console.error(`[STATUS UPDATE CRITICAL] Error updating status for ${id}:`, error);
-    res.status(500).json({ message: "Failed to update status due to internal error" });
   }
 };
 
@@ -441,7 +398,6 @@ exports.acceptSolution = async (req, res) => {
     if (solution.isAccepted) {
       solution.isAccepted = false;
       problem.isResolved = false;
-      problem.status = "open";
       problem.acceptedSolution = undefined;
       await updateReputation(solution.author, -REPUTATION_ACCEPT_SOLUTION);
       await logActivity(req.user?._id || "system", "revoke_solution", { solutionId: id, problemId: problem._id });
@@ -458,7 +414,6 @@ exports.acceptSolution = async (req, res) => {
 
       solution.isAccepted = true;
       problem.isResolved = true;
-      problem.status = "solved";
       problem.acceptedSolution = solution._id;
       await updateReputation(solution.author, REPUTATION_ACCEPT_SOLUTION);
       await logActivity(req.user?._id || "system", "accept_solution", { solutionId: id, problemId: problem._id });

@@ -25,11 +25,6 @@ const problemSchema = new mongoose.Schema(
     downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     isResolved: { type: Boolean, default: false },
     acceptedSolution: { type: mongoose.Schema.Types.ObjectId, ref: "Solution" },
-    status: {
-      type: String,
-      enum: ["open", "solved", "closed", "moderated"],
-      default: "open",
-    },
     isDeleted: { type: Boolean, default: false },
     deletedAt: { type: Date },
   },

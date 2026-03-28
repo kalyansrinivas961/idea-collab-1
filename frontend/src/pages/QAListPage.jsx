@@ -104,7 +104,7 @@ const QAListPage = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        problem.isResolved ? 'bg-emerald-100 text-emerald-600' : 'bg-indigo-100 text-indigo-600'
+                        problem.isResolved ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-600'
                       }`}>
                         {problem.isResolved ? 'Resolved' : 'Open'}
                       </span>

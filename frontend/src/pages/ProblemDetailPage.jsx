@@ -18,7 +18,6 @@ const ProblemDetailPage = () => {
   const [language, setLanguage] = useState("javascript");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubloading] = useState(false);
-  const [updatingStatus, setUpdatingStatus] = useState(false);
   const [replyTo, setReplyTo] = useState(null); // ID of solution being replied to
   const [replyText, setReplyText] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -52,21 +51,6 @@ const ProblemDetailPage = () => {
       toast.error(err.response?.data?.message || "Failed to delete question");
       setIsDeleting(false);
       setIsDeleteModalOpen(false);
-    }
-  };
-
-  const handleToggleStatus = async () => {
-    if (!isAuthor) return;
-    const newStatus = problem.status === "solved" ? "open" : "solved";
-    setUpdatingStatus(true);
-    try {
-      const res = await api.patch(`/qa/problems/${id}/status`, { status: newStatus });
-      setProblem(res.data);
-      toast.success(`Question marked as ${newStatus === "solved" ? "Solved" : "Still Looking"}`);
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to update status");
-    } finally {
-      setUpdatingStatus(false);
     }
   };
 
@@ -175,32 +159,6 @@ const ProblemDetailPage = () => {
           
           <div className="flex items-center gap-4">
             {isAuthor && (
-              <div className="flex items-center gap-3 pr-4 border-r border-slate-200">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Question Status</span>
-                <button
-                  onClick={handleToggleStatus}
-                  disabled={updatingStatus}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${
-                    problem.status === "solved" ? "bg-emerald-500" : "bg-slate-200"
-                  }`}
-                  role="switch"
-                  aria-checked={problem.status === "solved"}
-                >
-                  <span className="sr-only">Mark as Solved</span>
-                  <span
-                    aria-hidden="true"
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                      problem.status === "solved" ? "translate-x-5" : "translate-x-0"
-                    }`}
-                  />
-                </button>
-                <span className={`text-[10px] font-bold uppercase tracking-widest ${problem.status === "solved" ? 'text-emerald-600' : 'text-slate-400'}`}>
-                  {problem.status === "solved" ? 'Marked as Solved' : 'Still Looking'}
-                </span>
-              </div>
-            )}
-
-            {isAuthor && (
               <button 
                 onClick={() => setIsDeleteModalOpen(true)}
                 className="flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-xs font-bold transition-all border border-red-100"
@@ -234,17 +192,17 @@ const ProblemDetailPage = () => {
           <div className="flex-1 bg-white border border-slate-100 rounded-2xl p-8 shadow-sm">
             <div className="flex items-center gap-3 mb-4">
               <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider flex items-center gap-1.5 ${
-                problem.status === "solved" ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+                problem.isResolved ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'
               }`}>
-                {problem.status === "solved" ? (
+                {problem.isResolved ? (
                   <>
                     <Check className="w-3 h-3" strokeWidth={3} />
-                    Solved
+                    Resolved
                   </>
                 ) : (
                   <>
                     <div className="w-1.5 h-1.5 bg-indigo-600 rounded-full animate-pulse" />
-                    Still Looking
+                    Open
                   </>
                 )}
               </span>

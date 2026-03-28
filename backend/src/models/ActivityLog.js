@@ -10,7 +10,7 @@ const activityLogSchema = new mongoose.Schema(
     action: {
       type: String,
       required: true,
-      enum: ["follow", "unfollow", "remove_follower", "request_follow", "accept_follow", "reject_follow", "create_idea", "update_profile", "like_idea", "comment_idea", "create_problem", "delete_problem", "create_solution", "delete_solution", "vote_problem", "vote_solution", "update_problem_status"],
+      enum: ["follow", "unfollow", "remove_follower", "request_follow", "accept_follow", "reject_follow", "create_idea", "update_profile", "like_idea", "comment_idea", "create_problem", "delete_problem", "create_solution", "delete_solution", "vote_problem", "vote_solution"],
     },
     targetUser: {
       type: mongoose.Schema.Types.ObjectId,

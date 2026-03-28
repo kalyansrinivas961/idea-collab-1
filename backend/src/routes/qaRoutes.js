@@ -5,7 +5,6 @@ const {
   getProblems,
   getProblemById,
   voteProblem,
-  updateProblemStatus,
   createSolution,
   getSolutions,
   voteSolution,
@@ -25,7 +24,6 @@ router.route("/problems/:id")
   .delete(protect, deleteProblem);
 
 router.post("/problems/:id/vote", protect, voteProblem);
-router.patch("/problems/:id/status", protect, updateProblemStatus);
 
 // Solutions
 router.route("/problems/:problemId/solutions")
