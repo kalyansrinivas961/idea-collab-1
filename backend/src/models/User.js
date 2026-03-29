@@ -14,6 +14,11 @@ const userSchema = new mongoose.Schema(
       default: "Active" 
     },
     avatarUrl: { type: String, default: "" },
+    avatarHistory: [{
+      url: { type: String },
+      updatedAt: { type: Date, default: Date.now }
+    }],
+    avatarVersion: { type: Number, default: 1 },
     headline: { type: String, default: "" }, // Professional headline
     skills: [{ type: String }],
     location: { type: String, default: "" },

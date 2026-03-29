@@ -216,7 +216,35 @@ exports.updateProfile = async (req, res) => {
 
       if (req.file) {
         const baseUrl = process.env.VITE_API_URL || `${req.protocol}://${req.get("host")}`;
-        user.avatarUrl = `${baseUrl}/uploads/${req.file.filename}`;
+        const newAvatarUrl = `${baseUrl}/uploads/${req.file.filename}`;
+        
+        // Handle avatar versioning and history
+        if (user.avatarUrl && user.avatarUrl !== newAvatarUrl) {
+          user.avatarHistory.push({
+            url: user.avatarUrl,
+            updatedAt: new Date()
+          });
+          // Keep only last 5 history items
+          if (user.avatarHistory.length > 5) {
+            user.avatarHistory.shift();
+          }
+          user.avatarVersion = (user.avatarVersion || 1) + 1;
+        }
+        
+        user.avatarUrl = newAvatarUrl;
+      } else if (req.body.avatarUrl) {
+        // Handle default avatar selection
+        if (user.avatarUrl && user.avatarUrl !== req.body.avatarUrl) {
+          user.avatarHistory.push({
+            url: user.avatarUrl,
+            updatedAt: new Date()
+          });
+          if (user.avatarHistory.length > 5) {
+            user.avatarHistory.shift();
+          }
+          user.avatarVersion = (user.avatarVersion || 1) + 1;
+        }
+        user.avatarUrl = req.body.avatarUrl;
       }
 
       const updatedUser = await user.save();

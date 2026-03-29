@@ -33,6 +33,7 @@ import { useAuth } from "../context/AuthContext";
 import api from "../api/client";
 import Layout from "../components/Layout";
 import ConfirmationModal from "../components/ConfirmationModal";
+import AvatarSelectionModal from "../components/AvatarSelectionModal";
 import { useTheme } from "../context/ThemeContext";
 import { toast } from "react-hot-toast";
 import { calculateProfileCompletion } from "../utils/user";
@@ -50,6 +51,7 @@ const ProfilePage = () => {
   const [preview, setPreview] = useState(user?.avatarUrl || "");
   const [avatarFile, setAvatarFile] = useState(null);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const [settingsActiveTab, setSettingsActiveTab] = useState("appearance");
   
   // App Settings State
@@ -138,8 +140,25 @@ const ProfilePage = () => {
     });
   };
 
+  const handleAvatarSelect = async (url) => {
+    try {
+      setLoading(true);
+      const res = await api.put("/users/me", { avatarUrl: url });
+      updateUser(res.data);
+      setPreview(url);
+      setAvatarFile(null); // Clear any pending file upload
+      setIsAvatarModalOpen(false);
+      toast.success("Avatar updated successfully");
+      fetchActivity();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to update avatar");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAvatarClick = () => {
-    fileInputRef.current?.click();
+    setIsAvatarModalOpen(true);
   };
 
   const handleFileChange = (e) => {
@@ -260,8 +279,19 @@ const ProfilePage = () => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                <Camera className="text-white" size={32} />
+              <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <Palette className="text-white mb-1" size={24} />
+                <span className="text-[10px] text-white font-bold uppercase tracking-widest">Change</span>
+              </div>
+              <div 
+                className="absolute -bottom-1 -right-1 p-2.5 bg-indigo-600 text-white rounded-2xl shadow-xl hover:bg-indigo-700 transition-all active:scale-90"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  fileInputRef.current?.click();
+                }}
+                title="Upload custom image"
+              >
+                <Camera size={20} />
               </div>
               <input 
                 type="file" 
@@ -874,6 +904,12 @@ const ProfilePage = () => {
         </div>
       </div>
       
+      <AvatarSelectionModal 
+        isOpen={isAvatarModalOpen}
+        onClose={() => setIsAvatarModalOpen(false)}
+        onSelect={handleAvatarSelect}
+        currentAvatar={user?.avatarUrl}
+      />
       <ConfirmationModal
         isOpen={isLogoutModalOpen}
         title="Logout Confirmation"
