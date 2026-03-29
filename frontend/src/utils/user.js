@@ -85,10 +85,10 @@ export const calculateProfileCompletion = (user) => {
   const fields = [
     !!user.avatarUrl,
     !!user.bio,
-    user.skills.length > 0,
+    (user.skills || []).length > 0,
     !!user.location,
     !!user.headline,
-    Object.values(user.socialLinks).some(link => !!link)
+    Object.values(user.socialLinks || {}).some(link => !!link)
   ];
   
   const completed = fields.filter(Boolean).length;

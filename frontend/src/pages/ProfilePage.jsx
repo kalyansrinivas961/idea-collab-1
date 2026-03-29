@@ -29,14 +29,14 @@ import {
   Smartphone
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "../context/AuthContext";
-import api from "../api/client";
-import Layout from "../components/Layout";
-import ConfirmationModal from "../components/ConfirmationModal";
-import AvatarSelectionModal from "../components/AvatarSelectionModal";
-import { useTheme } from "../context/ThemeContext";
-import { toast } from "react-hot-toast";
-import { calculateProfileCompletion } from "../utils/user";
+import { useAuth } from "../context/AuthContext.jsx";
+import api from "../api/client.js";
+import Layout from "../components/Layout.jsx";
+import ConfirmationModal from "../components/ConfirmationModal.jsx";
+import AvatarSelectionModal from "../components/AvatarSelectionModal.jsx";
+import { useTheme } from "../context/ThemeContext.jsx";
+import toast from "react-hot-toast";
+import { calculateProfileCompletion } from "../utils/user.js";
 
 const ProfilePage = () => {
   const { user, loading: authLoading, updateUser, logout } = useAuth();
@@ -62,37 +62,60 @@ const ProfilePage = () => {
     twoFactorAuth: false
   });
   
-  // Form States
   const [profileForm, setProfileForm] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    bio: user?.bio || "",
-    location: user?.location || "",
-    headline: user?.headline || "",
-    role: user?.role || "",
-    skills: (user?.skills || []).join(", ")
+    name: "",
+    email: "",
+    bio: "",
+    location: "",
+    headline: "",
+    role: "",
+    skills: ""
   });
 
   const [socialForm, setSocialForm] = useState({
-    github: user?.socialLinks?.github || "",
-    linkedin: user?.socialLinks?.linkedin || "",
-    twitter: user?.socialLinks?.twitter || "",
-    portfolio: user?.socialLinks?.portfolio || ""
+    github: "",
+    linkedin: "",
+    twitter: "",
+    portfolio: ""
   });
 
   const [privacySettings, setPrivacySettings] = useState({
-    showEmail: user?.privacySettings?.showEmail ?? false,
-    showLocation: user?.privacySettings?.showLocation ?? true,
-    allowDirectMessages: user?.privacySettings?.allowDirectMessages ?? true,
-    profileVisibility: user?.privacySettings?.profileVisibility || "public"
+    showEmail: false,
+    showLocation: true,
+    allowDirectMessages: true,
+    profileVisibility: "public"
   });
 
   const fileInputRef = useRef(null);
 
   useEffect(() => {
+    if (user) {
+      setPreview(user.avatarUrl || "");
+      setProfileForm({
+        name: user.name || "",
+        email: user.email || "",
+        bio: user.bio || "",
+        location: user.location || "",
+        headline: user.headline || "",
+        role: user.role || "Developer",
+        skills: (user.skills || []).join(", ")
+      });
+      setSocialForm({
+        github: user.socialLinks?.github || "",
+        linkedin: user.socialLinks?.linkedin || "",
+        twitter: user.socialLinks?.twitter || "",
+        portfolio: user.socialLinks?.portfolio || ""
+      });
+      setPrivacySettings({
+        showEmail: user.privacySettings?.showEmail ?? false,
+        showLocation: user.privacySettings?.showLocation ?? true,
+        allowDirectMessages: user.privacySettings?.allowDirectMessages ?? true,
+        profileVisibility: user.privacySettings?.profileVisibility || "public"
+      });
+    }
     fetchStats();
     fetchActivity();
-  }, []);
+  }, [user]);
 
   const fetchStats = async () => {
     try {
