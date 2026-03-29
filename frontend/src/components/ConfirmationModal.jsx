@@ -43,7 +43,7 @@ const ConfirmationModal = ({
           </div>
           <button 
             onClick={onCancel}
-            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
+            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg transition-colors"
           >
             <X size={20} />
           </button>
@@ -57,7 +57,7 @@ const ConfirmationModal = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center gap-3 p-6 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-50 dark:border-slate-800">
+        <div className="flex items-center gap-3 p-6 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-50 dark:border-slate-800">
           <button
             onClick={onCancel}
             disabled={isLoading}

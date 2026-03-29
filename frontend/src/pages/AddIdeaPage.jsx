@@ -181,7 +181,7 @@ const AddIdeaPage = () => {
               name="title"
               value={form.title}
               onChange={handleChange}
-              className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors"
+              className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors focus:bg-white dark:focus:bg-slate-700"
               required
             />
           </div>
@@ -240,7 +240,7 @@ const AddIdeaPage = () => {
                 rows="5"
                 value={form.description}
                 onChange={handleChange}
-                className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10 transition-colors dark:text-white ${isAIProcessing ? "bg-indigo-50/30 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-800" : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"}`}
+                className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10 transition-colors dark:text-white focus:bg-white dark:focus:bg-slate-700 ${isAIProcessing ? "bg-indigo-50/30 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-800" : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"}`}
                 placeholder="Describe your startup or project in detail..."
                 required
               />

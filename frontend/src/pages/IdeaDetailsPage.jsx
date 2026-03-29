@@ -114,7 +114,7 @@ const IdeaDetailsPage = () => {
               {user && !isOwner && (
                 <button
                   onClick={() => setShowReportModal(true)}
-                  className="text-[10px] font-bold uppercase tracking-wider text-red-500 hover:text-red-700 dark:hover:text-red-400 flex items-center gap-1 transition-colors bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded border border-red-100 dark:border-red-900/30"
+                  className="text-[10px] font-bold uppercase tracking-wider text-red-500 hover:text-red-700 dark:hover:text-red-400 flex items-center gap-1 transition-colors bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded border border-red-100 dark:border-red-900/30 shadow-sm dark:shadow-none"
                 >
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4a1 1 0 01-.8 1.6H6a1 1 0 01-1-1V6z" clipRule="evenodd" />

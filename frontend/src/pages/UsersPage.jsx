@@ -101,7 +101,7 @@ const UsersPage = () => {
               className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-xl hover:shadow-indigo-500/5 transition-all flex flex-col items-center text-center group"
             >
               <div className="relative mb-6">
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl overflow-hidden shadow-lg border-2 border-white dark:border-slate-800 transition-transform group-hover:scale-95">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl overflow-hidden shadow-xl border-2 border-slate-100 dark:border-slate-800 transition-transform group-hover:scale-95">
                   <img
                     src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`}
                     alt={user.name}
@@ -109,7 +109,7 @@ const UsersPage = () => {
                   />
                 </div>
                 {user.reputation > 50 && (
-                  <div className="absolute -top-1 -right-1 bg-amber-400 text-white p-1.5 rounded-full shadow-lg border-2 border-white dark:border-slate-800" title="High Reputation">
+                  <div className="absolute -top-1 -right-1 bg-amber-400 text-white p-1.5 rounded-full shadow-lg border-2 border-slate-100 dark:border-slate-800" title="High Reputation">
                     <ShieldCheck size={14} />
                   </div>
                 )}
@@ -138,7 +138,7 @@ const UsersPage = () => {
                 )}
               </div>
 
-              <div className="w-full pt-4 border-t border-slate-50 dark:border-slate-800">
+              <div className="w-full pt-4 border-t border-slate-100 dark:border-slate-800">
                 <span className="inline-flex items-center justify-center w-full bg-slate-900 dark:bg-slate-800 text-white py-3 rounded-2xl text-xs font-bold hover:bg-indigo-600 dark:hover:bg-indigo-700 transition-all shadow-sm">
                   View Profile
                 </span>

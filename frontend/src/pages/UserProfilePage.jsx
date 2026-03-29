@@ -119,7 +119,7 @@ const UserProfilePage = () => {
       className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
         activeTab === id 
           ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none" 
-          : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+          : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50"
       }`}
     >
       <Icon size={18} />
@@ -292,7 +292,7 @@ const UserProfilePage = () => {
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {[
-                        { name: "github", label: "GitHub", icon: Github, color: "hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800" },
+                        { name: "github", label: "GitHub", icon: Github, color: "hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50" },
                         { name: "linkedin", label: "LinkedIn", icon: Linkedin, color: "hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20" },
                         { name: "twitter", label: "Twitter", icon: Twitter, color: "hover:text-sky-500 dark:hover:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20" },
                         { name: "portfolio", label: "Portfolio", icon: ExternalLink, color: "hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20" }

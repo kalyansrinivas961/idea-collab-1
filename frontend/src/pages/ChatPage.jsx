@@ -557,7 +557,7 @@ const ChatPage = () => {
             <div className="flex gap-2">
               <button 
                 onClick={() => setShowCreateGroup(true)}
-                className="p-2.5 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-2xl transition-all min-w-[44px] min-h-[44px] flex items-center justify-center border border-indigo-100 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm active:scale-90"
+                className="p-2.5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-2xl transition-all min-w-[44px] min-h-[44px] flex items-center justify-center border border-indigo-100 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm active:scale-90"
                 title="Create Group"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
@@ -618,7 +618,7 @@ const ChatPage = () => {
                 <button 
                   onClick={handleCreateGroup}
                   disabled={!groupName.trim() || selectedMembers.length === 0}
-                  className="w-full bg-indigo-600 text-white py-3.5 rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-200 transition-all active:scale-[0.98]"
+                  className="w-full bg-indigo-600 text-white py-3.5 rounded-xl text-sm font-bold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-200 dark:shadow-none transition-all active:scale-[0.98]"
                 >
                   Create Group
                 </button>
@@ -1117,7 +1117,7 @@ const ChatPage = () => {
                   </div>
                 )}
                 
-                <form onSubmit={handleSendMessage} className="flex items-end gap-2 bg-slate-100 dark:bg-slate-800/50 p-2 rounded-[2rem] relative border border-transparent focus-within:border-indigo-500/50 focus-within:bg-white dark:focus-within:bg-slate-800 transition-all shadow-inner-sm landscape:p-1.5">
+                <form onSubmit={handleSendMessage} className="flex items-end gap-2 bg-slate-100 dark:bg-slate-800/50 p-2 rounded-[2rem] relative border border-transparent focus-within:border-indigo-500/50 focus-within:bg-white dark:focus-within:bg-slate-700 transition-all shadow-inner-sm landscape:p-1.5">
                   <input 
                     type="file" 
                     ref={fileInputRef}
@@ -1130,7 +1130,7 @@ const ChatPage = () => {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="p-3 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-700 rounded-full transition-all min-w-[48px] min-h-[48px] flex items-center justify-center active:scale-90"
+                      className="p-3 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-white dark:hover:bg-slate-800 rounded-full transition-all min-w-[48px] min-h-[48px] flex items-center justify-center active:scale-90"
                       title="Attach file"
                     >
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -1141,7 +1141,7 @@ const ChatPage = () => {
                     <button
                       type="button"
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                      className="p-3 text-slate-500 dark:text-slate-400 hover:text-yellow-500 dark:hover:text-yellow-400 hover:bg-white dark:hover:bg-slate-700 rounded-full transition-all relative min-w-[48px] min-h-[48px] flex items-center justify-center active:scale-90"
+                      className="p-3 text-slate-500 dark:text-slate-400 hover:text-yellow-500 dark:hover:text-yellow-400 hover:bg-white dark:hover:bg-slate-800 rounded-full transition-all relative min-w-[48px] min-h-[48px] flex items-center justify-center active:scale-90"
                       title="Add emoji"
                     >
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -1154,7 +1154,7 @@ const ChatPage = () => {
                     <div className="absolute bottom-full left-0 mb-6 z-50 shadow-2xl rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-800 animate-fade-in-up">
                       <EmojiPicker 
                         onEmojiClick={handleEmojiClick} 
-                        theme={localStorage.getItem("theme") === "dark" ? "dark" : "light"}
+                        theme={document.documentElement.classList.contains('dark') ? 'dark' : 'light'}
                         width={320} 
                         height={400} 
                         previewConfig={{ showPreview: false }}
