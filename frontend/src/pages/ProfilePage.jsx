@@ -207,14 +207,14 @@ const ProfilePage = () => {
   const TabButton = ({ id, icon: Icon, label }) => (
     <button
       onClick={() => setActiveTab(id)}
-      className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
+      className={`flex items-center justify-center gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-xl font-bold text-sm md:text-base transition-all whitespace-nowrap ${
         activeTab === id 
-          ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" 
-          : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+          ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-none" 
+          : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50"
       }`}
     >
-      <Icon size={18} />
-      <span className="hidden md:inline">{label}</span>
+      <Icon size={18} className="flex-shrink-0" />
+      <span>{label}</span>
     </button>
   );
 
@@ -237,9 +237,9 @@ const ProfilePage = () => {
 
   return (
     <Layout>
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-6 md:py-8">
         {/* Header Section */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-800 mb-8 overflow-hidden relative group/header transition-colors">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100 dark:border-slate-800 mb-8 overflow-hidden relative transition-colors">
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 dark:bg-indigo-900/20 rounded-full -mr-32 -mt-32 opacity-50 blur-3xl"></div>
           
           <div className="relative flex flex-col md:flex-row items-center gap-8">
@@ -318,11 +318,13 @@ const ProfilePage = () => {
         </div>
 
         {/* Tabs Navigation */}
-        <div className="flex flex-wrap gap-2 mb-8 bg-white dark:bg-slate-900 p-2 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
-          <TabButton id="profile" icon={UserIcon} label="Personal Info" />
-          <TabButton id="activity" icon={Activity} label="Activity Timeline" />
-          <TabButton id="stats" icon={BarChart3} label="Insights" />
-          <TabButton id="settings" icon={Settings} label="Settings" />
+        <div className="mb-8 bg-white dark:bg-slate-900 p-1.5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-1.5 min-w-max md:min-w-0">
+            <TabButton id="profile" icon={UserIcon} label="Personal Info" />
+            <TabButton id="activity" icon={Activity} label="Activity Timeline" />
+            <TabButton id="stats" icon={BarChart3} label="Insights" />
+            <TabButton id="settings" icon={Settings} label="Settings" />
+          </div>
         </div>
 
         {/* Tab Content */}
@@ -560,26 +562,28 @@ const ProfilePage = () => {
                 >
                   <div className="flex flex-col md:flex-row min-h-[600px]">
                     {/* Settings Sidebar */}
-                    <aside className="w-full md:w-64 border-r border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 p-6 space-y-1">
-                      {[
-                        { id: "appearance", label: "Appearance", icon: Eye },
-                        { id: "notifications", label: "Notifications", icon: Bell },
-                        { id: "privacy", label: "Privacy & Safety", icon: Shield },
-                        { id: "account", label: "Account", icon: UserIcon },
-                      ].map((tab) => (
-                        <button
-                          key={tab.id}
-                          onClick={() => setSettingsActiveTab(tab.id)}
-                          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
-                            settingsActiveTab === tab.id
-                              ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-100 dark:border-slate-700"
-                              : "text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800/50"
-                          }`}
-                        >
-                          <tab.icon size={18} />
-                          {tab.label}
-                        </button>
-                      ))}
+                    <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 p-4 md:p-6 overflow-x-auto scrollbar-hide">
+                      <div className="flex md:flex-col gap-1.5 min-w-max md:min-w-0">
+                        {[
+                          { id: "appearance", label: "Appearance", icon: Eye },
+                          { id: "notifications", label: "Notifications", icon: Bell },
+                          { id: "privacy", label: "Privacy & Safety", icon: Shield },
+                          { id: "account", label: "Account", icon: UserIcon },
+                        ].map((tab) => (
+                          <button
+                            key={tab.id}
+                            onClick={() => setSettingsActiveTab(tab.id)}
+                            className={`flex-1 md:flex-none flex items-center justify-center md:justify-start gap-3 px-4 py-2.5 md:py-3 rounded-xl font-bold text-sm transition-all whitespace-nowrap ${
+                              settingsActiveTab === tab.id
+                                ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-100 dark:border-slate-700"
+                                : "text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800/50"
+                            }`}
+                          >
+                            <tab.icon size={18} className="flex-shrink-0" />
+                            <span>{tab.label}</span>
+                          </button>
+                        ))}
+                      </div>
                     </aside>
 
                     {/* Settings Content */}
@@ -755,26 +759,26 @@ const ProfilePage = () => {
                               Danger Zone
                             </h2>
                             <div className="space-y-4">
-                              <div className="bg-red-50 dark:bg-red-900/10 p-6 rounded-2xl border border-red-100 dark:border-red-900/20 flex items-center justify-between">
-                                <div className="flex-1">
+                              <div className="bg-red-50 dark:bg-red-900/10 p-6 rounded-2xl border border-red-100 dark:border-red-900/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div className="flex-1 text-center sm:text-left">
                                   <h3 className="font-bold text-red-900 dark:text-red-400 text-sm">Logout</h3>
                                   <p className="text-xs text-red-600 dark:text-red-500">Sign out of your account on this device.</p>
                                 </div>
                                 <button 
                                   onClick={() => setIsLogoutModalOpen(true)}
-                                  className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-all active:scale-95"
+                                  className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-all active:scale-95"
                                 >
                                   Logout
                                 </button>
                               </div>
-                              <div className="bg-red-50 dark:bg-red-900/10 p-6 rounded-2xl border border-red-100 dark:border-red-900/20 flex items-center justify-between">
-                                <div className="flex-1">
+                              <div className="bg-red-50 dark:bg-red-900/10 p-6 rounded-2xl border border-red-100 dark:border-red-900/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div className="flex-1 text-center sm:text-left">
                                   <h3 className="font-bold text-red-900 dark:text-red-400 text-sm">Delete Account</h3>
                                   <p className="text-xs text-red-600 dark:text-red-500">Permanently remove your account and all data.</p>
                                 </div>
                                 <button 
                                   onClick={() => toast.error("Account deletion requires admin confirmation.")}
-                                  className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-all active:scale-95"
+                                  className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-all active:scale-95"
                                 >
                                   Delete
                                 </button>

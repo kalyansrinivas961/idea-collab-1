@@ -41,4 +41,12 @@ body {
       box-shadow: 0 0 0 0px transparent;
     }
   }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
