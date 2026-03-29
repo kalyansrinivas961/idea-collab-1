@@ -29,17 +29,16 @@ import {
   Smartphone
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "../context/AuthContext.jsx";
-import api from "../api/client.js";
-import Layout from "../components/Layout.jsx";
-import ConfirmationModal from "../components/ConfirmationModal.jsx";
-import AvatarSelectionModal from "../components/AvatarSelectionModal.jsx";
-import { useTheme } from "../context/ThemeContext.jsx";
-import toast from "react-hot-toast";
-import { calculateProfileCompletion } from "../utils/user.js";
+import { useAuth } from "../context/AuthContext";
+import api from "../api/client";
+import Layout from "../components/Layout";
+import ConfirmationModal from "../components/ConfirmationModal";
+import { useTheme } from "../context/ThemeContext";
+import { toast } from "react-hot-toast";
+import { calculateProfileCompletion } from "../utils/user";
 
 const ProfilePage = () => {
-  const { user, loading: authLoading, updateUser, logout } = useAuth();
+  const { user, updateUser, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   
   // States
@@ -51,7 +50,6 @@ const ProfilePage = () => {
   const [preview, setPreview] = useState(user?.avatarUrl || "");
   const [avatarFile, setAvatarFile] = useState(null);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const [settingsActiveTab, setSettingsActiveTab] = useState("appearance");
   
   // App Settings State
@@ -62,60 +60,37 @@ const ProfilePage = () => {
     twoFactorAuth: false
   });
   
+  // Form States
   const [profileForm, setProfileForm] = useState({
-    name: "",
-    email: "",
-    bio: "",
-    location: "",
-    headline: "",
-    role: "",
-    skills: ""
+    name: user?.name || "",
+    email: user?.email || "",
+    bio: user?.bio || "",
+    location: user?.location || "",
+    headline: user?.headline || "",
+    role: user?.role || "",
+    skills: (user?.skills || []).join(", ")
   });
 
   const [socialForm, setSocialForm] = useState({
-    github: "",
-    linkedin: "",
-    twitter: "",
-    portfolio: ""
+    github: user?.socialLinks?.github || "",
+    linkedin: user?.socialLinks?.linkedin || "",
+    twitter: user?.socialLinks?.twitter || "",
+    portfolio: user?.socialLinks?.portfolio || ""
   });
 
   const [privacySettings, setPrivacySettings] = useState({
-    showEmail: false,
-    showLocation: true,
-    allowDirectMessages: true,
-    profileVisibility: "public"
+    showEmail: user?.privacySettings?.showEmail ?? false,
+    showLocation: user?.privacySettings?.showLocation ?? true,
+    allowDirectMessages: user?.privacySettings?.allowDirectMessages ?? true,
+    profileVisibility: user?.privacySettings?.profileVisibility || "public"
   });
 
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    if (user) {
-      setPreview(user.avatarUrl || "");
-      setProfileForm({
-        name: user.name || "",
-        email: user.email || "",
-        bio: user.bio || "",
-        location: user.location || "",
-        headline: user.headline || "",
-        role: user.role || "Developer",
-        skills: (user.skills || []).join(", ")
-      });
-      setSocialForm({
-        github: user.socialLinks?.github || "",
-        linkedin: user.socialLinks?.linkedin || "",
-        twitter: user.socialLinks?.twitter || "",
-        portfolio: user.socialLinks?.portfolio || ""
-      });
-      setPrivacySettings({
-        showEmail: user.privacySettings?.showEmail ?? false,
-        showLocation: user.privacySettings?.showLocation ?? true,
-        allowDirectMessages: user.privacySettings?.allowDirectMessages ?? true,
-        profileVisibility: user.privacySettings?.profileVisibility || "public"
-      });
-    }
     fetchStats();
     fetchActivity();
-  }, [user]);
+  }, []);
 
   const fetchStats = async () => {
     try {
@@ -163,25 +138,8 @@ const ProfilePage = () => {
     });
   };
 
-  const handleAvatarSelect = async (url) => {
-    try {
-      setLoading(true);
-      const res = await api.put("/users/me", { avatarUrl: url });
-      updateUser(res.data);
-      setPreview(url);
-      setAvatarFile(null); // Clear any pending file upload
-      setIsAvatarModalOpen(false);
-      toast.success("Avatar updated successfully");
-      fetchActivity();
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to update avatar");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleAvatarClick = () => {
-    setIsAvatarModalOpen(true);
+    fileInputRef.current?.click();
   };
 
   const handleFileChange = (e) => {
@@ -260,17 +218,6 @@ const ProfilePage = () => {
     </button>
   );
 
-  if (authLoading) {
-    return (
-      <Layout>
-        <div className="max-w-6xl mx-auto px-4 py-32 text-center">
-          <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-500 dark:text-slate-400 font-medium">Loading profile...</p>
-        </div>
-      </Layout>
-    );
-  }
-
   if (!user) {
     return (
       <Layout>
@@ -313,19 +260,8 @@ const ProfilePage = () => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                <Palette className="text-white mb-1" size={24} />
-                <span className="text-[10px] text-white font-bold uppercase tracking-widest">Change</span>
-              </div>
-              <div 
-                className="absolute -bottom-1 -right-1 p-2.5 bg-indigo-600 text-white rounded-2xl shadow-xl hover:bg-indigo-700 transition-all active:scale-90"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  fileInputRef.current?.click();
-                }}
-                title="Upload custom image"
-              >
-                <Camera size={20} />
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera className="text-white" size={32} />
               </div>
               <input 
                 type="file" 
@@ -938,12 +874,6 @@ const ProfilePage = () => {
         </div>
       </div>
       
-      <AvatarSelectionModal 
-        isOpen={isAvatarModalOpen}
-        onClose={() => setIsAvatarModalOpen(false)}
-        onSelect={handleAvatarSelect}
-        currentAvatar={user?.avatarUrl}
-      />
       <ConfirmationModal
         isOpen={isLogoutModalOpen}
         title="Logout Confirmation"

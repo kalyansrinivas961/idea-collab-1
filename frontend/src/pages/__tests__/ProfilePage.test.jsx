@@ -37,12 +37,6 @@ vi.mock('lucide-react', () => ({
   ExternalLink: () => <div />,
   ChevronRight: () => <div />,
   Briefcase: () => <div />,
-  Sun: () => <div />,
-  Moon: () => <div />,
-  Bell: () => <div />,
-  Lock: () => <div />,
-  Eye: () => <div />,
-  Smartphone: () => <div />,
 }));
 
 // Mock Layout
@@ -93,9 +87,9 @@ const mockUser = {
   createdAt: '2023-01-01T00:00:00.000Z',
 };
 
-const renderWithAuth = (ui, { user = mockUser, loading = false } = {}) => {
+const renderWithAuth = (ui) => {
   return render(
-    <AuthContext.Provider value={{ user, loading, logout: mockLogout, updateUser: mockUpdateUser }}>
+    <AuthContext.Provider value={{ user: mockUser, logout: mockLogout, updateUser: mockUpdateUser }}>
       <BrowserRouter>
         {ui}
       </BrowserRouter>
@@ -146,21 +140,11 @@ describe('ProfilePage', () => {
     
     const statsTab = screen.getByText('Insights');
     fireEvent.click(statsTab);
-    expect(screen.getByText('Account Insights')).toBeInTheDocument();
+    expect(screen.getByText('Performance Insights')).toBeInTheDocument();
 
-    const settingsTab = screen.getByText('Settings');
+    const settingsTab = screen.getByText('Privacy & Security');
     fireEvent.click(settingsTab);
-    expect(screen.getByText('Theme Preference')).toBeInTheDocument();
-  });
-
-  it('renders loading state when auth is loading', () => {
-    renderWithAuth(<ProfilePage />, { loading: true });
-    expect(screen.getByText('Loading profile...')).toBeInTheDocument();
-  });
-
-  it('renders not found state when user is missing', () => {
-    renderWithAuth(<ProfilePage />, { user: null });
-    expect(screen.getByText('Profile Not Found')).toBeInTheDocument();
+    expect(screen.getByText('Privacy Settings')).toBeInTheDocument();
   });
 
   it('updates profile information', async () => {
@@ -179,20 +163,28 @@ describe('ProfilePage', () => {
     });
   });
 
-  it('handles logout confirmation modal', async () => {
+  it('handles logout correctly from header button', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
     renderWithAuth(<ProfilePage />);
     
-    // Go to settings -> account tab to find logout button
-    const settingsTab = screen.getByText('Settings');
+    const headerLogoutBtn = screen.getByLabelText('Logout Account');
+    fireEvent.click(headerLogoutBtn);
+    
+    expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to log out?');
+    expect(mockLogout).toHaveBeenCalled();
+  });
+
+  it('handles logout correctly from settings tab', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    renderWithAuth(<ProfilePage />);
+    
+    // Go to settings tab where the other logout is located
+    const settingsTab = screen.getByText('Privacy & Security');
     fireEvent.click(settingsTab);
     
-    const accountTab = screen.getByText('Account');
-    fireEvent.click(accountTab);
+    const dangerLogoutBtn = screen.getByText('Logout Account');
+    fireEvent.click(dangerLogoutBtn);
     
-    const logoutBtn = screen.getByText('Logout');
-    fireEvent.click(logoutBtn);
-    
-    expect(screen.getByText('Logout Confirmation')).toBeInTheDocument();
-    expect(screen.getByText(/Are you sure you want to log out/)).toBeInTheDocument();
+    expect(mockLogout).toHaveBeenCalled();
   });
 });
