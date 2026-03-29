@@ -19,7 +19,13 @@ import {
   Trash2,
   ExternalLink,
   ChevronRight,
-  Briefcase
+  Briefcase,
+  Sun,
+  Moon,
+  Bell,
+  Lock,
+  Eye,
+  Smartphone
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
@@ -43,6 +49,15 @@ const ProfilePage = () => {
   const [preview, setPreview] = useState(user?.avatarUrl || "");
   const [avatarFile, setAvatarFile] = useState(null);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [settingsActiveTab, setSettingsActiveTab] = useState("appearance");
+  
+  // App Settings State
+  const [appSettings, setAppSettings] = useState({
+    emailNotifications: true,
+    pushNotifications: false,
+    language: "English",
+    twoFactorAuth: false
+  });
   
   // Form States
   const [profileForm, setProfileForm] = useState({
@@ -105,6 +120,21 @@ const ProfilePage = () => {
 
   const handlePrivacyToggle = (key) => {
     setPrivacySettings(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const handleAppSettingChange = (key) => {
+    setAppSettings(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+    toast.success("Setting updated", {
+      icon: <CheckCircle2 className="text-green-500" size={16} />,
+      style: {
+        borderRadius: '12px',
+        background: theme === 'dark' ? '#1e293b' : '#fff',
+        color: theme === 'dark' ? '#fff' : '#1e293b',
+      },
+    });
   };
 
   const handleAvatarClick = () => {
@@ -274,14 +304,7 @@ const ProfilePage = () => {
           <TabButton id="profile" icon={UserIcon} label="Personal Info" />
           <TabButton id="activity" icon={Activity} label="Activity Timeline" />
           <TabButton id="stats" icon={BarChart3} label="Insights" />
-          <TabButton id="settings" icon={Shield} label="Privacy & Security" />
-          <Link
-            to="/settings"
-            className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50"
-          >
-            <Settings size={18} />
-            <span className="hidden md:inline">Settings</span>
-          </Link>
+          <TabButton id="settings" icon={Settings} label="Settings" />
         </div>
 
         {/* Tab Content */}
@@ -515,75 +538,218 @@ const ProfilePage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className="space-y-6"
+                  className="bg-white dark:bg-slate-900 rounded-3xl p-0 shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden"
                 >
-                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-800">
-                    <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-8 flex items-center gap-2">
-                      <Shield className="text-indigo-600" size={24} />
-                      Privacy & Interface
-                    </h2>
-                    <div className="space-y-6">
-                      {/* Theme Toggle */}
-                      <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
-                        <div className="flex-1">
-                          <h3 className="font-bold text-slate-800 dark:text-white">Dark Mode</h3>
-                          <p className="text-sm text-slate-500 dark:text-slate-400">Switch between light and dark visual themes.</p>
-                        </div>
+                  <div className="flex flex-col md:flex-row min-h-[600px]">
+                    {/* Settings Sidebar */}
+                    <aside className="w-full md:w-64 border-r border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 p-6 space-y-1">
+                      {[
+                        { id: "appearance", label: "Appearance", icon: Eye },
+                        { id: "notifications", label: "Notifications", icon: Bell },
+                        { id: "privacy", label: "Privacy & Safety", icon: Shield },
+                        { id: "account", label: "Account", icon: UserIcon },
+                      ].map((tab) => (
                         <button
-                          onClick={toggleTheme}
-                          className={`w-12 h-6 rounded-full transition-colors relative ${
-                            theme === "dark" ? "bg-indigo-600" : "bg-slate-300"
+                          key={tab.id}
+                          onClick={() => setSettingsActiveTab(tab.id)}
+                          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
+                            settingsActiveTab === tab.id
+                              ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-100 dark:border-slate-700"
+                              : "text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800/50"
                           }`}
                         >
-                          <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
-                            theme === "dark" ? "left-7" : "left-1"
-                          }`}></div>
+                          <tab.icon size={18} />
+                          {tab.label}
                         </button>
-                      </div>
-
-                      {[
-                        { key: "showEmail", label: "Public Email", desc: "Show your email address on your public profile." },
-                        { key: "showLocation", label: "Public Location", desc: "Display your city and country to other users." },
-                        { key: "allowDirectMessages", label: "Direct Messages", desc: "Allow other users to send you direct messages." }
-                      ].map((item) => (
-                        <div key={item.key} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
-                          <div className="flex-1">
-                            <h3 className="font-bold text-slate-800 dark:text-white">{item.label}</h3>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">{item.desc}</p>
-                          </div>
-                          <button
-                            onClick={() => handlePrivacyToggle(item.key)}
-                            className={`w-12 h-6 rounded-full transition-colors relative ${
-                              privacySettings[item.key] ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-600"
-                            }`}
-                          >
-                            <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
-                              privacySettings[item.key] ? "left-7" : "left-1"
-                            }`}></div>
-                          </button>
-                        </div>
                       ))}
-                    </div>
+                    </aside>
 
-                    <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800">
-                      <h2 className="text-xl font-bold text-red-600 mb-6 flex items-center gap-2">
-                        <AlertCircle size={24} />
-                        Danger Zone
-                      </h2>
-                      <div className="bg-red-50 dark:bg-red-900/10 p-6 rounded-2xl border border-red-100 dark:border-red-900/20 flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div>
-                          <h3 className="font-bold text-red-900 dark:text-red-400">Logout</h3>
-                          <p className="text-sm text-red-600 dark:text-red-500">Terminate your current session on this device.</p>
+                    {/* Settings Content */}
+                    <main className="flex-1 p-8">
+                      {settingsActiveTab === "appearance" && (
+                        <div className="space-y-6 animate-fade-in">
+                          <div>
+                            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Theme Preference</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Choose how IdeaCollab looks to you.</p>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <button 
+                                onClick={() => theme === 'dark' && toggleTheme()}
+                                className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all ${
+                                  theme === 'light' 
+                                    ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/10' 
+                                    : 'border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 bg-white dark:bg-slate-900'
+                                }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={`p-2 rounded-xl ${theme === 'light' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
+                                    <Sun size={20} />
+                                  </div>
+                                  <div className="text-left">
+                                    <p className="font-bold text-slate-800 dark:text-white text-sm">Light Mode</p>
+                                  </div>
+                                </div>
+                                {theme === 'light' && <CheckCircle2 className="text-indigo-600" size={18} />}
+                              </button>
+
+                              <button 
+                                onClick={() => theme === 'light' && toggleTheme()}
+                                className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all ${
+                                  theme === 'dark' 
+                                    ? 'border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/10' 
+                                    : 'border-slate-100 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 bg-white dark:bg-slate-900'
+                                }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={`p-2 rounded-xl ${theme === 'dark' ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
+                                    <Moon size={20} />
+                                  </div>
+                                  <div className="text-left">
+                                    <p className="font-bold text-slate-800 dark:text-white text-sm">Dark Mode</p>
+                                  </div>
+                                </div>
+                                {theme === 'dark' && <CheckCircle2 className="text-indigo-600" size={18} />}
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="pt-6 border-t border-slate-100 dark:border-slate-800">
+                            <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Accessibility</h3>
+                            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-white dark:bg-slate-800 rounded-xl text-slate-500">
+                                  <Smartphone size={20} />
+                                </div>
+                                <div>
+                                  <p className="font-bold text-slate-800 dark:text-white text-sm">Reduced Motion</p>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400">Minimize animations</p>
+                                </div>
+                              </div>
+                              <label className="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" className="sr-only peer" />
+                                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                              </label>
+                            </div>
+                          </div>
                         </div>
-                        <button 
-                          onClick={() => setIsLogoutModalOpen(true)}
-                          className="px-6 py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all shadow-lg shadow-red-100 flex items-center gap-2"
-                        >
-                          <LogOut size={18} />
-                          Logout Account
-                        </button>
-                      </div>
-                    </div>
+                      )}
+
+                      {settingsActiveTab === "notifications" && (
+                        <div className="space-y-6 animate-fade-in">
+                          <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Notifications</h3>
+                          <div className="space-y-4">
+                            {[
+                              { key: "emailNotifications", label: "Email Notifications", desc: "Receive updates via email", icon: Globe },
+                              { key: "pushNotifications", label: "Push Notifications", desc: "Get real-time alerts", icon: Bell }
+                            ].map((item) => (
+                              <div key={item.key} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 bg-white dark:bg-slate-800 rounded-xl text-slate-500">
+                                    <item.icon size={20} />
+                                  </div>
+                                  <div>
+                                    <p className="font-bold text-slate-800 dark:text-white text-sm">{item.label}</p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">{item.desc}</p>
+                                  </div>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                  <input 
+                                    type="checkbox" 
+                                    checked={appSettings[item.key]} 
+                                    onChange={() => handleAppSettingChange(item.key)}
+                                    className="sr-only peer" 
+                                  />
+                                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                                </label>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {settingsActiveTab === "privacy" && (
+                        <div className="space-y-6 animate-fade-in">
+                          <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Privacy & Safety</h3>
+                          <div className="space-y-4">
+                            {[
+                              { key: "showEmail", label: "Public Email", desc: "Show email on your profile" },
+                              { key: "showLocation", label: "Public Location", desc: "Display city and country" },
+                              { key: "allowDirectMessages", label: "Direct Messages", desc: "Allow users to message you" }
+                            ].map((item) => (
+                              <div key={item.key} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
+                                <div className="flex-1">
+                                  <h3 className="font-bold text-slate-800 dark:text-white text-sm">{item.label}</h3>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400">{item.desc}</p>
+                                </div>
+                                <button
+                                  onClick={() => handlePrivacyToggle(item.key)}
+                                  className={`w-11 h-6 rounded-full transition-colors relative ${
+                                    privacySettings[item.key] ? "bg-indigo-600" : "bg-slate-300 dark:bg-slate-600"
+                                  }`}
+                                >
+                                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
+                                    privacySettings[item.key] ? "left-6" : "left-1"
+                                  }`}></div>
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {settingsActiveTab === "account" && (
+                        <div className="space-y-6 animate-fade-in">
+                          <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Account Security</h3>
+                          <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
+                            <div className="flex items-center justify-between mb-6">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-white dark:bg-slate-800 rounded-xl text-slate-500">
+                                  <Lock size={20} />
+                                </div>
+                                <div>
+                                  <p className="font-bold text-slate-800 dark:text-white text-sm">Two-Factor Auth</p>
+                                  <p className="text-xs text-slate-500 dark:text-slate-400">Add extra layer of security</p>
+                                </div>
+                              </div>
+                              <label className="relative inline-flex items-center cursor-pointer">
+                                <input 
+                                  type="checkbox" 
+                                  checked={appSettings.twoFactorAuth} 
+                                  onChange={() => handleAppSettingChange("twoFactorAuth")}
+                                  className="sr-only peer" 
+                                />
+                                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                              </label>
+                            </div>
+                            <Link 
+                              to="/change-password"
+                              className="block w-full text-center py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-95"
+                            >
+                              Manage Password
+                            </Link>
+                          </div>
+
+                          <div className="pt-8 border-t border-slate-100 dark:border-slate-800">
+                            <h2 className="text-lg font-bold text-red-600 mb-6 flex items-center gap-2">
+                              <AlertCircle size={20} />
+                              Danger Zone
+                            </h2>
+                            <div className="bg-red-50 dark:bg-red-900/10 p-6 rounded-2xl border border-red-100 dark:border-red-900/20 flex items-center justify-between">
+                              <div className="flex-1">
+                                <h3 className="font-bold text-red-900 dark:text-red-400 text-sm">Logout</h3>
+                                <p className="text-xs text-red-600 dark:text-red-500">Sign out of your account.</p>
+                              </div>
+                              <button 
+                                onClick={() => setIsLogoutModalOpen(true)}
+                                className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-all active:scale-95"
+                              >
+                                Logout
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </main>
                   </div>
                 </motion.div>
               )}

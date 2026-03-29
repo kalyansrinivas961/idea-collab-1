@@ -286,9 +286,6 @@ const Layout = ({ children }) => {
                 <NavLink to="/profile" className="hidden md:flex text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 p-2 min-w-[44px] min-h-[44px] justify-center items-center transition-colors" title="Profile" aria-label="My Profile">
                   <User className="w-6 h-6" />
                 </NavLink>
-                <NavLink to="/settings" className="hidden md:flex text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 p-2 min-w-[44px] min-h-[44px] justify-center items-center transition-colors" title="Settings" aria-label="Settings">
-                  <Settings className="w-6 h-6" />
-                </NavLink>
                 <button 
                   onClick={() => setIsLogoutModalOpen(true)}
                   className="hidden md:flex text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 p-2 min-w-[44px] min-h-[44px] justify-center items-center transition-colors"
@@ -374,14 +371,6 @@ const Layout = ({ children }) => {
                 >
                   <UserPlus className="w-5 h-5" />
                   Following
-                </NavLink>
-                <NavLink 
-                  to="/settings" 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
-                >
-                  <Settings className="w-5 h-5" />
-                  Settings
                 </NavLink>
               </div>
               <button 
