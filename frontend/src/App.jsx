@@ -21,6 +21,7 @@ import UsersPage from "./pages/UsersPage.jsx";
 import ChatPage from "./pages/ChatPage.jsx";
 import NotificationHistoryPage from "./pages/NotificationHistoryPage.jsx";
 import ChangePasswordPage from "./pages/ChangePasswordPage.jsx";
+import SettingsPage from "./pages/SettingsPage.jsx";
 import TermsPage from "./pages/TermsPage.jsx";
 import PrivacyPage from "./pages/PrivacyPage.jsx";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
@@ -157,6 +158,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
               </ProtectedRoute>
             }
           />

@@ -275,6 +275,13 @@ const ProfilePage = () => {
           <TabButton id="activity" icon={Activity} label="Activity Timeline" />
           <TabButton id="stats" icon={BarChart3} label="Insights" />
           <TabButton id="settings" icon={Shield} label="Privacy & Security" />
+          <Link
+            to="/settings"
+            className="flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+          >
+            <Settings size={18} />
+            <span className="hidden md:inline">Settings</span>
+          </Link>
         </div>
 
         {/* Tab Content */}
