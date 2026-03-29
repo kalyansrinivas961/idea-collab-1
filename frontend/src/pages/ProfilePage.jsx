@@ -39,7 +39,7 @@ import { toast } from "react-hot-toast";
 import { calculateProfileCompletion } from "../utils/user";
 
 const ProfilePage = () => {
-  const { user, updateUser, logout } = useAuth();
+  const { user, loading: authLoading, updateUser, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   
   // States
@@ -236,6 +236,17 @@ const ProfilePage = () => {
       <span>{label}</span>
     </button>
   );
+
+  if (authLoading) {
+    return (
+      <Layout>
+        <div className="max-w-6xl mx-auto px-4 py-32 text-center">
+          <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-500 dark:text-slate-400 font-medium">Loading profile...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!user) {
     return (
