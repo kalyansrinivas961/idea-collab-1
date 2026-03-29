@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { 
   User as UserIcon, 
   Mail, 
@@ -216,6 +217,23 @@ const ProfilePage = () => {
       <span className="hidden md:inline">{label}</span>
     </button>
   );
+
+  if (!user) {
+    return (
+      <Layout>
+        <div className="max-w-6xl mx-auto px-4 py-32 text-center">
+          <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+            <UserIcon className="text-slate-400" size={32} />
+          </div>
+          <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Profile Not Found</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-6">We couldn't load your profile information. Please try logging in again.</p>
+          <Link to="/login" className="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-all">
+            Go to Login
+          </Link>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -700,8 +718,8 @@ const ProfilePage = () => {
                       {settingsActiveTab === "account" && (
                         <div className="space-y-6 animate-fade-in">
                           <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Account Security</h3>
-                          <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
-                            <div className="flex items-center justify-between mb-6">
+                          <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl space-y-6">
+                            <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
                                 <div className="p-2 bg-white dark:bg-slate-800 rounded-xl text-slate-500">
                                   <Lock size={20} />
@@ -721,12 +739,14 @@ const ProfilePage = () => {
                                 <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
                               </label>
                             </div>
-                            <Link 
-                              to="/change-password"
-                              className="block w-full text-center py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-95"
-                            >
-                              Manage Password
-                            </Link>
+                            <div className="pt-4 border-t border-slate-100 dark:border-slate-700">
+                              <Link 
+                                to="/change-password"
+                                className="block w-full text-center py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-95"
+                              >
+                                Manage Password
+                              </Link>
+                            </div>
                           </div>
 
                           <div className="pt-8 border-t border-slate-100 dark:border-slate-800">
@@ -734,17 +754,31 @@ const ProfilePage = () => {
                               <AlertCircle size={20} />
                               Danger Zone
                             </h2>
-                            <div className="bg-red-50 dark:bg-red-900/10 p-6 rounded-2xl border border-red-100 dark:border-red-900/20 flex items-center justify-between">
-                              <div className="flex-1">
-                                <h3 className="font-bold text-red-900 dark:text-red-400 text-sm">Logout</h3>
-                                <p className="text-xs text-red-600 dark:text-red-500">Sign out of your account.</p>
+                            <div className="space-y-4">
+                              <div className="bg-red-50 dark:bg-red-900/10 p-6 rounded-2xl border border-red-100 dark:border-red-900/20 flex items-center justify-between">
+                                <div className="flex-1">
+                                  <h3 className="font-bold text-red-900 dark:text-red-400 text-sm">Logout</h3>
+                                  <p className="text-xs text-red-600 dark:text-red-500">Sign out of your account on this device.</p>
+                                </div>
+                                <button 
+                                  onClick={() => setIsLogoutModalOpen(true)}
+                                  className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-all active:scale-95"
+                                >
+                                  Logout
+                                </button>
                               </div>
-                              <button 
-                                onClick={() => setIsLogoutModalOpen(true)}
-                                className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-all active:scale-95"
-                              >
-                                Logout
-                              </button>
+                              <div className="bg-red-50 dark:bg-red-900/10 p-6 rounded-2xl border border-red-100 dark:border-red-900/20 flex items-center justify-between">
+                                <div className="flex-1">
+                                  <h3 className="font-bold text-red-900 dark:text-red-400 text-sm">Delete Account</h3>
+                                  <p className="text-xs text-red-600 dark:text-red-500">Permanently remove your account and all data.</p>
+                                </div>
+                                <button 
+                                  onClick={() => toast.error("Account deletion requires admin confirmation.")}
+                                  className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 transition-all active:scale-95"
+                                >
+                                  Delete
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
