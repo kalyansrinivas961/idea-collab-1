@@ -227,7 +227,5 @@ const ChangePasswordPage = () => {
     </Layout>
   );
 };
-  );
-};
 
 export default ChangePasswordPage;
