@@ -24,10 +24,10 @@ const FollowersPage = () => {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-slate-800 mb-6">Followers</h1>
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-6">Followers</h1>
         {loading ? (
-          <div className="text-center py-10 text-slate-500">Loading followers...</div>
+          <div className="text-center py-10 text-slate-500 dark:text-slate-400">Loading followers...</div>
         ) : (
           <UserList users={followers} type="followers" onRemove={handleRemove} />
         )}
