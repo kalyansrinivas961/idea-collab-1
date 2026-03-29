@@ -144,7 +144,7 @@ const NotificationHistoryPage = () => {
     <Layout>
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-          <h1 className="text-2xl font-bold text-slate-800">
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">
             Notification History {unreadCount > 0 && <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full ml-2">{unreadCount}</span>}
           </h1>
           <div className="flex gap-2">
@@ -152,13 +152,13 @@ const NotificationHistoryPage = () => {
               <>
                 <button
                   onClick={() => markAsRead(selectedIds)}
-                  className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 text-sm"
+                  className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded hover:bg-indigo-200 dark:hover:bg-indigo-900/50 text-sm transition-colors"
                 >
                   Mark Read ({selectedIds.length})
                 </button>
                 <button
                   onClick={() => deleteNotifications(selectedIds)}
-                  className="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-sm"
+                  className="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded hover:bg-red-200 dark:hover:bg-red-900/50 text-sm transition-colors"
                 >
                   Delete ({selectedIds.length})
                 </button>
@@ -166,7 +166,7 @@ const NotificationHistoryPage = () => {
             )}
             <button
               onClick={() => markAsRead(notifications.map(n => n._id))}
-              className="px-3 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm"
+              className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-sm transition-colors"
             >
               Mark All Read
             </button>
@@ -174,20 +174,20 @@ const NotificationHistoryPage = () => {
         </div>
 
         {/* Filter Bar */}
-        <div className="bg-white p-4 rounded-lg shadow mb-6 flex flex-col md:flex-row gap-4 items-center">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 mb-6 flex flex-col md:flex-row gap-4 items-center transition-colors">
           <input
             type="text"
             name="search"
             placeholder="Search..."
             value={filters.search}
             onChange={handleFilterChange}
-            className="border rounded px-3 py-2 text-sm flex-grow w-full md:w-auto"
+            className="border border-slate-200 dark:border-slate-700 rounded px-3 py-2 text-sm flex-grow w-full md:w-auto bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
           />
           <select
             name="type"
             value={filters.type}
             onChange={handleFilterChange}
-            className="border rounded px-3 py-2 text-sm w-full md:w-auto"
+            className="border border-slate-200 dark:border-slate-700 rounded px-3 py-2 text-sm w-full md:w-auto bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
           >
             <option value="">All Types</option>
             <option value="info">Info</option>
@@ -200,32 +200,32 @@ const NotificationHistoryPage = () => {
             name="startDate"
             value={filters.startDate}
             onChange={handleFilterChange}
-            className="border rounded px-3 py-2 text-sm w-full md:w-auto"
+            className="border border-slate-200 dark:border-slate-700 rounded px-3 py-2 text-sm w-full md:w-auto bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
           />
-          <span className="text-gray-400 hidden md:inline">-</span>
+          <span className="text-slate-400 dark:text-slate-500 hidden md:inline">-</span>
           <input
             type="date"
             name="endDate"
             value={filters.endDate}
             onChange={handleFilterChange}
-            className="border rounded px-3 py-2 text-sm w-full md:w-auto"
+            className="border border-slate-200 dark:border-slate-700 rounded px-3 py-2 text-sm w-full md:w-auto bg-white dark:bg-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
           />
         </div>
 
         {/* Notification List */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="p-3 border-b bg-gray-50 flex items-center">
+        <div className="bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors">
+          <div className="p-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center">
             <input
               type="checkbox"
               checked={selectedIds.length === notifications.length && notifications.length > 0}
               onChange={handleSelectAll}
-              className="mr-3"
+              className="mr-3 w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 dark:bg-slate-700"
             />
-            <span className="text-sm text-gray-500">Select All</span>
+            <span className="text-sm text-slate-500 dark:text-slate-400">Select All</span>
           </div>
 
           {notifications.length === 0 && !loading ? (
-            <div className="p-8 text-center text-gray-500">
+            <div className="p-8 text-center text-slate-500 dark:text-slate-400">
               No notifications found.
             </div>
           ) : (
@@ -233,8 +233,8 @@ const NotificationHistoryPage = () => {
               {notifications.map((notification) => (
                 <li
                   key={notification._id}
-                  className={`border-b last:border-0 p-4 hover:bg-gray-50 transition-colors ${
-                    !notification.isRead ? "bg-indigo-50/50" : ""
+                  className={`border-b border-slate-100 dark:border-slate-800 last:border-0 p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${
+                    !notification.isRead ? "bg-indigo-50/30 dark:bg-indigo-900/10" : ""
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -242,7 +242,7 @@ const NotificationHistoryPage = () => {
                       type="checkbox"
                       checked={selectedIds.includes(notification._id)}
                       onChange={() => handleSelectOne(notification._id)}
-                      className="mt-1.5 relative z-10"
+                      className="mt-1.5 w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500 dark:bg-slate-700 relative z-10"
                     />
                     <div className="mt-1 text-xl">{getIcon(notification.type)}</div>
                     <div 
@@ -253,14 +253,14 @@ const NotificationHistoryPage = () => {
                       }}
                     >
                       <div className="flex justify-between items-start">
-                        <h3 className={`text-sm font-semibold ${!notification.isRead ? 'text-slate-900' : 'text-slate-600'}`}>
+                        <h3 className={`text-sm font-semibold transition-colors ${!notification.isRead ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>
                           {notification.title}
                         </h3>
-                        <span className="text-xs text-gray-400 whitespace-nowrap ml-2">
+                        <span className="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap ml-2">
                           {new Date(notification.createdAt).toLocaleString()}
                         </span>
                       </div>
-                      <p className="text-sm text-slate-600 mt-1">{notification.message}</p>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{notification.message}</p>
                     </div>
                     <div className="flex flex-col gap-1 ml-2 relative z-10">
                       <button
@@ -268,7 +268,7 @@ const NotificationHistoryPage = () => {
                           e.stopPropagation();
                           markAsRead([notification._id]);
                         }}
-                        className="text-xs text-indigo-600 hover:text-indigo-800 p-1"
+                        className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 p-1 font-medium transition-colors"
                         title="Mark as Read"
                       >
                         {notification.isRead ? "Read" : "Mark Read"}
@@ -278,7 +278,7 @@ const NotificationHistoryPage = () => {
                           e.stopPropagation();
                           deleteNotifications([notification._id]);
                         }}
-                        className="text-xs text-red-600 hover:text-red-800 p-1"
+                        className="text-xs text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 p-1 font-medium transition-colors"
                         title="Delete"
                       >
                         Delete
@@ -291,14 +291,14 @@ const NotificationHistoryPage = () => {
           )}
           
           {loading && (
-            <div className="p-4 text-center text-gray-500">Loading...</div>
+            <div className="p-4 text-center text-slate-500 dark:text-slate-400">Loading...</div>
           )}
 
           {!loading && page < totalPages && (
-            <div className="p-4 text-center border-t">
+            <div className="p-4 text-center border-t border-slate-100 dark:border-slate-800">
               <button
                 onClick={() => setPage((prev) => prev + 1)}
-                className="text-indigo-600 hover:underline text-sm font-medium"
+                className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm font-medium"
               >
                 Load More
               </button>

@@ -5,19 +5,19 @@ const TermsPage = () => {
   return (
     <Layout>
       <div className="max-w-4xl mx-auto py-8 px-4">
-        <section aria-labelledby="terms-heading" className="bg-white rounded-xl border shadow-sm p-8">
-          <h1 id="terms-heading" className="text-3xl font-bold text-slate-900 mb-6 border-b pb-4">Terms of Service</h1>
+        <section aria-labelledby="terms-heading" className="bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm p-8 transition-colors">
+          <h1 id="terms-heading" className="text-3xl font-bold text-slate-900 dark:text-white mb-6 border-b dark:border-slate-800 pb-4">Terms of Service</h1>
           
-          <div className="space-y-8 text-slate-600 leading-relaxed">
+          <div className="space-y-8 text-slate-600 dark:text-slate-400 leading-relaxed">
             <div>
-              <h2 className="text-xl font-semibold text-slate-800 mb-3">1. Acceptance of Terms</h2>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-white mb-3">1. Acceptance of Terms</h2>
               <p>
                 By accessing and using IdeaCollab, you agree to be bound by these Terms of Service. If you do not agree to all of these terms, do not use this application.
               </p>
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-slate-800 mb-3">2. User Accounts</h2>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-white mb-3">2. User Accounts</h2>
               <p>
                 To use certain features of the service, you must register for an account. You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.
               </p>
@@ -29,7 +29,7 @@ const TermsPage = () => {
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-slate-800 mb-3">3. User Content</h2>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-white mb-3">3. User Content</h2>
               <p>
                 You retain ownership of the ideas, comments, and other content you post on IdeaCollab. However, by posting content, you grant IdeaCollab a worldwide, non-exclusive, royalty-free license to use, copy, reproduce, process, adapt, modify, publish, transmit, and display such content.
               </p>
@@ -39,7 +39,7 @@ const TermsPage = () => {
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-slate-800 mb-3">4. Prohibited Conduct</h2>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-white mb-3">4. Prohibited Conduct</h2>
               <p>You agree not to engage in any of the following prohibited activities:</p>
               <ul className="list-disc ml-6 mt-2 space-y-2">
                 <li>Harassing, threatening, or intimidating other users.</li>
@@ -50,28 +50,28 @@ const TermsPage = () => {
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-slate-800 mb-3">5. Intellectual Property</h2>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-white mb-3">5. Intellectual Property</h2>
               <p>
                 The IdeaCollab name, logo, and all original content and features are the exclusive property of IdeaCollab and its licensors.
               </p>
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-slate-800 mb-3">6. Termination</h2>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-white mb-3">6. Termination</h2>
               <p>
                 We may terminate or suspend your account and access to the service immediately, without prior notice or liability, for any reason, including if you breach the Terms.
               </p>
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold text-slate-800 mb-3">7. Limitation of Liability</h2>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-white mb-3">7. Limitation of Liability</h2>
               <p>
                 In no event shall IdeaCollab be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or in connection with your use of the service.
               </p>
             </div>
 
-            <div className="border-t pt-6 mt-10">
-              <p className="text-sm text-slate-400 italic">
+            <div className="border-t dark:border-slate-800 pt-6 mt-10">
+              <p className="text-sm text-slate-400 dark:text-slate-500 italic">
                 Last updated: March 14, 2026
               </p>
             </div>

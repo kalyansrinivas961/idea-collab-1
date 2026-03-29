@@ -107,57 +107,77 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="flex-1 flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-white shadow-sm rounded-xl p-8">
-          <h1 className="text-2xl font-semibold text-slate-800 mb-2">Join IdeaCollab</h1>
-          <p className="text-sm text-slate-500 mb-6">
-            Create your profile and start collaborating on ideas.
-          </p>
-          {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
-          {message && <div className="mb-4 text-sm text-emerald-600">{message}</div>}
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="max-w-md w-full bg-white dark:bg-slate-900 shadow-xl rounded-2xl p-8 border border-slate-100 dark:border-slate-800 transition-all">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">Join IdeaCollab</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Create your profile and start collaborating on ideas.
+            </p>
+          </div>
+          
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-xl text-sm text-red-600 dark:text-red-400 flex items-center gap-3">
+              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {error}
+            </div>
+          )}
+          {message && (
+            <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/30 rounded-xl text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-3">
+              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {message}
+            </div>
+          )}
 
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-8">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={handleGoogleError}
-              theme="outline"
+              theme={document.documentElement.classList.contains('dark') ? "filled_black" : "outline"}
               size="large"
               shape="pill"
               text="signup_with"
+              width="100%"
             />
           </div>
 
-          <div className="relative mb-6">
+          <div className="relative mb-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200"></div>
+              <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-slate-500">Or register with email</span>
+            <div className="relative flex justify-center text-xs uppercase tracking-widest font-bold">
+              <span className="bg-white dark:bg-slate-900 px-4 text-slate-400 dark:text-slate-500">Or register with email</span>
             </div>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Full name</label>
+              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Full Name</label>
               <input
                 type="text"
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="John Doe"
+                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Email Address</label>
               <input
                 type="email"
                 name="email"
                 value={form.email}
                 onChange={handleChange}
-                className={`w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-                  isGoogleSignup ? "bg-slate-50 cursor-not-allowed" : ""
+                placeholder="john@example.com"
+                className={`w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white ${
+                  isGoogleSignup ? "bg-slate-50 dark:bg-slate-900/50 cursor-not-allowed opacity-60" : ""
                 }`}
                 required
                 readOnly={isGoogleSignup}
@@ -166,25 +186,26 @@ const RegisterPage = () => {
 
             {!isGoogleSignup && (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Password</label>
                 <input
                   type="password"
                   name="password"
                   value={form.password}
                   onChange={handleChange}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="••••••••"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white"
                   required
                 />
               </div>
             )}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Role</label>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Role</label>
                 <select
                   name="role"
                   value={form.role}
                   onChange={handleChange}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white appearance-none"
                 >
                   <option>Founder</option>
                   <option>Developer</option>
@@ -195,29 +216,35 @@ const RegisterPage = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Skills (comma separated)
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
+                  Skills
                 </label>
                 <input
                   type="text"
                   name="skills"
                   value={form.skills}
                   onChange={handleChange}
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="React, UI/UX..."
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white"
                 />
               </div>
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-indigo-700 disabled:opacity-60"
+              className="w-full bg-indigo-600 text-white rounded-xl py-3 text-sm font-bold hover:bg-indigo-700 disabled:opacity-60 shadow-lg shadow-indigo-200 dark:shadow-none transition-all active:scale-95"
             >
-              {loading ? "Creating account..." : "Create account"}
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <span>Creating account...</span>
+                </div>
+              ) : "Create account"}
             </button>
           </form>
-          <p className="mt-4 text-xs text-slate-500 text-center">
+          <p className="mt-8 text-sm text-slate-500 dark:text-slate-400 text-center">
             Already have an account?{" "}
-            <Link to="/login" className="text-indigo-600 font-medium">
+            <Link to="/login" className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
               Sign in
             </Link>
           </p>

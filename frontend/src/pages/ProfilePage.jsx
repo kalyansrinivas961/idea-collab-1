@@ -191,7 +191,7 @@ const ProfilePage = () => {
     <Layout>
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header Section */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-800 mb-8 overflow-hidden relative group/header">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-800 mb-8 overflow-hidden relative group/header transition-colors">
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 dark:bg-indigo-900/20 rounded-full -mr-32 -mt-32 opacity-50 blur-3xl"></div>
           
           <div className="relative flex flex-col md:flex-row items-center gap-8">

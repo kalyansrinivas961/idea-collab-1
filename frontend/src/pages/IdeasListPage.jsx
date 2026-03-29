@@ -55,16 +55,16 @@ const IdeasListPage = () => {
   return (
     <Layout>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-semibold text-slate-800">
+        <h1 className="text-xl font-semibold text-slate-800 dark:text-white">
           {activeTab === "saved" ? "Saved Ideas" : "Explore Ideas"}
         </h1>
-        <div className="flex bg-slate-100 rounded-lg p-1">
+        <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
           <button
             onClick={() => setActiveTab("all")}
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
               activeTab === "all"
-                ? "bg-white text-indigo-600 shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
+                ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
             }`}
           >
             All Ideas
@@ -73,8 +73,8 @@ const IdeasListPage = () => {
             onClick={() => setActiveTab("saved")}
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
               activeTab === "saved"
-                ? "bg-white text-indigo-600 shadow-sm"
-                : "text-slate-500 hover:text-slate-700"
+                ? "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
             }`}
           >
             Saved
@@ -88,7 +88,7 @@ const IdeasListPage = () => {
             e.preventDefault();
             fetchIdeas();
           }}
-          className="flex flex-col md:flex-row items-stretch md:items-center gap-3 bg-white rounded-xl p-3 shadow-sm border mb-4"
+          className="flex flex-col md:flex-row items-stretch md:items-center gap-3 bg-white dark:bg-slate-900 rounded-xl p-3 shadow-sm border border-slate-100 dark:border-slate-800 mb-4 transition-colors"
         >
           <div className="flex-1 relative">
             <input
@@ -96,7 +96,7 @@ const IdeasListPage = () => {
               placeholder="Search by title"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[44px]"
+              className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 dark:text-white min-h-[44px]"
             />
           </div>
           <div className="w-full md:w-48 relative">
@@ -105,7 +105,7 @@ const IdeasListPage = () => {
               placeholder="Filter by category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[44px]"
+              className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 dark:text-white min-h-[44px]"
             />
           </div>
           <button
@@ -122,18 +122,18 @@ const IdeasListPage = () => {
           <Link
             key={idea._id}
             to={`/ideas/${idea._id}`}
-            className="block bg-white rounded-xl p-4 shadow-sm border hover:border-indigo-200"
+            className="block bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-700 transition-colors"
           >
             <div className="flex items-center justify-between mb-1">
-              <h3 className="font-semibold text-slate-800 hover:text-indigo-600 transition-colors">{idea.title}</h3>
-              <span className="text-xs rounded-full bg-indigo-50 text-indigo-700 px-2 py-0.5">
+              <h3 className="font-semibold text-slate-800 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">{idea.title}</h3>
+              <span className="text-xs rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-2 py-0.5">
                 {idea.category}
               </span>
             </div>
-            <p className="text-sm text-slate-600 line-clamp-2 mb-2">{idea.description}</p>
-            <div className="flex items-center justify-between text-xs text-slate-500 mt-2">
+            <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-2">{idea.description}</p>
+            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-500 mt-2">
               <div className="flex items-center gap-3">
-                <span className="font-medium text-slate-700">{idea.owner?.name}</span>
+                <span className="font-medium text-slate-700 dark:text-slate-300">{idea.owner?.name}</span>
                 <LikeButton idea={idea} />
                 <SaveButton idea={idea} />
               </div>
@@ -142,7 +142,7 @@ const IdeasListPage = () => {
           </Link>
         ))}
         {ideas.length === 0 && (
-          <div className="bg-white rounded-xl p-6 text-sm text-slate-500 text-center border">
+          <div className="bg-white dark:bg-slate-900 rounded-xl p-6 text-sm text-slate-500 dark:text-slate-400 text-center border border-slate-100 dark:border-slate-800">
             {activeTab === "saved"
               ? "You haven't saved any ideas yet."
               : "No ideas match the current filters."}

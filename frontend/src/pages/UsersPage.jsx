@@ -68,11 +68,11 @@ const UsersPage = () => {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-              <UserIcon className="text-indigo-600" size={28} />
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight flex items-center gap-2">
+              <UserIcon className="text-indigo-600 dark:text-indigo-400" size={28} />
               Community Network
             </h1>
-            <p className="text-slate-500 font-medium mt-1">
+            <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">
               Connect with {totalUsers} talented creators across the platform.
             </p>
           </div>
@@ -81,14 +81,14 @@ const UsersPage = () => {
         {/* Search Bar */}
         <div className="relative mb-12">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-slate-400" />
+            <Search className="h-5 w-5 text-slate-400 dark:text-slate-500" />
           </div>
           <input
             type="text"
             placeholder="Search by name, role, email or skills..."
             value={search}
             onChange={handleSearchChange}
-            className="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium text-slate-800 shadow-sm text-lg"
+            className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all font-medium text-slate-800 dark:text-white shadow-sm text-lg"
           />
         </div>
 
@@ -98,7 +98,7 @@ const UsersPage = () => {
             <Link
               key={user._id}
               to={`/users/${user._id}`}
-              className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-500/5 transition-all flex flex-col items-center text-center group"
+              className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-xl hover:shadow-indigo-500/5 transition-all flex flex-col items-center text-center group"
             >
               <div className="relative mb-6">
                 <div className="w-20 h-20 md:w-24 md:h-24 rounded-3xl overflow-hidden shadow-lg border-2 border-white dark:border-slate-800 transition-transform group-hover:scale-95">
@@ -109,18 +109,18 @@ const UsersPage = () => {
                   />
                 </div>
                 {user.reputation > 50 && (
-                  <div className="absolute -top-1 -right-1 bg-amber-400 text-white p-1.5 rounded-full shadow-lg border-2 border-white" title="High Reputation">
+                  <div className="absolute -top-1 -right-1 bg-amber-400 text-white p-1.5 rounded-full shadow-lg border-2 border-white dark:border-slate-800" title="High Reputation">
                     <ShieldCheck size={14} />
                   </div>
                 )}
               </div>
               
-              <h3 className="text-lg font-bold text-slate-800 group-hover:text-indigo-600 transition-colors mb-1">{user.name}</h3>
-              <p className="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-4 px-3 py-1 bg-indigo-50 rounded-full inline-block">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors mb-1">{user.name}</h3>
+              <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-4 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 rounded-full inline-block">
                 {user.role || "Member"}
               </p>
               
-              <p className="text-sm text-slate-500 line-clamp-2 mb-6 h-10 leading-relaxed italic">
+              <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mb-6 h-10 leading-relaxed italic">
                 {user.headline || user.bio || "Crafting something amazing..."}
               </p>
               
@@ -128,18 +128,18 @@ const UsersPage = () => {
                 {user.skills && user.skills.slice(0, 3).map((skill, index) => (
                   <span
                     key={index}
-                    className="text-[10px] bg-slate-50 text-slate-600 px-2.5 py-1 rounded-lg font-bold border border-slate-100"
+                    className="text-[10px] bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-lg font-bold border border-slate-100 dark:border-slate-700"
                   >
                     #{skill}
                   </span>
                 ))}
                 {user.skills && user.skills.length > 3 && (
-                  <span className="text-[10px] text-slate-400 font-bold self-center">+{user.skills.length - 3}</span>
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold self-center">+{user.skills.length - 3}</span>
                 )}
               </div>
 
-              <div className="w-full pt-4 border-t border-slate-50">
-                <span className="inline-flex items-center justify-center w-full bg-slate-900 text-white py-3 rounded-2xl text-xs font-bold hover:bg-indigo-600 transition-all shadow-sm">
+              <div className="w-full pt-4 border-t border-slate-50 dark:border-slate-800">
+                <span className="inline-flex items-center justify-center w-full bg-slate-900 dark:bg-slate-800 text-white py-3 rounded-2xl text-xs font-bold hover:bg-indigo-600 dark:hover:bg-indigo-700 transition-all shadow-sm">
                   View Profile
                 </span>
               </div>
@@ -149,8 +149,8 @@ const UsersPage = () => {
 
         {/* Loading / Load More / No Results States */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-500">
-            <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-200 border-t-indigo-600 mb-4"></div>
+          <div className="flex flex-col items-center justify-center py-20 text-slate-500 dark:text-slate-400">
+            <div className="animate-spin rounded-full h-10 w-10 border-4 border-slate-200 dark:border-slate-800 border-t-indigo-600 dark:border-t-indigo-400 mb-4"></div>
             <p className="font-bold text-sm uppercase tracking-widest">Searching...</p>
           </div>
         )}
@@ -159,7 +159,7 @@ const UsersPage = () => {
           <div className="mt-12 text-center">
             <button
               onClick={loadMore}
-              className="bg-white text-slate-600 px-8 py-3 rounded-2xl font-bold border border-slate-200 hover:border-indigo-300 hover:text-indigo-600 transition-all shadow-sm active:scale-95"
+              className="bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 px-8 py-3 rounded-2xl font-bold border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm active:scale-95"
             >
               Load More Creators
             </button>
@@ -167,12 +167,12 @@ const UsersPage = () => {
         )}
 
         {!loading && users.length === 0 && (
-          <div className="text-center py-24 text-slate-500 bg-white rounded-3xl border border-dashed border-slate-200">
-            <div className="mb-6 text-slate-200">
+          <div className="text-center py-24 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+            <div className="mb-6 text-slate-200 dark:text-slate-800">
               <Search size={64} className="mx-auto" strokeWidth={1} />
             </div>
-            <h3 className="text-xl font-bold text-slate-800 mb-2">No creators found</h3>
-            <p className="text-slate-500 font-medium">Try searching for a different name, role, or skill set.</p>
+            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">No creators found</h3>
+            <p className="text-slate-500 dark:text-slate-400 font-medium">Try searching for a different name, role, or skill set.</p>
           </div>
         )}
       </div>

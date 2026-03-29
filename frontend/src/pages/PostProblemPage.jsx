@@ -92,30 +92,30 @@ const PostProblemPage = () => {
     <Layout>
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-xl font-semibold text-slate-800 tracking-tight">Post a Problem</h1>
-          <p className="text-slate-500 text-sm">Explain your challenge clearly to get the best solutions.</p>
+          <h1 className="text-xl font-semibold text-slate-800 dark:text-white tracking-tight">Post a Problem</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Explain your challenge clearly to get the best solutions.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white border border-slate-100 rounded-2xl p-8 shadow-sm space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-8 shadow-sm space-y-6 transition-colors">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2 uppercase tracking-wider">Problem Title</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">Problem Title</label>
             <input
               type="text"
               placeholder="e.g. How to implement real-time notifications with Socket.io?"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm"
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm dark:text-white"
               required
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2 uppercase tracking-wider">Category</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">Category</label>
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm outline-none"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm outline-none dark:text-white"
               >
                 <option value="technical">Technical</option>
                 <option value="operational">Operational</option>
@@ -124,27 +124,27 @@ const PostProblemPage = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2 uppercase tracking-wider">Tags (comma separated)</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">Tags (comma separated)</label>
               <input
                 type="text"
                 placeholder="e.g. react, node, socket.io"
                 value={formData.tags}
                 onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm dark:text-white"
               />
             </div>
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-slate-700 uppercase tracking-wider">Detailed Description</label>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 uppercase tracking-wider">Detailed Description</label>
               
               <div className="flex items-center gap-2">
                 {descriptionHistory.length > 0 && (
                   <button
                     type="button"
                     onClick={handleRevert}
-                    className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                    className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
                     title="Revert to previous version"
                   >
                     <RotateCcw size={16} />
@@ -158,35 +158,35 @@ const PostProblemPage = () => {
                     disabled={isAIProcessing}
                     className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-xl border transition-all ${
                       isAIProcessing 
-                      ? "bg-slate-50 text-slate-400 border-slate-200 cursor-not-allowed" 
-                      : "bg-indigo-50 text-indigo-700 border-indigo-100 hover:border-indigo-300 hover:bg-indigo-100/50"
+                      ? "bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-700 cursor-not-allowed" 
+                      : "bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 border-indigo-100 dark:border-indigo-800 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-100/50 dark:hover:bg-indigo-900/50"
                     }`}
                   >
                     {isAIProcessing ? (
-                      <div className="w-3.5 h-3.5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-3.5 h-3.5 border-2 border-indigo-600 dark:border-indigo-400 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <Sparkles size={14} className="text-indigo-600" />
+                      <Sparkles size={14} className="text-indigo-600 dark:text-indigo-400" />
                     )}
                     AI NARRATE
                     <ChevronDown size={12} className={`transition-transform duration-200 ${showAIMenu ? 'rotate-180' : ''}`} />
                   </button>
                   
                   {showAIMenu && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-100 rounded-2xl shadow-xl z-30 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50 mb-1">
+                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-xl z-30 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest border-b border-slate-50 dark:border-slate-700 mb-1">
                         AI Transformation
                       </div>
                       <button 
                         type="button" 
                         onClick={() => handleEnhance("expand")} 
-                        className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-indigo-50 text-slate-700 transition flex items-center justify-between group"
+                        className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-slate-700 dark:text-slate-200 transition flex items-center justify-between group"
                       >
                         Expand to Narrative
-                        <span className="text-[10px] text-indigo-500 opacity-0 group-hover:opacity-100 transition">Recommended</span>
+                        <span className="text-[10px] text-indigo-500 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition">Recommended</span>
                       </button>
-                      <button type="button" onClick={() => handleEnhance("professional")} className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-indigo-50 text-slate-700 transition">Make Professional</button>
-                      <button type="button" onClick={() => handleEnhance("creative")} className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-indigo-50 text-slate-700 transition">Make Creative</button>
-                      <button type="button" onClick={() => handleEnhance("concise")} className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-indigo-50 text-slate-700 transition">Make Concise</button>
+                      <button type="button" onClick={() => handleEnhance("professional")} className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-slate-700 dark:text-slate-200 transition">Make Professional</button>
+                      <button type="button" onClick={() => handleEnhance("creative")} className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-slate-700 dark:text-slate-200 transition">Make Creative</button>
+                      <button type="button" onClick={() => handleEnhance("concise")} className="w-full text-left px-4 py-2.5 text-xs font-medium hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-slate-700 dark:text-slate-200 transition">Make Concise</button>
                     </div>
                   )}
                 </div>
@@ -198,19 +198,19 @@ const PostProblemPage = () => {
                 placeholder="Describe your problem in detail... (Hint: Write a brief summary and use AI Narrate to expand it!)"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/5 transition-all font-medium min-h-[220px] text-sm resize-none ${
+                className={`w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3.5 focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/5 transition-all font-medium min-h-[220px] text-sm resize-none dark:text-white ${
                   isAIProcessing ? "opacity-60 grayscale-[0.5]" : ""
                 }`}
                 required
               />
               {isAIProcessing && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/40 backdrop-blur-[1px] rounded-xl z-10">
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/40 dark:bg-slate-900/40 backdrop-blur-[1px] rounded-xl z-10">
                   <div className="flex gap-1.5 mb-2">
-                    <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce" />
-                    <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce [animation-delay:0.2s]" />
-                    <div className="w-2 h-2 bg-indigo-600 rounded-full animate-bounce [animation-delay:0.4s]" />
+                    <div className="w-2 h-2 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-bounce" />
+                    <div className="w-2 h-2 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-bounce [animation-delay:0.2s]" />
+                    <div className="w-2 h-2 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-bounce [animation-delay:0.4s]" />
                   </div>
-                  <span className="text-xs font-bold text-indigo-700 animate-pulse tracking-tight">AI is crafting your narrative...</span>
+                  <span className="text-xs font-bold text-indigo-700 dark:text-indigo-400 animate-pulse tracking-tight">AI is crafting your narrative...</span>
                 </div>
               )}
             </div>
@@ -218,14 +218,14 @@ const PostProblemPage = () => {
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                <Code size={16} className="text-indigo-500" />
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                <Code size={16} className="text-indigo-500 dark:text-indigo-400" />
                 Code Snippet (Optional)
               </label>
               <select
                 value={formData.language}
                 onChange={(e) => setFormData({ ...formData, language: e.target.value })}
-                className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg outline-none"
+                className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded-lg outline-none"
               >
                 <option value="javascript">JavaScript</option>
                 <option value="python">Python</option>

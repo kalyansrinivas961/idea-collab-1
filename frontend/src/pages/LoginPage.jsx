@@ -77,50 +77,72 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <div className="flex-1 flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-white shadow-sm rounded-xl p-8">
-          <h1 className="text-2xl font-semibold text-slate-800 mb-2">Welcome back</h1>
-          <p className="text-sm text-slate-500 mb-6">Sign in to continue to IdeaCollab.</p>
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="max-w-md w-full bg-white dark:bg-slate-900 shadow-xl rounded-2xl p-8 border border-slate-100 dark:border-slate-800 transition-all">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">Welcome back</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Sign in to continue to IdeaCollab.</p>
+          </div>
           
-          {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
-          {message && <div className="mb-4 text-sm text-emerald-600">{message}</div>}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-xl text-sm text-red-600 dark:text-red-400 flex items-center gap-3">
+              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {error}
+            </div>
+          )}
+          {message && (
+            <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/30 rounded-xl text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-3">
+              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {message}
+            </div>
+          )}
 
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-8">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={handleGoogleError}
               useOneTap
-              theme="outline"
+              theme={document.documentElement.classList.contains('dark') ? "filled_black" : "outline"}
               size="large"
               shape="pill"
+              width="100%"
             />
           </div>
 
-          <div className="relative mb-6">
+          <div className="relative mb-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200"></div>
+              <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-slate-500">Or continue with email</span>
+            <div className="relative flex justify-center text-xs uppercase tracking-widest font-bold">
+              <span className="bg-white dark:bg-slate-900 px-4 text-slate-400 dark:text-slate-500">Or continue with email</span>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+              <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Email Address</label>
               <input
                 type="email"
                 name="identifier"
                 placeholder="email@example.com"
                 value={form.identifier}
                 onChange={handleChange}
-                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Password</label>
+                <Link to="/forgot-password" title="Forgot password?" className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <input
                   id="login-password"
@@ -128,14 +150,14 @@ const LoginPage = () => {
                   name="password"
                   value={form.password}
                   onChange={handleChange}
-                  className="w-full border rounded-lg px-3 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 pr-12 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white"
                   required
                   autoComplete="current-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-2 my-auto p-2 text-slate-500 hover:text-indigo-700 focus:outline-none rounded"
+                  className="absolute inset-y-0 right-0 px-4 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                 >
                   {showPassword ? (
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor">
@@ -154,20 +176,20 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-indigo-700 disabled:opacity-60"
+              className="w-full bg-indigo-600 text-white rounded-xl py-3 text-sm font-bold hover:bg-indigo-700 disabled:opacity-60 shadow-lg shadow-indigo-200 dark:shadow-none transition-all active:scale-95"
             >
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <span>Signing in...</span>
+                </div>
+              ) : "Sign in"}
             </button>
-            
-            <div className="text-right">
-              <Link to="/forgot-password" title="Forgot password?" className="text-xs text-indigo-600 hover:underline">
-                Forgot password?
-              </Link>
-            </div>
           </form>
-          <p className="mt-4 text-xs text-slate-500 text-center">
+
+          <p className="mt-8 text-sm text-slate-500 dark:text-slate-400 text-center">
             New to IdeaCollab?{" "}
-            <Link to="/register" className="text-indigo-600 font-medium">
+            <Link to="/register" className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
               Create an account
             </Link>
           </p>
