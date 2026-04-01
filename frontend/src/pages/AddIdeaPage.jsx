@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import Layout from "../components/Layout.jsx";
 import api from "../api/client.js";
 import EmojiPicker from "emoji-picker-react";
+import VoiceInput from "../components/VoiceInput.jsx";
 
 const AddIdeaPage = () => {
   const navigate = useNavigate();
@@ -65,6 +66,14 @@ const AddIdeaPage = () => {
     } catch (err) {
       console.error("AI Suggestion failed:", err);
     }
+  };
+
+  const handleVoiceTranscript = (field, transcript) => {
+    setForm(prev => ({
+      ...prev,
+      [field]: prev[field] ? `${prev[field]} ${transcript}` : transcript
+    }));
+    toast.success(`Transcribed to ${field}`);
   };
 
   const handleEnhance = async (mode) => {
@@ -175,7 +184,10 @@ const AddIdeaPage = () => {
         {error && <div className="mb-4 text-sm text-red-600 dark:text-red-400">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Title</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Title</label>
+              <VoiceInput onTranscript={(t) => handleVoiceTranscript("title", t)} />
+            </div>
             <input
               type="text"
               name="title"
@@ -189,6 +201,7 @@ const AddIdeaPage = () => {
             <div className="flex items-center justify-between mb-1">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
               <div className="flex items-center gap-2">
+                <VoiceInput onTranscript={(t) => handleVoiceTranscript("description", t)} />
                 {descriptionHistory.length > 0 && (
                   <button
                     type="button"

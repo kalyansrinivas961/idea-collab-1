@@ -67,6 +67,14 @@ const IdeaDetailsPage = () => {
     }
   };
 
+  const handleReportSuccess = (referenceNumber) => {
+    setShowReportModal(false);
+    toast.success(`Report submitted! Reference: ${referenceNumber}`, {
+      duration: 6000,
+      icon: "🛡️"
+    });
+  };
+
   if (loading) {
     return (
       <Layout>
@@ -177,12 +185,12 @@ const IdeaDetailsPage = () => {
           </div>
         </div>
 
-        {showReportModal && (
-          <ReportModal
-            ideaId={id}
-            onClose={() => setShowReportModal(false)}
-          />
-        )}
+        <ReportModal
+          ideaId={id}
+          onClose={() => setShowReportModal(false)}
+          isOpen={showReportModal}
+          onReportSuccess={handleReportSuccess}
+        />
 
         <CommentSection idea={idea} onUpdate={setIdea} />
         

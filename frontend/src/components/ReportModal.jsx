@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import api from "../api/client";
 
-const ReportModal = ({ ideaId, onClose, onReportSuccess }) => {
+const ReportModal = ({ ideaId, onClose, onReportSuccess, isOpen }) => {
   const [category, setCategory] = useState("spam");
   const [context, setContext] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [referenceNumber, setReferenceNumber] = useState("");
+
+  if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -115,3 +115,29 @@ exports.getAllReports = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Update report status (Moderator only)
+exports.updateReportStatus = async (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Access denied. Moderators only." });
+  }
+
+  const { status } = req.body;
+  if (!["pending", "reviewed", "resolved", "dismissed"].includes(status)) {
+    return res.status(400).json({ message: "Invalid status" });
+  }
+
+  try {
+    const report = await Report.findById(req.params.id);
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    report.status = status;
+    await report.save();
+
+    res.json({ message: `Report status updated to ${status}`, report });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

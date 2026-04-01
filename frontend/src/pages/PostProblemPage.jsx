@@ -4,6 +4,7 @@ import { Send, Code, Sparkles, ChevronDown, RotateCcw } from "lucide-react";
 import Layout from "../components/Layout.jsx";
 import api from "../api/client.js";
 import toast from "react-hot-toast";
+import VoiceInput from "../components/VoiceInput.jsx";
 
 const PostProblemPage = () => {
   const navigate = useNavigate();
@@ -22,6 +23,14 @@ const PostProblemPage = () => {
   const [showAIMenu, setShowAIMenu] = useState(false);
   const [descriptionHistory, setDescriptionHistory] = useState([]);
   const menuRef = useRef(null);
+
+  const handleVoiceTranscript = (field, transcript) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field] ? `${prev[field]} ${transcript}` : transcript
+    }));
+    toast.success(`Transcribed to ${field}`);
+  };
 
   const handleEnhance = async (mode) => {
     if (!formData.description && mode !== "generate") {
@@ -98,7 +107,10 @@ const PostProblemPage = () => {
 
         <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-8 shadow-sm space-y-6 transition-colors">
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">Problem Title</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 uppercase tracking-wider">Problem Title</label>
+              <VoiceInput onTranscript={(t) => handleVoiceTranscript("title", t)} />
+            </div>
             <input
               type="text"
               placeholder="e.g. How to implement real-time notifications with Socket.io?"
@@ -140,6 +152,7 @@ const PostProblemPage = () => {
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 uppercase tracking-wider">Detailed Description</label>
               
               <div className="flex items-center gap-2">
+                <VoiceInput onTranscript={(t) => handleVoiceTranscript("description", t)} />
                 {descriptionHistory.length > 0 && (
                   <button
                     type="button"

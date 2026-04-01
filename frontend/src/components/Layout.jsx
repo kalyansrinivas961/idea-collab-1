@@ -15,7 +15,8 @@ import {
   UserPlus,
   LogOut,
   Settings,
-  ArrowRight
+  ArrowRight,
+  ShieldCheck
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import api from "../api/client.js";
@@ -286,6 +287,11 @@ const Layout = ({ children }) => {
                 <NavLink to="/profile" className="hidden md:flex text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 p-2 min-w-[44px] min-h-[44px] justify-center items-center transition-colors" title="Profile" aria-label="My Profile">
                   <User className="w-6 h-6" />
                 </NavLink>
+                {user.role === 'admin' && (
+                  <NavLink to="/admin" className="hidden md:flex text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 p-2 min-w-[44px] min-h-[44px] justify-center items-center transition-colors" title="Admin Dashboard" aria-label="Admin Dashboard">
+                    <ShieldCheck className="w-6 h-6" />
+                  </NavLink>
+                )}
                 <button 
                   onClick={() => setIsLogoutModalOpen(true)}
                   className="hidden md:flex text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 p-2 min-w-[44px] min-h-[44px] justify-center items-center transition-colors"
@@ -372,6 +378,16 @@ const Layout = ({ children }) => {
                   <UserPlus className="w-5 h-5" />
                   Following
                 </NavLink>
+                {user.role === 'admin' && (
+                  <NavLink 
+                    to="/admin" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+                  >
+                    <ShieldCheck className="w-5 h-5" />
+                    Moderation
+                  </NavLink>
+                )}
               </div>
               <button 
                 onClick={() => {

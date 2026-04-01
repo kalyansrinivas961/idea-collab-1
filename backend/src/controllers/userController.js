@@ -290,6 +290,18 @@ exports.getUserById = async (req, res) => {
       }
     }
 
+    // Role-based information for admins
+    if (req.user && req.user.role === 'admin') {
+      const Report = require("../models/Report");
+      const reportsAgainstUser = await Report.countDocuments({
+        idea: { $in: await require("../models/Idea").find({ owner: user._id }, "_id") }
+      });
+      userObj.moderationInfo = {
+        reportsCount: reportsAgainstUser,
+        isSuspended: user.status === 'Suspended'
+      };
+    }
+
     res.json(userObj);
   } catch (error) {
     res.status(500).json({ message: error.message });
