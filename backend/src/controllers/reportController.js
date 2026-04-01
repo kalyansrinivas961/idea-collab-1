@@ -9,11 +9,11 @@ const crypto = require("crypto");
 exports.createReport = async (req, res) => {
   const { ideaId, category, context } = req.body;
 
-  // 1. Mandatory context validation (500 character minimum as requested)
-  if (!context || context.length < 500) {
+  // 1. Mandatory context validation (reduced minimum for better UX)
+  if (!context || context.trim().length < 50) {
     return res.status(400).json({ 
-      message: "Context is mandatory and must be at least 500 characters long.",
-      currentLength: context ? context.length : 0
+      message: "Context is mandatory and must be at least 50 characters long.",
+      currentLength: context ? context.trim().length : 0
     });
   }
 
