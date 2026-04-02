@@ -6,8 +6,6 @@ import socket from "../api/socket";
 import EmojiPicker from "emoji-picker-react";
 import { motion, AnimatePresence } from "framer-motion";
 import VoiceInput from "../components/VoiceInput";
-import AudioRecorder from "../components/AudioRecorder";
-import AudioPlayer from "../components/AudioPlayer";
 
 const SERVER_URL = import.meta.env.VITE_API_URL || "http://localhost:5002";
 
@@ -468,10 +466,6 @@ const ChatPage = () => {
     setNewMessage(prev => prev ? `${prev} ${transcript}` : transcript);
   };
 
-  const handleAudioSend = (audioBlob) => {
-    setAttachment(audioBlob);
-  };
-
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if ((!newMessage.trim() && !attachment) || !selectedUser) return;
@@ -486,7 +480,7 @@ const ChatPage = () => {
       status: 'sending', // custom field for UI
       attachment: attachment ? { 
         url: URL.createObjectURL(attachment), 
-        fileType: attachment.type.startsWith('audio/') ? 'audio' : (attachment.type.startsWith('image/') ? 'image' : 'document'),
+        fileType: attachment.type.startsWith('image/') ? 'image' : 'document',
         originalName: attachment.name,
         isLocal: true // flag to use local blob URL
       } : null
@@ -673,18 +667,11 @@ const ChatPage = () => {
             ) : (
               <div className="divide-y divide-slate-50 dark:divide-slate-800">
                 {conversations.map(conv => (
-                    <div 
-                      key={conv._id}
-                      onClick={() => {
-                        try {
-                          setSelectedUser(conv);
-                        } catch (error) {
-                          console.error('Error selecting user:', error);
-                          alert('An error occurred while opening the chat. Please try again.');
-                        }
-                      }}
-                      className={`flex items-center gap-4 p-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 cursor-pointer transition-all relative border-l-4 ${selectedUser?._id === conv._id ? 'bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-600' : 'border-transparent'}`}
-                    >
+                  <div 
+                    key={conv._id}
+                    onClick={() => setSelectedUser(conv)}
+                    className={`flex items-center gap-4 p-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 cursor-pointer transition-all relative border-l-4 ${selectedUser?._id === conv._id ? 'bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-600' : 'border-transparent'}`}
+                  >
                     <div className="relative flex-shrink-0">
                       {conv.isGroup ? (
                         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-lg">
@@ -755,7 +742,7 @@ const ChatPage = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className={`flex-1 flex flex-col bg-slate-50/30 dark:bg-slate-950/30 md:relative md:z-auto h-full transition-all duration-300 ${selectedUser ? 'fixed inset-0 z-[70]' : 'hidden'}`}
+              className={`flex-1 flex flex-col bg-slate-50/30 dark:bg-slate-950/30 fixed inset-0 z-[70] md:relative md:z-auto h-full transition-all duration-300`}
             >
               {/* Header */}
               <div className="p-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b dark:border-slate-800 flex items-center justify-between shadow-sm z-20 sticky top-0 min-h-[72px] landscape:min-h-[56px]">
@@ -906,8 +893,6 @@ const ChatPage = () => {
                                     alt="attachment" 
                                     className="max-w-full h-auto object-cover max-h-72 w-full hover:scale-105 transition-transform duration-500 cursor-pointer" 
                                   />
-                                ) : msg.attachment.fileType === 'audio' ? (
-                                  <AudioPlayer src={msg.attachment.isLocal ? msg.attachment.url : (msg.attachment.url.startsWith('http') ? msg.attachment.url : `${SERVER_URL}${msg.attachment.url}`)} />
                                 ) : (
                                   <a 
                                     href={msg.attachment.isLocal ? msg.attachment.url : (msg.attachment.url.startsWith('http') ? msg.attachment.url : `${SERVER_URL}${msg.attachment.url}`)}
@@ -1157,7 +1142,7 @@ const ChatPage = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                       </svg>
                     </button>
-                    <AudioRecorder onSend={handleAudioSend} />
+                    
                     <button
                       type="button"
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
