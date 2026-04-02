@@ -159,7 +159,6 @@ const PostProblemPage = () => {
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 uppercase tracking-wider">Detailed Description</label>
               
               <div className="flex items-center gap-2">
-                <VoiceInput onTranscript={(t) => handleVoiceTranscript("description", t)} />
                 {descriptionHistory.length > 0 && (
                   <button
                     type="button"

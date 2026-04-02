@@ -203,7 +203,6 @@ const AddIdeaPage = () => {
             <div className="flex items-center justify-between mb-1">
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
               <div className="flex items-center gap-2">
-                <VoiceInput onTranscript={(t) => handleVoiceTranscript("description", t)} />
                 {descriptionHistory.length > 0 && (
                   <button
                     type="button"
