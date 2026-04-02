@@ -355,6 +355,7 @@ const RegisterPage = () => {
               ) : "Create account"}
             </button>
           </form>
+          )}
           <p className="mt-8 text-sm text-slate-500 dark:text-slate-400 text-center">
             Already have an account?{" "}
             <Link to="/login" className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
