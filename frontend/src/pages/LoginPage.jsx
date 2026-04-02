@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 import api from "../api/client.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import Footer from "../components/Footer.jsx";
-import VoiceInput from "../components/VoiceInput.jsx";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -18,11 +17,6 @@ const LoginPage = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  const handleVoiceTranscript = (transcript) => {
-    setForm({ ...form, identifier: transcript });
-    toast.success(`Transcribed to email`);
-  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -139,12 +133,9 @@ const LoginPage = () => {
                   placeholder="email@example.com"
                   value={form.identifier}
                   onChange={handleChange}
-                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white pr-10"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white"
                   required
                 />
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                  <VoiceInput onTranscript={handleVoiceTranscript} />
-                </div>
               </div>
             </div>
             <div>

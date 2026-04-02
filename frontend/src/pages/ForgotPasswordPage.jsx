@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api/client.js";
 import Footer from "../components/Footer.jsx";
-import VoiceInput from "../components/VoiceInput.jsx";
 
 const ForgotPasswordPage = () => {
   const navigate = useNavigate();
@@ -14,11 +13,6 @@ const ForgotPasswordPage = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1); // 1: Email, 2: OTP & New Password
-
-  const handleVoiceTranscript = (transcript) => {
-    setEmail(transcript);
-    toast.success(`Transcribed to email`);
-  };
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
@@ -107,13 +101,10 @@ const ForgotPasswordPage = () => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white pr-10"
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white"
                     placeholder="email@example.com"
                     required
                   />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <VoiceInput onTranscript={handleVoiceTranscript} />
-                  </div>
                 </div>
               </div>
               <button
