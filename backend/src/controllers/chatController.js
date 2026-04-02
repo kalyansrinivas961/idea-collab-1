@@ -19,7 +19,8 @@ exports.sendMessage = async (req, res) => {
 
     if (file) {
       const isImage = file.mimetype.startsWith("image/");
-      const fileType = isImage ? "image" : "document";
+      const isAudio = file.mimetype.startsWith("audio/");
+      const fileType = isImage ? "image" : (isAudio ? "audio" : "document");
       
       messageData.attachment = {
         url: `/uploads/${file.filename}`,

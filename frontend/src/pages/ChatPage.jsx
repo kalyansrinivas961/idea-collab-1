@@ -6,6 +6,8 @@ import socket from "../api/socket";
 import EmojiPicker from "emoji-picker-react";
 import { motion, AnimatePresence } from "framer-motion";
 import VoiceInput from "../components/VoiceInput";
+import AudioRecorder from "../components/AudioRecorder";
+import AudioPlayer from "../components/AudioPlayer";
 
 const SERVER_URL = import.meta.env.VITE_API_URL || "http://localhost:5002";
 
@@ -466,6 +468,10 @@ const ChatPage = () => {
     setNewMessage(prev => prev ? `${prev} ${transcript}` : transcript);
   };
 
+  const handleAudioSend = (audioBlob) => {
+    setAttachment(audioBlob);
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if ((!newMessage.trim() && !attachment) || !selectedUser) return;
@@ -480,7 +486,7 @@ const ChatPage = () => {
       status: 'sending', // custom field for UI
       attachment: attachment ? { 
         url: URL.createObjectURL(attachment), 
-        fileType: attachment.type.startsWith('image/') ? 'image' : 'document',
+        fileType: attachment.type.startsWith('audio/') ? 'audio' : (attachment.type.startsWith('image/') ? 'image' : 'document'),
         originalName: attachment.name,
         isLocal: true // flag to use local blob URL
       } : null
@@ -893,6 +899,8 @@ const ChatPage = () => {
                                     alt="attachment" 
                                     className="max-w-full h-auto object-cover max-h-72 w-full hover:scale-105 transition-transform duration-500 cursor-pointer" 
                                   />
+                                ) : msg.attachment.fileType === 'audio' ? (
+                                  <AudioPlayer src={msg.attachment.isLocal ? msg.attachment.url : (msg.attachment.url.startsWith('http') ? msg.attachment.url : `${SERVER_URL}${msg.attachment.url}`)} />
                                 ) : (
                                   <a 
                                     href={msg.attachment.isLocal ? msg.attachment.url : (msg.attachment.url.startsWith('http') ? msg.attachment.url : `${SERVER_URL}${msg.attachment.url}`)}
@@ -1142,7 +1150,7 @@ const ChatPage = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                       </svg>
                     </button>
-                    
+                    <AudioRecorder onSend={handleAudioSend} />
                     <button
                       type="button"
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
