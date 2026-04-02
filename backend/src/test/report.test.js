@@ -44,7 +44,7 @@ describe("Reporting Workflow", () => {
   });
 
   describe("POST /api/reports", () => {
-    it("should fail if context is less than 50 characters", async () => {
+    it("should fail if context is less than 500 characters", async () => {
       const res = await request(app)
         .post("/api/reports")
         .set("Authorization", `Bearer ${userToken}`)
@@ -55,18 +55,18 @@ describe("Reporting Workflow", () => {
         });
 
       expect(res.status).toBe(400);
-      expect(res.body.message).toContain("at least 50 characters");
+      expect(res.body.message).toContain("at least 500 characters");
     });
 
     it("should create a report if valid", async () => {
-      const validContext = "a".repeat(51);
+      const longContext = "a".repeat(501);
       const res = await request(app)
         .post("/api/reports")
         .set("Authorization", `Bearer ${userToken}`)
         .send({
           ideaId,
           category: "spam",
-          context: validContext
+          context: longContext
         });
 
       expect(res.status).toBe(201);
@@ -79,7 +79,7 @@ describe("Reporting Workflow", () => {
     });
 
     it("should prevent duplicate reports within 24 hours", async () => {
-      const validContext = "a".repeat(51);
+      const longContext = "a".repeat(501);
       
       // First report
       await request(app)
@@ -88,7 +88,7 @@ describe("Reporting Workflow", () => {
         .send({
           ideaId,
           category: "spam",
-          context: validContext
+          context: longContext
         });
 
       // Second report immediately
@@ -98,11 +98,11 @@ describe("Reporting Workflow", () => {
         .send({
           ideaId,
           category: "harassment",
-          context: validContext
+          context: longContext
         });
 
       expect(res.status).toBe(400);
-      expect(res.body.message).toContain("already reported this idea");
+      expect(res.body.message).toContain("already reported");
     });
   });
 

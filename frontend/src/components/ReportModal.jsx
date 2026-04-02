@@ -14,8 +14,8 @@ const ReportModal = ({ ideaId, onClose, onReportSuccess, isOpen }) => {
     e.preventDefault();
     setError("");
     
-    if (context.trim().length < 50) {
-      setError(`Context must be at least 50 characters. Current length: ${context.trim().length}`);
+    if (context.length < 500) {
+      setError(`Context must be at least 500 characters. Current length: ${context.length}`);
       return;
     }
 
@@ -111,8 +111,8 @@ const ReportModal = ({ ideaId, onClose, onReportSuccess, isOpen }) => {
           <div>
             <div className="flex justify-between items-center mb-2">
               <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">Additional Context</label>
-              <span className={`text-[10px] font-black uppercase tracking-widest ${context.trim().length < 50 ? "text-slate-400" : "text-emerald-500"}`}>
-                {context.trim().length} / 50 characters
+              <span className={`text-[10px] font-black uppercase tracking-widest ${context.length < 500 ? "text-slate-400" : "text-emerald-500"}`}>
+                {context.length} / 500 characters
               </span>
             </div>
             <textarea
@@ -120,7 +120,7 @@ const ReportModal = ({ ideaId, onClose, onReportSuccess, isOpen }) => {
               rows="6"
               value={context}
               onChange={(e) => setContext(e.target.value)}
-              placeholder="Please provide detailed information about why this content should be removed. (Minimum 50 characters)"
+              placeholder="Please provide detailed information about why this content should be removed. (Minimum 500 characters)"
               className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all dark:text-white resize-none"
             />
             <div className="mt-3 flex gap-2 items-start text-[10px] text-slate-400 dark:text-slate-500 font-medium leading-relaxed italic">
@@ -141,7 +141,7 @@ const ReportModal = ({ ideaId, onClose, onReportSuccess, isOpen }) => {
             </button>
             <button
               type="submit"
-              disabled={loading || context.trim().length < 50}
+              disabled={loading || context.length < 500}
               className="px-8 py-2.5 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-red-100 dark:shadow-none active:scale-95"
             >
               {loading ? (
