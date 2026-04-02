@@ -673,11 +673,18 @@ const ChatPage = () => {
             ) : (
               <div className="divide-y divide-slate-50 dark:divide-slate-800">
                 {conversations.map(conv => (
-                  <div 
-                    key={conv._id}
-                    onClick={() => setSelectedUser(conv)}
-                    className={`flex items-center gap-4 p-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 cursor-pointer transition-all relative border-l-4 ${selectedUser?._id === conv._id ? 'bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-600' : 'border-transparent'}`}
-                  >
+                    <div 
+                      key={conv._id}
+                      onClick={() => {
+                        try {
+                          setSelectedUser(conv);
+                        } catch (error) {
+                          console.error('Error selecting user:', error);
+                          alert('An error occurred while opening the chat. Please try again.');
+                        }
+                      }}
+                      className={`flex items-center gap-4 p-4 hover:bg-slate-50/80 dark:hover:bg-slate-800/50 cursor-pointer transition-all relative border-l-4 ${selectedUser?._id === conv._id ? 'bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-600' : 'border-transparent'}`}
+                    >
                     <div className="relative flex-shrink-0">
                       {conv.isGroup ? (
                         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white shadow-lg">
@@ -748,7 +755,7 @@ const ChatPage = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className={`flex-1 flex flex-col bg-slate-50/30 dark:bg-slate-950/30 fixed inset-0 z-[70] md:relative md:z-auto h-full transition-all duration-300`}
+              className={`flex-1 flex flex-col bg-slate-50/30 dark:bg-slate-950/30 md:relative md:z-auto h-full transition-all duration-300 ${selectedUser ? 'fixed inset-0 z-[70]' : 'hidden'}`}
             >
               {/* Header */}
               <div className="p-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b dark:border-slate-800 flex items-center justify-between shadow-sm z-20 sticky top-0 min-h-[72px] landscape:min-h-[56px]">
