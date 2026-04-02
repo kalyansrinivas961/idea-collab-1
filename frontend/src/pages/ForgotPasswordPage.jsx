@@ -12,7 +12,9 @@ const ForgotPasswordPage = () => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(1); // 1: Email, 2: OTP & New Password
+  const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: Backup Code, 4: New Password
+  const [resetToken, setResetToken] = useState("");
+  const [backupCode, setBackupCode] = useState("");
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
@@ -31,6 +33,24 @@ const ForgotPasswordPage = () => {
     }
   };
 
+  const handleVerifyBackupCode = async (e) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+    setLoading(true);
+
+    try {
+      const res = await api.post("/auth/verify-backup-code", { email, backupCode });
+      setResetToken(res.data.resetToken);
+      setMessage("Backup code verified! Please set your new password.");
+      setStep(4);
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid backup code.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleResetPassword = async (e) => {
     e.preventDefault();
     setError("");
@@ -44,11 +64,11 @@ const ForgotPasswordPage = () => {
     setLoading(true);
 
     try {
-      const res = await api.post("/auth/reset-password", { 
-        email, 
-        otp, 
-        newPassword 
-      });
+      const payload = step === 4 
+        ? { email, resetToken, newPassword, mode: 'backup_code' }
+        : { email, otp, newPassword };
+        
+      const res = await api.post("/auth/reset-password", payload);
       setMessage(res.data.message);
       toast.success("Password reset successfully!");
       setTimeout(() => {
@@ -68,10 +88,10 @@ const ForgotPasswordPage = () => {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">Reset Password</h1>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              {step === 1 
-                ? "Enter your email address and we'll send you a verification code to reset your password."
-                : `Enter the 6-digit code sent to ${email} and your new password.`
-              }
+              {step === 1 && "Enter your email address and we'll send you a verification code."}
+              {step === 2 && `Enter the 6-digit code sent to ${email}.`}
+              {step === 3 && "Enter one of your 8-10 character backup codes."}
+              {step === 4 && "Choose a new secure password for your account."}
             </p>
           </div>
           
@@ -112,16 +132,28 @@ const ForgotPasswordPage = () => {
                 disabled={loading}
                 className="w-full bg-indigo-600 text-white rounded-xl py-3 text-sm font-bold hover:bg-indigo-700 disabled:opacity-60 shadow-lg shadow-indigo-200 dark:shadow-none transition-all active:scale-95"
               >
-                {loading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span>Sending...</span>
-                  </div>
-                ) : "Send Verification Code"}
+                {loading ? "Sending..." : "Send Verification Code"}
+              </button>
+              
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-100 dark:border-slate-800"></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase tracking-widest font-bold">
+                  <span className="bg-white dark:bg-slate-900 px-4 text-slate-400 dark:text-slate-500">Or use backup code</span>
+                </div>
+              </div>
+              
+              <button
+                type="button"
+                onClick={() => setStep(3)}
+                className="w-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl py-3 text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
+              >
+                Use Backup Code
               </button>
             </form>
-          ) : (
-            <form onSubmit={handleResetPassword} className="space-y-5">
+          ) : step === 2 ? (
+            <form onSubmit={() => setStep(4)} className="space-y-5">
               <div>
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Verification Code</label>
                 <input
@@ -134,6 +166,63 @@ const ForgotPasswordPage = () => {
                   required
                 />
               </div>
+              <button
+                type="button"
+                onClick={() => setStep(4)}
+                className="w-full bg-indigo-600 text-white rounded-xl py-3 text-sm font-bold hover:bg-indigo-700 transition-all active:scale-95"
+              >
+                Verify Code
+              </button>
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="w-full text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 py-2 transition-colors"
+              >
+                ← Back to email
+              </button>
+            </form>
+          ) : step === 3 ? (
+            <form onSubmit={handleVerifyBackupCode} className="space-y-6">
+              <div>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Email Address</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white"
+                  placeholder="email@example.com"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Backup Code</label>
+                <input
+                  type="text"
+                  value={backupCode}
+                  onChange={(e) => setBackupCode(e.target.value.toUpperCase())}
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all dark:text-white text-center font-mono uppercase tracking-widest"
+                  placeholder="ABC123XY"
+                  maxLength="10"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-indigo-600 text-white rounded-xl py-3 text-sm font-bold hover:bg-indigo-700 disabled:opacity-60 shadow-lg shadow-indigo-200 dark:shadow-none transition-all active:scale-95"
+              >
+                {loading ? "Verifying..." : "Verify Backup Code"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="w-full text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 py-2 transition-colors"
+              >
+                ← Use email verification instead
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleResetPassword} className="space-y-5">
               <div>
                 <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">New Password</label>
                 <input
@@ -161,19 +250,7 @@ const ForgotPasswordPage = () => {
                 disabled={loading}
                 className="w-full bg-indigo-600 text-white rounded-xl py-3 text-sm font-bold hover:bg-indigo-700 disabled:opacity-60 shadow-lg shadow-indigo-200 dark:shadow-none transition-all active:scale-95"
               >
-                {loading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span>Resetting...</span>
-                  </div>
-                ) : "Reset Password"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                className="w-full text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 py-2 transition-colors"
-              >
-                ← Back to email entry
+                {loading ? "Resetting..." : "Reset Password"}
               </button>
             </form>
           )}

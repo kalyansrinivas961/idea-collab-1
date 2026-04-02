@@ -30,4 +30,14 @@ const otpLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-module.exports = { passwordChangeLimiter, relationshipLimiter, otpLimiter };
+const backupCodeLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5, // Limit to 5 attempts per IP per hour
+  message: {
+    message: "Too many backup code validation attempts. Please try again in an hour.",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+module.exports = { passwordChangeLimiter, relationshipLimiter, otpLimiter, backupCodeLimiter };

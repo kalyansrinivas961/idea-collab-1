@@ -1,6 +1,8 @@
 const User = require("../models/User");
+const BackupCode = require("../models/BackupCode");
 const EmailOtp = require("../models/EmailOtp");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const { OAuth2Client } = require("google-auth-library");
 const emailValidator = require("email-validator");
 const dns = require("dns").promises;
@@ -8,6 +10,8 @@ const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
 const { createNotification } = require("./notificationController");
 const { formatUserResponse } = require("../utils/userUtils");
+const { generateBackupCodes, hashBackupCode } = require("../utils/backupCodeUtils");
+const ActivityLog = require("../models/ActivityLog");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -198,9 +202,32 @@ exports.registerUser = async (req, res) => {
     const user = await User.create(userData);
 
     if (user) {
+      // Generate initial backup codes
+      const rawBackupCodes = generateBackupCodes();
+      const hashedBackupCodes = await Promise.all(
+        rawBackupCodes.map(async (code) => ({
+          user: user._id,
+          hashedCode: await hashBackupCode(code),
+        }))
+      );
+      
+      await BackupCode.insertMany(hashedBackupCodes);
+      
+      // Mark as generated
+      user.backupCodesGenerated = true;
+      await user.save();
+
+      // Log the generation
+      await ActivityLog.create({
+        user: user._id,
+        action: "generate_backup_codes",
+        metadata: { source: "registration" }
+      });
+
       res.status(201).json({
         token: generateToken(user._id),
         user: formatUserResponse(user),
+        backupCodes: rawBackupCodes, // Only returned once
       });
     } else {
       res.status(400).json({ message: "Invalid user data" });
@@ -352,63 +379,163 @@ exports.forgotPassword = async (req, res) => {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
         <div style="text-align: center; margin-bottom: 20px;">
           <h1 style="color: #4f46e5; margin: 0;">IdeaCollab</h1>
-          <p style="color: #6b7280; font-size: 14px;">Connect. Create. Collaborate.</p>
         </div>
         <div style="background-color: #f9fafb; padding: 30px; border-radius: 8px; text-align: center;">
           <h2 style="color: #111827; margin-top: 0;">Password Reset Code</h2>
           <p style="color: #374151; font-size: 16px; margin-bottom: 24px;">Please use the following code to reset your password:</p>
-          <div style="font-size: 36px; font-weight: bold; color: #dc2626; letter-spacing: 5px; margin-bottom: 24px; padding: 15px; background: white; border: 2px dashed #e5e7eb; border-radius: 8px; display: inline-block;">
+          <div style="font-size: 36px; font-weight: bold; color: #4f46e5; letter-spacing: 5px; margin-bottom: 24px; padding: 15px; background: white; border: 2px dashed #e5e7eb; border-radius: 8px; display: inline-block;">
             ${otp}
           </div>
           <p style="color: #6b7280; font-size: 14px; margin-top: 0;">This code will expire in 10 minutes.</p>
         </div>
-        <div style="margin-top: 24px; color: #6b7280; font-size: 12px; text-align: center;">
-          <p>If you didn't request a password reset, please secure your account immediately.</p>
-          <p>&copy; ${new Date().getFullYear()} IdeaCollab. All rights reserved.</p>
-        </div>
       </div>
     `;
 
-    // Send email
-    try {
-      const sent = await sendEmail({
-        email,
-        subject: "Password Reset Verification Code - IdeaCollab",
-        message: `Your verification code for password reset is: ${otp}. It will expire in 10 minutes.`,
-        html: htmlContent
-      });
-      
-      if (!sent) {
-        throw new Error("Email delivery returned false status");
-      }
-      
-      console.log(`[PASSWORD RESET OTP] Success for ${email}`);
-      res.json({ message: "Verification code sent to your email." });
-    } catch (emailError) {
-      console.error(`[PASSWORD RESET OTP FAILURE] Delivery failed for ${email}:`, emailError.message);
-      res.status(503).json({ 
-        message: "We're having trouble delivering the reset code. Please try again later or contact support.",
-        technical: emailError.message 
-      });
-    }
+    await sendEmail({
+      email,
+      subject: "Password Reset Code - IdeaCollab",
+      message: `Your password reset code is: ${otp}`,
+      html: htmlContent
+    });
+
+    res.json({ message: "Password reset code sent to your email" });
   } catch (error) {
-    console.error(`[PASSWORD RESET CRITICAL] Error in forgotPassword for ${email}:`, error);
-    res.status(500).json({ message: "An internal error occurred." });
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.verifyBackupCode = async (req, res) => {
+  const { email, backupCode } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find all unused backup codes for this user
+    const userBackupCodes = await BackupCode.find({ user: user._id, usedStatus: false });
+
+    // Compare with bcrypt
+    let foundCode = null;
+    for (const codeRecord of userBackupCodes) {
+      const isMatch = await bcrypt.compare(backupCode, codeRecord.hashedCode);
+      if (isMatch) {
+        foundCode = codeRecord;
+        break;
+      }
+    }
+
+    if (!foundCode) {
+      // Check if it's already used for a better error message
+      const allBackupCodes = await BackupCode.find({ user: user._id });
+      for (const record of allBackupCodes) {
+         if (record.usedStatus && await bcrypt.compare(backupCode, record.hashedCode)) {
+           return res.status(400).json({ message: "This backup code has already been used" });
+         }
+      }
+      return res.status(400).json({ message: "Invalid backup code" });
+    }
+
+    // Atomic update to mark as used
+    foundCode.usedStatus = true;
+    foundCode.usedAt = new Date();
+    await foundCode.save();
+
+    // Log the usage
+    await ActivityLog.create({
+      user: user._id,
+      action: "use_backup_code",
+      metadata: { codeId: foundCode._id }
+    });
+
+    // Provide a short-lived token for password reset
+    const resetToken = jwt.sign({ id: user._id, type: 'backup_code_reset' }, process.env.JWT_SECRET, {
+      expiresIn: "15m",
+    });
+
+    res.json({ 
+      message: "Backup code validated successfully",
+      resetToken 
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.regenerateBackupCodes = async (req, res) => {
+  try {
+    const user = req.user;
+
+    // 1. Invalidate all previous backup codes
+    await BackupCode.deleteMany({ user: user._id });
+
+    // 2. Generate new set
+    const rawBackupCodes = generateBackupCodes();
+    const hashedBackupCodes = await Promise.all(
+      rawBackupCodes.map(async (code) => ({
+        user: user._id,
+        hashedCode: await hashBackupCode(code),
+      }))
+    );
+    
+    await BackupCode.insertMany(hashedBackupCodes);
+    
+    // 3. Update User model
+    user.backupCodesGenerated = true;
+    await user.save();
+
+    // 4. Log the regeneration
+    await ActivityLog.create({
+      user: user._id,
+      action: "regenerate_backup_codes",
+      metadata: { source: "user_request" }
+    });
+
+    res.json({
+      message: "New backup codes generated successfully",
+      backupCodes: rawBackupCodes, // Only returned once
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
 exports.resetPasswordWithOtp = async (req, res) => {
-  const { email, otp, newPassword } = req.body;
+  const { email, otp, newPassword, mode, resetToken } = req.body;
 
   try {
-    // 1. Verify OTP
-    const otpRecord = await EmailOtp.findOne({ email, otp });
-    if (!otpRecord) {
-      return res.status(400).json({ message: "Invalid or expired verification code" });
+    let user;
+
+    if (mode === 'backup_code') {
+      // Verify reset token
+      if (!resetToken) {
+        return res.status(400).json({ message: "Reset token is required for backup code recovery" });
+      }
+
+      try {
+        const decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
+        if (decoded.type !== 'backup_code_reset') {
+          return res.status(400).json({ message: "Invalid reset token type" });
+        }
+        user = await User.findById(decoded.id);
+      } catch (err) {
+        return res.status(401).json({ message: "Reset token expired or invalid" });
+      }
+    } else {
+      // 1. Verify OTP
+      const otpRecord = await EmailOtp.findOne({ email, otp });
+      if (!otpRecord) {
+        return res.status(400).json({ message: "Invalid or expired verification code" });
+      }
+
+      // 2. Find user
+      user = await User.findOne({ email });
+      
+      // Cleanup OTP
+      await EmailOtp.deleteOne({ _id: otpRecord._id });
     }
 
-    // 2. Find user
-    const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -425,8 +552,12 @@ exports.resetPasswordWithOtp = async (req, res) => {
     user.password = newPassword;
     await user.save();
 
-    // 5. Cleanup OTP
-    await EmailOtp.deleteOne({ _id: otpRecord._id });
+    // 5. Log the action
+    await ActivityLog.create({
+      user: user._id,
+      action: "reset_password",
+      metadata: { method: mode === 'backup_code' ? 'backup_code' : 'otp' }
+    });
 
     // 6. Send notification email
     const successHtml = `

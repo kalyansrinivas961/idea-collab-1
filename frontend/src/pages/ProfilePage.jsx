@@ -36,6 +36,7 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import { useTheme } from "../context/ThemeContext";
 import { toast } from "react-hot-toast";
 import { calculateProfileCompletion } from "../utils/user";
+import { jsPDF } from "jspdf";
 
 const ProfilePage = () => {
   const { user, updateUser, logout } = useAuth();
@@ -51,6 +52,8 @@ const ProfilePage = () => {
   const [avatarFile, setAvatarFile] = useState(null);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [settingsActiveTab, setSettingsActiveTab] = useState("appearance");
+  const [newBackupCodes, setNewBackupCodes] = useState(null);
+  const [isRegenerating, setIsRegenerating] = useState(false);
   
   // App Settings State
   const [appSettings, setAppSettings] = useState({
@@ -203,6 +206,55 @@ const ProfilePage = () => {
     }
   };
 
+  const handleRegenerateBackupCodes = async () => {
+    setIsRegenerating(true);
+    try {
+      const res = await api.post("/auth/regenerate-backup-codes");
+      setNewBackupCodes(res.data.backupCodes);
+      toast.success("Backup codes regenerated successfully!");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to regenerate backup codes");
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
+  const downloadTXT = () => {
+    if (!newBackupCodes) return;
+    const content = `IdeaCollab Backup Codes\n\nGenerated for: ${user.email}\nDate: ${new Date().toLocaleString()}\n\nCodes:\n${newBackupCodes.join("\n")}\n\nWARNING: Keep these codes safe. Previous codes are now invalid.`;
+    const element = document.createElement("a");
+    const file = new Blob([content], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = "ideacollab-backup-codes.txt";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const downloadPDF = () => {
+    if (!newBackupCodes) return;
+    const doc = new jsPDF();
+    doc.setFontSize(22);
+    doc.text("IdeaCollab Backup Codes", 20, 20);
+    doc.setFontSize(12);
+    doc.text(`Generated for: ${user.email}`, 20, 35);
+    doc.text(`Date: ${new Date().toLocaleString()}`, 20, 42);
+    doc.setFontSize(14);
+    doc.text("Your New Backup Codes:", 20, 55);
+    
+    doc.setFontSize(12);
+    newBackupCodes.forEach((code, index) => {
+      doc.text(`${index + 1}. ${code}`, 30, 65 + (index * 8));
+    });
+
+    doc.setFontSize(10);
+    doc.setTextColor(220, 38, 38);
+    doc.text("WARNING: These codes replace all your previous backup codes.", 20, 150);
+    doc.text("Previous codes will no longer work.", 20, 157);
+    
+    doc.save("ideacollab-backup-codes.pdf");
+  };
+
   // Components
   const TabButton = ({ id, icon: Icon, label }) => (
     <button
@@ -323,6 +375,7 @@ const ProfilePage = () => {
             <TabButton id="profile" icon={UserIcon} label="Personal Info" />
             <TabButton id="activity" icon={Activity} label="Activity Timeline" />
             <TabButton id="stats" icon={BarChart3} label="Insights" />
+            <TabButton id="security" icon={Shield} label="Security" />
             <TabButton id="settings" icon={Settings} label="Settings" />
           </div>
         </div>
@@ -556,6 +609,112 @@ const ProfilePage = () => {
                           <span className="text-slate-500 dark:text-slate-400 font-medium mb-1">Engagements</span>
                         </div>
                         <p className="mt-4 text-slate-600 dark:text-slate-400 text-sm">Total likes received across all your shared ideas.</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeTab === "security" && (
+                <motion.div
+                  key="security"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="space-y-6"
+                >
+                  <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-100 dark:border-slate-800">
+                    <h2 className="text-xl font-semibold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+                      <Shield className="text-indigo-600" size={24} />
+                      Security & Recovery
+                    </h2>
+                    
+                    <div className="space-y-8">
+                      {/* Backup Codes Section */}
+                      <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                          <div>
+                            <h3 className="text-lg font-bold text-slate-800 dark:text-white">Backup Recovery Codes</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                              Use these codes to recover your account if you lose access to your email.
+                            </p>
+                          </div>
+                          <button
+                            onClick={handleRegenerateBackupCodes}
+                            disabled={isRegenerating}
+                            className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-indigo-700 transition-all shadow-md active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                          >
+                            {isRegenerating ? (
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                              <>
+                                <Lock size={16} />
+                                Regenerate Codes
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {newBackupCodes ? (
+                          <div className="animate-fade-in space-y-6">
+                            <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/30 rounded-xl mb-4">
+                              <p className="text-xs text-amber-800 dark:text-amber-400 font-medium">
+                                <strong>Warning:</strong> These are your new backup codes. All previous codes have been invalidated. Please save them now as they will not be shown again.
+                              </p>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                              {newBackupCodes.map((code, idx) => (
+                                <div key={idx} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-center font-mono text-sm tracking-wider text-slate-700 dark:text-slate-300 select-all">
+                                  {code}
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                              <button
+                                onClick={downloadTXT}
+                                className="flex-1 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
+                              >
+                                <Plus size={14} className="rotate-45" />
+                                Download TXT
+                              </button>
+                              <button
+                                onClick={downloadPDF}
+                                className="flex-1 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
+                              >
+                                <ExternalLink size={14} />
+                                Download PDF
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-center py-8 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl">
+                            <Lock className="mx-auto text-slate-300 dark:text-slate-600 mb-3" size={40} />
+                            <p className="text-sm text-slate-500 dark:text-slate-400">
+                              Your backup codes are securely stored. <br />
+                              Click regenerate if you've lost your previous set.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Password Management */}
+                      <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="text-lg font-bold text-slate-800 dark:text-white">Password Management</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                              Change your account password regularly to stay secure.
+                            </p>
+                          </div>
+                          <Link
+                            to="/change-password"
+                            className="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm active:scale-95"
+                          >
+                            Change Password
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
