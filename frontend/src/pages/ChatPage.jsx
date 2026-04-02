@@ -5,6 +5,7 @@ import api from "../api/client";
 import socket from "../api/socket";
 import EmojiPicker from "emoji-picker-react";
 import { motion, AnimatePresence } from "framer-motion";
+import VoiceInput from "../components/VoiceInput";
 
 const SERVER_URL = import.meta.env.VITE_API_URL || "http://localhost:5002";
 
@@ -459,6 +460,10 @@ const ChatPage = () => {
     if (e.target.files && e.target.files[0]) {
       setAttachment(e.target.files[0]);
     }
+  };
+
+  const handleVoiceTranscript = (transcript) => {
+    setNewMessage(prev => prev ? `${prev} ${transcript}` : transcript);
   };
 
   const handleSendMessage = async (e) => {
@@ -1163,19 +1168,24 @@ const ChatPage = () => {
                     </div>
                   )}
 
-                  <textarea
-                    value={newMessage}
-                    onChange={handleInputChange}
-                    placeholder="Type a message..."
-                    rows="1"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendMessage(e);
-                      }
-                    }}
-                    className="flex-1 bg-transparent border-none focus:ring-0 resize-none max-h-32 text-slate-800 dark:text-white placeholder:text-slate-400 font-medium py-3.5 px-2 min-h-[52px] text-sm md:text-base landscape:py-2 landscape:min-h-[44px]"
-                  />
+                  <div className="relative flex-1">
+                    <textarea
+                      value={newMessage}
+                      onChange={handleInputChange}
+                      placeholder="Type a message..."
+                      rows="1"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage(e);
+                        }
+                      }}
+                      className="flex-1 bg-transparent border-none focus:ring-0 resize-none max-h-32 text-slate-800 dark:text-white placeholder:text-slate-400 font-medium py-3.5 px-2 min-h-[52px] text-sm md:text-base landscape:py-2 landscape:min-h-[44px] pr-10"
+                    />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                      <VoiceInput onTranscript={handleVoiceTranscript} />
+                    </div>
+                  </div>
                   
                   <button 
                     type="submit"

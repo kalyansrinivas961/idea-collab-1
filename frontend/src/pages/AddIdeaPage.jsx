@@ -184,18 +184,20 @@ const AddIdeaPage = () => {
         {error && <div className="mb-4 text-sm text-red-600 dark:text-red-400">{error}</div>}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Title</label>
-              <VoiceInput onTranscript={(t) => handleVoiceTranscript("title", t)} />
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Title</label>
+            <div className="relative">
+              <input
+                type="text"
+                name="title"
+                value={form.title}
+                onChange={handleChange}
+                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors focus:bg-white dark:focus:bg-slate-700 pr-10"
+                required
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-2">
+                <VoiceInput onTranscript={(t) => handleVoiceTranscript("title", t)} />
+              </div>
             </div>
-            <input
-              type="text"
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors focus:bg-white dark:focus:bg-slate-700"
-              required
-            />
           </div>
           <div className="relative">
             <div className="flex items-center justify-between mb-1">
@@ -257,17 +259,19 @@ const AddIdeaPage = () => {
                 placeholder="Describe your startup or project in detail..."
                 required
               />
-              
-              <button
-                type="button"
-                onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                className="absolute right-3 top-3 text-slate-400 hover:text-yellow-500 transition"
-                title="Add emoji"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </button>
+              <div className="absolute top-2 right-2 flex items-center space-x-2">
+                <VoiceInput onTranscript={(t) => handleVoiceTranscript("description", t)} />
+                <button
+                  type="button"
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="text-slate-400 hover:text-yellow-500 transition"
+                  title="Add emoji"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
+              </div>
 
               {aiSuggestion && (
                 <div className="absolute left-0 right-0 -bottom-10 bg-indigo-600 dark:bg-indigo-500 text-white text-[11px] p-2 rounded-lg flex items-center justify-between shadow-lg animate-fade-in-up z-10">
@@ -346,28 +350,36 @@ const AddIdeaPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Category</label>
-              <input
-                type="text"
-                name="category"
-                value={form.category}
-                onChange={handleChange}
-                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors min-h-[44px]"
-                placeholder="FinTech, EdTech, AI..."
-                required
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  name="category"
+                  value={form.category}
+                  onChange={handleChange}
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors focus:bg-white dark:focus:bg-slate-700 pr-10"
+                  placeholder="FinTech, EdTech, AI..."
+                  required
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2">
+                  <VoiceInput onTranscript={(t) => handleVoiceTranscript("category", t)} />
+                </div>
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                Tags (comma separated)
-              </label>
-              <input
-                type="text"
-                name="tags"
-                value={form.tags}
-                onChange={handleChange}
-                className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors min-h-[44px]"
-                placeholder="React, AI, Startup..."
-              />
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tags (comma separated)</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  name="tags"
+                  value={form.tags}
+                  onChange={handleChange}
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-colors focus:bg-white dark:focus:bg-slate-700 pr-10"
+                  placeholder="React, AI, Startup..."
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2">
+                  <VoiceInput onTranscript={(t) => handleVoiceTranscript("tags", t)} />
+                </div>
+              </div>
             </div>
           </div>
 

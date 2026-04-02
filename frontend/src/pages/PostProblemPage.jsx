@@ -107,18 +107,20 @@ const PostProblemPage = () => {
 
         <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-8 shadow-sm space-y-6 transition-colors">
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 uppercase tracking-wider">Problem Title</label>
-              <VoiceInput onTranscript={(t) => handleVoiceTranscript("title", t)} />
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">Problem Title</label>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="e.g. How to implement real-time notifications with Socket.io?"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm dark:text-white pr-10"
+                required
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <VoiceInput onTranscript={(t) => handleVoiceTranscript("title", t)} />
+              </div>
             </div>
-            <input
-              type="text"
-              placeholder="e.g. How to implement real-time notifications with Socket.io?"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm dark:text-white"
-              required
-            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -137,13 +139,18 @@ const PostProblemPage = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">Tags (comma separated)</label>
-              <input
-                type="text"
-                placeholder="e.g. react, node, socket.io"
-                value={formData.tags}
-                onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm dark:text-white"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="e.g. react, node, socket.io"
+                  value={formData.tags}
+                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-indigo-500/10 transition-all font-medium text-sm dark:text-white pr-10"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <VoiceInput onTranscript={(t) => handleVoiceTranscript("tags", t)} />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -211,11 +218,14 @@ const PostProblemPage = () => {
                 placeholder="Describe your problem in detail... (Hint: Write a brief summary and use AI Narrate to expand it!)"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className={`w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3.5 focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/5 transition-all font-medium min-h-[220px] text-sm resize-none dark:text-white ${
+                className={`w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3.5 focus:outline-none focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-indigo-500/5 transition-all font-medium min-h-[220px] text-sm resize-none dark:text-white pr-10 ${
                   isAIProcessing ? "opacity-60 grayscale-[0.5]" : ""
                 }`}
                 required
               />
+              <div className="absolute top-2 right-2 flex items-center space-x-2">
+                <VoiceInput onTranscript={(t) => handleVoiceTranscript("description", t)} />
+              </div>
               {isAIProcessing && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/40 dark:bg-slate-900/40 backdrop-blur-[1px] rounded-xl z-10">
                   <div className="flex gap-1.5 mb-2">
@@ -247,12 +257,17 @@ const PostProblemPage = () => {
                 <option value="sql">SQL</option>
               </select>
             </div>
-            <textarea
-              placeholder="// Paste your code here..."
-              value={formData.code}
-              onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-              className="w-full bg-slate-900 text-slate-100 border-none rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all font-mono text-sm min-h-[150px]"
-            />
+            <div className="relative">
+              <textarea
+                placeholder="// Paste your code here..."
+                value={formData.code}
+                onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                className="w-full bg-slate-900 text-slate-100 border-none rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all font-mono text-sm min-h-[150px] pr-10"
+              />
+              <div className="absolute top-2 right-2 flex items-center space-x-2">
+                <VoiceInput onTranscript={(t) => handleVoiceTranscript("code", t)} />
+              </div>
+            </div>
           </div>
 
           <div className="pt-4">

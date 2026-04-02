@@ -2,11 +2,16 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import VoiceInput from "./VoiceInput";
 
 const CommentSection = ({ idea, onUpdate }) => {
   const { user } = useAuth();
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleVoiceTranscript = (transcript) => {
+    setText(prev => prev ? `${prev} ${transcript}` : transcript);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -112,7 +117,7 @@ const CommentSection = ({ idea, onUpdate }) => {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Add a comment..."
-              className="w-full bg-slate-50 dark:bg-slate-800 border-0 dark:border dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-800 transition dark:text-white resize-none"
+              className="w-full bg-slate-50 dark:bg-slate-800 border-0 dark:border dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-800 transition dark:text-white resize-none pr-20"
               rows="1"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -121,15 +126,18 @@ const CommentSection = ({ idea, onUpdate }) => {
                 }
               }}
             />
-            <button 
-              type="submit" 
-              disabled={loading || !text.trim()}
-              className="absolute right-2 top-2 p-1 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-full disabled:opacity-50 transition"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            </button>
+            <div className="absolute right-2 top-2 flex items-center">
+              <VoiceInput onTranscript={handleVoiceTranscript} />
+              <button 
+                type="submit" 
+                disabled={loading || !text.trim()}
+                className="p-1 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-full disabled:opacity-50 transition"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </div>
           </div>
         </form>
       ) : (

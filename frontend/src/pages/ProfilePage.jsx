@@ -119,6 +119,22 @@ const ProfilePage = () => {
     setSocialForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleVoiceTranscript = (field, transcript) => {
+    setProfileForm(prev => ({
+      ...prev,
+      [field]: prev[field] ? `${prev[field]} ${transcript}` : transcript
+    }));
+    toast.success(`Transcribed to ${field}`);
+  };
+
+  const handleSocialVoiceTranscript = (field, transcript) => {
+    setSocialForm(prev => ({
+      ...prev,
+      [field]: prev[field] ? `${prev[field]} ${transcript}` : transcript
+    }));
+    toast.success(`Transcribed to ${field}`);
+  };
+
   const handlePrivacyToggle = (key) => {
     setPrivacySettings(prev => ({ ...prev, [key]: !prev[key] }));
   };
@@ -348,25 +364,35 @@ const ProfilePage = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Full Name</label>
-                          <input 
-                            type="text" 
-                            name="name"
-                            value={profileForm.name}
-                            onChange={handleProfileChange}
-                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white"
-                            placeholder="Your Name"
-                          />
+                          <div className="relative">
+                            <input 
+                              type="text" 
+                              name="name"
+                              value={profileForm.name}
+                              onChange={handleProfileChange}
+                              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white pr-10"
+                              placeholder="Your Name"
+                            />
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                              <VoiceInput onTranscript={(t) => handleVoiceTranscript("name", t)} />
+                            </div>
+                          </div>
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Professional Headline</label>
-                          <input 
-                            type="text" 
-                            name="headline"
-                            value={profileForm.headline}
-                            onChange={handleProfileChange}
-                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white"
-                            placeholder="e.g. Senior UX Designer"
-                          />
+                          <div className="relative">
+                            <input 
+                              type="text" 
+                              name="headline"
+                              value={profileForm.headline}
+                              onChange={handleProfileChange}
+                              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white pr-10"
+                              placeholder="e.g. Senior UX Designer"
+                            />
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                              <VoiceInput onTranscript={(t) => handleVoiceTranscript("headline", t)} />
+                            </div>
+                          </div>
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Primary Role</label>
@@ -385,39 +411,54 @@ const ProfilePage = () => {
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Location</label>
-                          <input 
-                            type="text" 
-                            name="location"
-                            value={profileForm.location}
-                            onChange={handleProfileChange}
-                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white"
-                            placeholder="City, Country"
-                          />
+                          <div className="relative">
+                            <input 
+                              type="text" 
+                              name="location"
+                              value={profileForm.location}
+                              onChange={handleProfileChange}
+                              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white pr-10"
+                              placeholder="City, Country"
+                            />
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                              <VoiceInput onTranscript={(t) => handleVoiceTranscript("location", t)} />
+                            </div>
+                          </div>
                         </div>
                       </div>
 
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Bio</label>
-                        <textarea 
-                          name="bio"
-                          value={profileForm.bio}
-                          onChange={handleProfileChange}
-                          rows={4}
-                          className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none resize-none dark:text-white"
-                          placeholder="Tell us about yourself..."
-                        />
+                        <div className="relative">
+                          <textarea 
+                            name="bio"
+                            value={profileForm.bio}
+                            onChange={handleProfileChange}
+                            rows={4}
+                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none resize-none dark:text-white pr-10"
+                            placeholder="Tell us about yourself..."
+                          />
+                          <div className="absolute top-2 right-2 flex items-center space-x-2">
+                            <VoiceInput onTranscript={(t) => handleVoiceTranscript("bio", t)} />
+                          </div>
+                        </div>
                       </div>
 
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Skills (comma separated)</label>
-                        <input 
-                          type="text" 
-                          name="skills"
-                          value={profileForm.skills}
-                          onChange={handleProfileChange}
-                          className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white"
-                          placeholder="React, Node.js, Design Thinking"
-                        />
+                        <div className="relative">
+                          <input 
+                            type="text" 
+                            name="skills"
+                            value={profileForm.skills}
+                            onChange={handleProfileChange}
+                            className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white pr-10"
+                            placeholder="React, Node.js, Design Thinking"
+                          />
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                            <VoiceInput onTranscript={(t) => handleVoiceTranscript("skills", t)} />
+                          </div>
+                        </div>
                       </div>
 
                       <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
@@ -441,9 +482,12 @@ const ProfilePage = () => {
                                   name={social.name}
                                   value={socialForm[social.name]}
                                   onChange={handleSocialChange}
-                                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl pl-12 pr-4 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white"
+                                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl pl-12 pr-10 py-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none dark:text-white"
                                   placeholder={`${social.label}...`}
                                 />
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                                  <VoiceInput onTranscript={(t) => handleSocialVoiceTranscript(social.name, t)} />
+                                </div>
                               </div>
                             </div>
                           ))}
