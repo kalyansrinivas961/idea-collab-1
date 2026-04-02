@@ -229,7 +229,7 @@ const AdminDashboardPage = () => {
 
                           {report.context && (
                             <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50">
-                              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed italic">
+                              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed italic overflow-wrap-break-word whitespace-pre-wrap">
                                 "{report.context}"
                               </p>
                             </div>
