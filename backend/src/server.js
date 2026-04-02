@@ -22,6 +22,7 @@ const server = http.createServer(app);
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://127.0.0.1:5173",
   process.env.CLIENT_ORIGIN,
 ].filter(Boolean);
 
@@ -30,9 +31,17 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+    const isAllowed = allowedOrigins.some(allowed => origin === allowed) || 
+                     origin.endsWith(".vercel.app") || 
+                     origin.includes("localhost") || 
+                     origin.includes("127.0.0.1") ||
+                     origin.includes("ngrok-free.dev") || // Allow ngrok
+                     /^http:\/\/192\.168\.\d+\.\d+:5173$/.test(origin); // Allow LAN access
+
+    if (isAllowed) {
       callback(null, true);
     } else {
+      console.warn(`[CORS] Blocked origin: ${origin}`);
       callback(new Error("Not allowed by CORS"));
     }
   },

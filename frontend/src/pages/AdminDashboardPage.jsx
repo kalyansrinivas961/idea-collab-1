@@ -30,11 +30,14 @@ const AdminDashboardPage = () => {
   const navigate = useNavigate();
 
   const fetchReports = async () => {
+    console.log("Fetching reports...");
     setLoading(true);
     try {
       const res = await api.get("/reports");
+      console.log("Reports fetched successfully:", res.data.length);
       setReports(res.data);
     } catch (err) {
+      console.error("Error fetching reports:", err);
       toast.error("Failed to load reports");
     } finally {
       setLoading(false);
@@ -64,10 +67,11 @@ const AdminDashboardPage = () => {
 
   const filteredReports = reports.filter(r => {
     const matchesTab = activeTab === "all" || r.status === activeTab;
+    const searchLower = search.toLowerCase();
     const matchesSearch = !search || 
-      r.referenceNumber.toLowerCase().includes(search.toLowerCase()) ||
-      r.reporter?.name.toLowerCase().includes(search.toLowerCase()) ||
-      r.idea?.title.toLowerCase().includes(search.toLowerCase());
+      (r.referenceNumber && r.referenceNumber.toLowerCase().includes(searchLower)) ||
+      (r.reporter?.name && r.reporter.name.toLowerCase().includes(searchLower)) ||
+      (r.idea?.title && r.idea.title.toLowerCase().includes(searchLower));
     return matchesTab && matchesSearch;
   });
 

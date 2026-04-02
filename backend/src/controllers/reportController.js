@@ -101,7 +101,10 @@ exports.createReport = async (req, res) => {
 
 // Get all reports (Moderator only)
 exports.getAllReports = async (req, res) => {
+  console.log(`[REPORTS FETCH] Fetching all reports for user: ${req.user._id} with role: ${req.user.role}`);
+  
   if (req.user.role !== "admin") {
+    console.warn(`[REPORTS FETCH] Access denied for user: ${req.user._id} with role: ${req.user.role}`);
     return res.status(403).json({ message: "Access denied. Moderators only." });
   }
 
@@ -110,8 +113,10 @@ exports.getAllReports = async (req, res) => {
       .populate("reporter", "name email")
       .populate("idea", "title")
       .sort({ createdAt: -1 });
+    console.log(`[REPORTS FETCH] Successfully fetched ${reports.length} reports`);
     res.json(reports);
   } catch (error) {
+    console.error(`[REPORTS FETCH] Error fetching reports:`, error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -144,16 +149,19 @@ exports.updateReportStatus = async (req, res) => {
 
 // Get single report by ID (Moderator only)
 exports.getReportById = async (req, res) => {
+  console.log(`[REPORT FETCH] Fetching report ID: ${req.params.id} for user: ${req.user._id}`);
+  
   if (req.user.role !== "admin") {
+    console.warn(`[REPORT FETCH] Access denied for user: ${req.user._id} with role: ${req.user.role}`);
     return res.status(403).json({ message: "Access denied. Moderators only." });
   }
 
   try {
     const report = await Report.findById(req.params.id)
       .populate("reporter", "name email avatarUrl")
-      .populate("idea", "title description owner visibility category createdAt")
       .populate({
         path: "idea",
+        select: "title description owner visibility category createdAt",
         populate: {
           path: "owner",
           select: "name email avatarUrl"
@@ -161,11 +169,14 @@ exports.getReportById = async (req, res) => {
       });
 
     if (!report) {
+      console.warn(`[REPORT FETCH] Report not found: ${req.params.id}`);
       return res.status(404).json({ message: "Report not found" });
     }
 
+    console.log(`[REPORT FETCH] Successfully fetched report: ${report.referenceNumber}`);
     res.json(report);
   } catch (error) {
+    console.error(`[REPORT FETCH] Error fetching report:`, error);
     res.status(500).json({ message: error.message });
   }
 };
