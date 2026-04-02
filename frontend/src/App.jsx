@@ -22,6 +22,7 @@ import ChatPage from "./pages/ChatPage.jsx";
 import NotificationHistoryPage from "./pages/NotificationHistoryPage.jsx";
 import ChangePasswordPage from "./pages/ChangePasswordPage.jsx";
 import AdminDashboardPage from "./pages/AdminDashboardPage.jsx";
+import ReportDetailsPage from "./pages/ReportDetailsPage.jsx";
 import TermsPage from "./pages/TermsPage.jsx";
 import PrivacyPage from "./pages/PrivacyPage.jsx";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
@@ -166,6 +167,14 @@ const App = () => {
             element={
               <ProtectedRoute adminOnly={true}>
                 <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/reports/:id"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <ReportDetailsPage />
               </ProtectedRoute>
             }
           />

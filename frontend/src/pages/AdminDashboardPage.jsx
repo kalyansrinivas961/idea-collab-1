@@ -15,16 +15,19 @@ import {
   AlertTriangle,
   FileText,
   RefreshCw,
-  BarChart3
+  BarChart3,
+  Mic
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import VoiceInput from "../components/VoiceInput";
 
 const AdminDashboardPage = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
   const fetchReports = async () => {
     setLoading(true);
@@ -174,8 +177,14 @@ const AdminDashboardPage = () => {
                   placeholder="Search reports..." 
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl pl-11 pr-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all dark:text-white"
+                  className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl pl-11 pr-12 py-3 text-sm focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all dark:text-white"
                 />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                  <VoiceInput 
+                    onTranscript={(text) => setSearch(text)}
+                    className="p-1.5"
+                  />
+                </div>
               </div>
             </div>
 
@@ -191,11 +200,19 @@ const AdminDashboardPage = () => {
             ) : filteredReports.length > 0 ? (
               <div className="grid grid-cols-1 gap-5">
                 {filteredReports.map((report) => (
-                  <div key={report._id} className={`bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-sm border dark:border-slate-800 hover:shadow-lg hover:border-indigo-500/50 transition-all border-l-4 ${getAccentColor(report.status)}`}>
+                  <div 
+                    key={report._id} 
+                    onClick={(e) => {
+                      // Only navigate if we're not clicking a button or a link
+                      if (e.target.closest('button') || e.target.closest('a')) return;
+                      navigate(`/admin/reports/${report._id}`);
+                    }}
+                    className={`bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-sm border dark:border-slate-800 hover:shadow-lg hover:border-indigo-500/50 transition-all border-l-4 ${getAccentColor(report.status)} cursor-pointer group/card`}
+                  >
                     <div className="p-4 sm:p-6">
                       <div className="flex flex-col lg:flex-row justify-between gap-6">
                         {/* Left: Metadata & Content */}
-                        <div className="flex-1 space-y-5">
+                        <div className="flex-1 min-w-0 space-y-5">
                           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                             <span className="font-mono text-xs font-bold tracking-tighter text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2.5 py-1 rounded-md border border-indigo-100 dark:border-indigo-900/50 uppercase">
                               {report.referenceNumber}
@@ -208,10 +225,15 @@ const AdminDashboardPage = () => {
                           </div>
 
                           <div className="space-y-3">
-                            <h3 className="text-base sm:text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                            <h3 className="text-base sm:text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2 group-hover/card:text-indigo-600 transition-colors">
                               {report.idea?.title || "Archived Content"}
                               {report.idea && (
-                                <Link to={`/ideas/${report.idea._id}`} className="p-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-400 hover:text-indigo-600 transition-colors" title="View Idea">
+                                <Link 
+                                  to={`/ideas/${report.idea._id}`} 
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="p-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-slate-400 hover:text-indigo-600 transition-colors" 
+                                  title="View Idea"
+                                >
                                   <ExternalLink size={14} />
                                 </Link>
                               )}
@@ -228,8 +250,8 @@ const AdminDashboardPage = () => {
                           </div>
 
                           {report.context && (
-                            <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 max-h-40 overflow-y-auto">
-                              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed italic overflow-wrap-break-word whitespace-pre-wrap">
+                            <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 max-h-40 overflow-y-auto overflow-x-auto md:overflow-x-hidden">
+                              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed italic break-words whitespace-pre-wrap">
                                 "{report.context}"
                               </p>
                             </div>

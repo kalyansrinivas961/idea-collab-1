@@ -141,3 +141,31 @@ exports.updateReportStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Get single report by ID (Moderator only)
+exports.getReportById = async (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Access denied. Moderators only." });
+  }
+
+  try {
+    const report = await Report.findById(req.params.id)
+      .populate("reporter", "name email avatarUrl")
+      .populate("idea", "title description owner visibility category createdAt")
+      .populate({
+        path: "idea",
+        populate: {
+          path: "owner",
+          select: "name email avatarUrl"
+        }
+      });
+
+    if (!report) {
+      return res.status(404).json({ message: "Report not found" });
+    }
+
+    res.json(report);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
