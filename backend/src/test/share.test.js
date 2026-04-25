@@ -4,6 +4,8 @@ const app = require("../server");
 const User = require("../models/User");
 const Idea = require("../models/Idea");
 const SharedLink = require("../models/SharedLink");
+const Message = require("../models/Message");
+const Conversation = require("../models/Conversation");
 const jwt = require("jsonwebtoken");
 
 describe("Idea Sharing Endpoints", () => {
@@ -36,6 +38,8 @@ describe("Idea Sharing Endpoints", () => {
     await User.deleteMany({});
     await Idea.deleteMany({});
     await SharedLink.deleteMany({});
+    await Message.deleteMany({});
+    await Conversation.deleteMany({});
   });
 
   describe("POST /api/share/create", () => {
@@ -128,6 +132,37 @@ describe("Idea Sharing Endpoints", () => {
 
       expect(res.statusCode).toEqual(201);
       expect(res.body).toHaveProperty("shareToken");
+    });
+
+    it("should automatically send messages when sharing with internal users", async () => {
+      const recipient = await User.create({
+        name: "Recipient User",
+        email: `recipient-${Date.now()}@example.com`,
+        password: "password123"
+      });
+
+      const res = await request(app)
+        .post("/api/share/create")
+        .set("Authorization", `Bearer ${token}`)
+        .send({
+          ideaId: idea._id,
+          sharedWith: [recipient._id]
+        });
+
+      expect(res.statusCode).toEqual(201);
+
+      // Verify message creation
+      const message = await Message.findOne({ receiver: recipient._id, sender: user._id });
+      expect(message).toBeTruthy();
+      expect(message.content).toContain(idea.title);
+      expect(message.content).toContain(res.body.shareToken);
+
+      // Verify conversation creation
+      const conversation = await Conversation.findOne({
+        members: { $all: [user._id, recipient._id] }
+      });
+      expect(conversation).toBeTruthy();
+      expect(conversation.lastMessage.toString()).toEqual(message._id.toString());
     });
   });
 

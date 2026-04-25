@@ -1,6 +1,8 @@
 const SharedLink = require("../models/SharedLink");
 const Idea = require("../models/Idea");
 const User = require("../models/User");
+const Message = require("../models/Message");
+const Conversation = require("../models/Conversation");
 const crypto = require("crypto");
 
 /**
@@ -51,6 +53,50 @@ exports.createSharedLink = async (req, res) => {
       sharedWith: req.user ? (sharedWith || []) : [], // Guests cannot use internal sharing
       shareToken,
     });
+
+    // If internal sharing, send messages to recipients
+    if (req.user && sharedWith && sharedWith.length > 0) {
+      const shareUrl = `${process.env.CLIENT_ORIGIN || 'http://localhost:5173'}/share/${shareToken}`;
+      const messageContent = `I shared an idea with you: "${idea.title}". View it here: ${shareUrl}`;
+
+      for (const receiverId of sharedWith) {
+        try {
+          // Create message
+          const message = await Message.create({
+            sender: req.user._id,
+            receiver: receiverId,
+            content: messageContent,
+          });
+
+          // Find or create conversation
+          let conversation = await Conversation.findOne({
+            isGroup: false,
+            members: { $all: [req.user._id, receiverId] }
+          });
+
+          if (!conversation) {
+            conversation = await Conversation.create({
+              isGroup: false,
+              members: [req.user._id, receiverId],
+              lastMessage: message._id
+            });
+          } else {
+            conversation.lastMessage = message._id;
+            await conversation.save();
+          }
+
+          // Notify receiver via socket
+          if (req.io) {
+            const populatedMessage = await Message.findById(message._id)
+              .populate("sender", "name avatarUrl");
+            req.io.to(receiverId.toString()).emit("chat:message", populatedMessage);
+          }
+        } catch (msgError) {
+          console.error(`Failed to send share message to ${receiverId}:`, msgError);
+          // Continue with other recipients even if one fails
+        }
+      }
+    }
 
     res.status(201).json(sharedLink);
   } catch (error) {

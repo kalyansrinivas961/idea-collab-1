@@ -60,9 +60,17 @@ const ShareModal = ({ idea, isOpen, onClose }) => {
       });
       const link = `${window.location.origin}/share/${res.data.shareToken}`;
       setShareLink(link);
-      toast.success("Share link generated!", {
-        icon: <CheckCircle2 className="text-emerald-500" />,
-      });
+      
+      if (activeTab === "internal" && selectedUsers.length > 0) {
+        toast.success(`Idea shared with ${selectedUsers.length} contact${selectedUsers.length > 1 ? 's' : ''}!`, {
+          icon: <Send className="text-emerald-500" />,
+        });
+        setSelectedUsers([]); // Clear selection after sharing
+      } else {
+        toast.success("Share link generated!", {
+          icon: <CheckCircle2 className="text-emerald-500" />,
+        });
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to generate link");
     } finally {
