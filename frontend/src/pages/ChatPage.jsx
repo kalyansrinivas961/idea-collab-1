@@ -6,8 +6,53 @@ import socket from "../api/socket";
 import EmojiPicker from "emoji-picker-react";
 import { motion, AnimatePresence } from "framer-motion";
 import VoiceInput from "../components/VoiceInput";
+import { useNavigate } from "react-router-dom";
 
 const SERVER_URL = import.meta.env.VITE_API_URL || "http://localhost:5002";
+
+const SharedIdeaCard = ({ msg, isMe }) => {
+  const navigate = useNavigate();
+  const idea = msg.sharedIdea?.idea;
+  const token = msg.sharedIdea?.shareToken;
+
+  const handleClick = () => {
+    if (token) {
+      navigate(`/share/${token}`);
+    } else if (idea?._id) {
+      navigate(`/ideas/${idea._id}`);
+    }
+  };
+
+  return (
+    <div 
+      onClick={handleClick}
+      className={`mt-2 p-4 rounded-2xl cursor-pointer transition-all border shadow-sm hover:shadow-md active:scale-[0.98] w-full max-w-[280px] ${
+        isMe 
+          ? 'bg-white/10 border-white/20 text-white' 
+          : 'bg-indigo-50/50 dark:bg-indigo-900/20 border-indigo-100 dark:border-indigo-800 text-slate-800 dark:text-slate-200'
+      }`}
+    >
+      <div className="flex items-center gap-3 mb-3">
+        <div className={`p-2 rounded-xl ${isMe ? 'bg-white/20' : 'bg-indigo-600 shadow-sm'}`}>
+          <svg className={`w-5 h-5 ${isMe ? 'text-white' : 'text-white'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+        </div>
+        <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Shared Idea</span>
+      </div>
+      
+      <h4 className="font-black text-sm mb-1 line-clamp-2 leading-tight tracking-tight">
+        {msg.content?.replace('I shared an idea with you: ', '').replace(/"/g, '') || "Untitled Idea"}
+      </h4>
+      <p className="text-[10px] opacity-70 font-bold flex items-center gap-1 mt-2">
+        Click to view details
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </p>
+    </div>
+  );
+};
 
 const ChatPage = () => {
   const { user } = useAuth();
@@ -932,8 +977,14 @@ const ChatPage = () => {
                             ) : (
                               msg.content && (
                                 <div className="space-y-1">
-                                  <p className="leading-relaxed whitespace-pre-wrap break-words font-semibold tracking-tight">{msg.content}</p>
-                                  {msg.isEdited && <span className="text-[9px] font-black opacity-60 uppercase tracking-widest">(Edited)</span>}
+                                  {msg.messageType === 'idea_share' ? (
+                                    <SharedIdeaCard msg={msg} isMe={isMe} />
+                                  ) : (
+                                    <>
+                                      <p className="leading-relaxed whitespace-pre-wrap break-words font-semibold tracking-tight">{msg.content}</p>
+                                      {msg.isEdited && <span className="text-[9px] font-black opacity-60 uppercase tracking-widest">(Edited)</span>}
+                                    </>
+                                  )}
                                 </div>
                               )
                             )}

@@ -154,8 +154,10 @@ describe("Idea Sharing Endpoints", () => {
       // Verify message creation
       const message = await Message.findOne({ receiver: recipient._id, sender: user._id });
       expect(message).toBeTruthy();
+      expect(message.messageType).toEqual("idea_share");
+      expect(message.sharedIdea.idea.toString()).toEqual(idea._id.toString());
+      expect(message.sharedIdea.shareToken).toEqual(res.body.shareToken);
       expect(message.content).toContain(idea.title);
-      expect(message.content).toContain(res.body.shareToken);
 
       // Verify conversation creation
       const conversation = await Conversation.findOne({

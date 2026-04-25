@@ -57,15 +57,20 @@ exports.createSharedLink = async (req, res) => {
     // If internal sharing, send messages to recipients
     if (req.user && sharedWith && sharedWith.length > 0) {
       const shareUrl = `${process.env.CLIENT_ORIGIN || 'http://localhost:5173'}/share/${shareToken}`;
-      const messageContent = `I shared an idea with you: "${idea.title}". View it here: ${shareUrl}`;
+      const messageContent = `I shared an idea with you: "${idea.title}"`;
 
       for (const receiverId of sharedWith) {
         try {
-          // Create message
+          // Create message as an idea share
           const message = await Message.create({
             sender: req.user._id,
             receiver: receiverId,
             content: messageContent,
+            messageType: "idea_share",
+            sharedIdea: {
+              idea: ideaId,
+              shareToken: shareToken
+            }
           });
 
           // Find or create conversation

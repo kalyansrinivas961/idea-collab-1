@@ -21,6 +21,15 @@ const messageSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    messageType: {
+      type: String,
+      enum: ["text", "idea_share"],
+      default: "text",
+    },
+    sharedIdea: {
+      idea: { type: mongoose.Schema.Types.ObjectId, ref: "Idea" },
+      shareToken: String,
+    },
     attachment: {
       url: String,
       fileType: String, // 'image', 'document', etc.
