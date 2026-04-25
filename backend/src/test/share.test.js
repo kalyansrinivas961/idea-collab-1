@@ -102,6 +102,33 @@ describe("Idea Sharing Endpoints", () => {
 
       expect(res.statusCode).toEqual(401);
     });
+
+    it("should allow authenticated non-owners to share public ideas", async () => {
+      const otherUser = await User.create({
+        name: "Other User",
+        email: `other-${Date.now()}@example.com`,
+        password: "password123"
+      });
+      const otherToken = jwt.sign({ id: otherUser._id }, process.env.JWT_SECRET || "secret");
+
+      const publicIdea = await Idea.create({
+        title: "Public Idea",
+        description: "Public description",
+        category: "Technology",
+        owner: user._id,
+        visibility: "public"
+      });
+
+      const res = await request(app)
+        .post("/api/share/create")
+        .set("Authorization", `Bearer ${otherToken}`)
+        .send({
+          ideaId: publicIdea._id
+        });
+
+      expect(res.statusCode).toEqual(201);
+      expect(res.body).toHaveProperty("shareToken");
+    });
   });
 
   describe("GET /api/share/:token", () => {

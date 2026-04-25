@@ -19,13 +19,14 @@ exports.createSharedLink = async (req, res) => {
 
     // Access control logic
     if (req.user) {
-      // Authenticated: check if owner or collaborator
+      // Authenticated: check if owner, collaborator, or if the idea is public
       const isOwner = idea.owner.toString() === req.user._id.toString();
       const isCollaborator = idea.collaborators.some(
         (id) => id.toString() === req.user._id.toString()
       );
+      const isPublic = idea.visibility === "public";
 
-      if (!isOwner && !isCollaborator) {
+      if (!isOwner && !isCollaborator && !isPublic) {
         return res.status(403).json({ message: "Not authorized to share this idea" });
       }
     } else {
