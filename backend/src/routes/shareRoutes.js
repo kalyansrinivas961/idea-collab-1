@@ -5,7 +5,7 @@ const {
   getSharingHistory,
   revokeSharedLink,
 } = require("../controllers/shareController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect, optionalProtect } = require("../middleware/authMiddleware");
 const rateLimit = require("express-rate-limit");
 
 const router = express.Router();
@@ -23,7 +23,7 @@ const shareLimiter = rateLimit({
 
 router.post("/create", protect, shareLimiter, createSharedLink);
 router.get("/history", protect, getSharingHistory);
-router.get("/:token", getIdeaByShareToken);
+router.get("/:token", optionalProtect, getIdeaByShareToken);
 router.delete("/:id", protect, revokeSharedLink);
 
 module.exports = router;

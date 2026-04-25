@@ -124,9 +124,12 @@ exports.getIdeaByShareToken = async (req, res) => {
       .populate("collaborators", "name role avatarUrl status")
       .populate("comments.user", "name avatarUrl status");
 
+    // Enforce view-only for unauthenticated users
+    const effectivePermissions = req.user ? sharedLink.permissions : "view";
+
     res.json({
       idea,
-      permissions: sharedLink.permissions,
+      permissions: effectivePermissions,
       expiresAt: sharedLink.expiresAt,
     });
   } catch (error) {

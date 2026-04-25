@@ -81,11 +81,26 @@ describe("Idea Sharing Endpoints", () => {
         permissions: "comment"
       });
 
-      const res = await request(app).get(`/api/share/${sharedLink.shareToken}`);
+      const res = await request(app)
+        .get(`/api/share/${sharedLink.shareToken}`)
+        .set("Authorization", `Bearer ${token}`);
 
       expect(res.statusCode).toEqual(200);
       expect(res.body.idea.title).toEqual(idea.title);
       expect(res.body.permissions).toEqual("comment");
+    });
+
+    it("should return view-only for guests even if link has higher permissions", async () => {
+      const sharedLink = await SharedLink.create({
+        idea: idea._id,
+        creator: user._id,
+        permissions: "edit"
+      });
+
+      const res = await request(app).get(`/api/share/${sharedLink.shareToken}`);
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.permissions).toEqual("view");
     });
 
     it("should fail for an invalid token", async () => {

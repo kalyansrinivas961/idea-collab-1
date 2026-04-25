@@ -145,6 +145,7 @@ exports.searchUsers = async (req, res) => {
   try {
     const searchRegex = new RegExp(query, "i");
     const searchQuery = {
+      status: "Active",
       $or: [
         { name: searchRegex },
         { email: searchRegex },
