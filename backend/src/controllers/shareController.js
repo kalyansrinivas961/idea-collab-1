@@ -3,6 +3,7 @@ const Idea = require("../models/Idea");
 const User = require("../models/User");
 const Message = require("../models/Message");
 const Conversation = require("../models/Conversation");
+const { createNotification } = require("./notificationController");
 const crypto = require("crypto");
 
 /**
@@ -96,6 +97,16 @@ exports.createSharedLink = async (req, res) => {
               .populate("sender", "name avatarUrl");
             req.io.to(receiverId.toString()).emit("chat:message", populatedMessage);
           }
+
+          // Create notification for the receiver
+          await createNotification(req, {
+            recipient: receiverId,
+            type: "Idea",
+            title: "Idea Shared With You",
+            message: `${req.user.name} shared an idea: "${idea.title}"`,
+            relatedId: ideaId,
+            relatedModel: "Idea",
+          });
         } catch (msgError) {
           console.error(`Failed to send share message to ${receiverId}:`, msgError);
           // Continue with other recipients even if one fails

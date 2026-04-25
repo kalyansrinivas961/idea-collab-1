@@ -18,9 +18,25 @@ exports.createNotification = async (req, { recipient, type, title, message, rela
       relatedModel,
     });
 
-    // Emit socket event
+    // Emit socket event with retry logic
     if (req.io) {
-      req.io.to(recipient.toString()).emit("notification:new", notification);
+      let retries = 0;
+      const maxRetries = 3;
+      const emitNotification = () => {
+        try {
+          req.io.to(recipient.toString()).emit("notification:new", notification);
+          console.log(`[NOTIFICATION] Emitted to user: ${recipient}`);
+        } catch (emitErr) {
+          if (retries < maxRetries) {
+            retries++;
+            console.warn(`[NOTIFICATION RETRY ${retries}] for user: ${recipient}`);
+            setTimeout(emitNotification, 1000 * retries);
+          } else {
+            console.error(`[NOTIFICATION FAILURE] Failed to emit after ${maxRetries} retries:`, emitErr);
+          }
+        }
+      };
+      emitNotification();
     }
 
     return notification;

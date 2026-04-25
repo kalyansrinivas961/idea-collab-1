@@ -6,6 +6,7 @@ const Idea = require("../models/Idea");
 const SharedLink = require("../models/SharedLink");
 const Message = require("../models/Message");
 const Conversation = require("../models/Conversation");
+const Notification = require("../models/Notification");
 const jwt = require("jsonwebtoken");
 
 describe("Idea Sharing Endpoints", () => {
@@ -40,6 +41,7 @@ describe("Idea Sharing Endpoints", () => {
     await SharedLink.deleteMany({});
     await Message.deleteMany({});
     await Conversation.deleteMany({});
+    await Notification.deleteMany({});
   });
 
   describe("POST /api/share/create", () => {
@@ -165,6 +167,12 @@ describe("Idea Sharing Endpoints", () => {
       });
       expect(conversation).toBeTruthy();
       expect(conversation.lastMessage.toString()).toEqual(message._id.toString());
+
+      // Verify notification creation
+      const notification = await Notification.findOne({ recipient: recipient._id, type: "Idea" });
+      expect(notification).toBeTruthy();
+      expect(notification.relatedId.toString()).toEqual(idea._id.toString());
+      expect(notification.message).toContain(user.name);
     });
   });
 
