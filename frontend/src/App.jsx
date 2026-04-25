@@ -29,6 +29,8 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
 import QAListPage from "./pages/QAListPage.jsx";
 import PostProblemPage from "./pages/PostProblemPage.jsx";
 import ProblemDetailPage from "./pages/ProblemDetailPage.jsx";
+import SharedIdeaPage from "./pages/SharedIdeaPage.jsx";
+import SharingHistoryPage from "./pages/SharingHistoryPage.jsx";
 
 const App = () => {
   return (
@@ -119,6 +121,15 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <IdeaDetailsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/share/:token" element={<SharedIdeaPage />} />
+          <Route
+            path="/sharing-history"
+            element={
+              <ProtectedRoute>
+                <SharingHistoryPage />
               </ProtectedRoute>
             }
           />

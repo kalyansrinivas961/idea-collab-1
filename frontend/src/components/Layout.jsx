@@ -16,7 +16,8 @@ import {
   LogOut,
   Settings,
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  Share2
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import api from "../api/client.js";
@@ -360,6 +361,14 @@ const Layout = ({ children }) => {
                 {followRequestCount > 0 && (
                   <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">{followRequestCount}</span>
                 )}
+              </NavLink>
+              <NavLink 
+                to="/sharing-history" 
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({isActive}) => `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'}`}
+              >
+                <Share2 className="w-5 h-5" />
+                Sharing History
               </NavLink>
               <div className="pt-4 mt-4 border-t dark:border-slate-800">
                 <NavLink 

@@ -4,7 +4,7 @@ import api from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import VoiceInput from "./VoiceInput";
 
-const CommentSection = ({ idea, onUpdate }) => {
+const CommentSection = ({ idea, onUpdate, readOnly = false }) => {
   const { user } = useAuth();
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -97,7 +97,11 @@ const CommentSection = ({ idea, onUpdate }) => {
       </div>
 
       {/* Add Comment Form */}
-      {!user ? (
+      {readOnly ? (
+         <div className="text-center bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 text-sm text-slate-500 dark:text-slate-400">
+           Comments are disabled for this shared link.
+         </div>
+      ) : !user ? (
          <div className="text-center bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 text-sm text-slate-500 dark:text-slate-400">
            Please <Link to="/login" className="text-indigo-600 dark:text-indigo-400 font-medium">login</Link> to join the discussion.
          </div>

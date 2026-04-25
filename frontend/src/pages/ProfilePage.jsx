@@ -26,7 +26,8 @@ import {
   Bell,
   Lock,
   Eye,
-  Smartphone
+  Smartphone,
+  Share2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
@@ -377,6 +378,13 @@ const ProfilePage = () => {
             <TabButton id="stats" icon={BarChart3} label="Insights" />
             <TabButton id="security" icon={Shield} label="Security" />
             <TabButton id="settings" icon={Settings} label="Settings" />
+            <Link 
+              to="/sharing-history"
+              className="flex items-center justify-center gap-2 px-4 md:px-6 py-2.5 md:py-3 rounded-xl font-bold text-sm md:text-base transition-all whitespace-nowrap text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+            >
+              <Share2 size={18} className="flex-shrink-0" />
+              <span>Sharing History</span>
+            </Link>
           </div>
         </div>
 

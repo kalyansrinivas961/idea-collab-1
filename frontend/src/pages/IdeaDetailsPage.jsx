@@ -7,6 +7,7 @@ import LikeButton from "../components/LikeButton.jsx";
 import SaveButton from "../components/SaveButton.jsx";
 import CommentSection from "../components/CommentSection.jsx";
 import ReportModal from "../components/ReportModal.jsx";
+import ShareModal from "../components/ShareModal.jsx";
 import socket from "../api/socket.js";
 
 const IdeaDetailsPage = () => {
@@ -19,6 +20,7 @@ const IdeaDetailsPage = () => {
   const [requestMessage, setRequestMessage] = useState("");
   const [requestStatus, setRequestStatus] = useState("");
   const [showReportModal, setShowReportModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const fetchIdea = () => {
     setLoading(true);
@@ -182,6 +184,15 @@ const IdeaDetailsPage = () => {
           <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex gap-3">
              <LikeButton idea={idea} />
              <SaveButton idea={idea} />
+             <button
+               onClick={() => setShowShareModal(true)}
+               className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+             >
+               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+               </svg>
+               Share
+             </button>
           </div>
         </div>
 
@@ -190,6 +201,12 @@ const IdeaDetailsPage = () => {
           onClose={() => setShowReportModal(false)}
           isOpen={showReportModal}
           onReportSuccess={handleReportSuccess}
+        />
+
+        <ShareModal
+          idea={idea}
+          onClose={() => setShowShareModal(false)}
+          isOpen={showShareModal}
         />
 
         <CommentSection idea={idea} onUpdate={setIdea} />
