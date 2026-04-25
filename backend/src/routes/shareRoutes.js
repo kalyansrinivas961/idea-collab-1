@@ -21,7 +21,7 @@ const shareLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-router.post("/create", protect, shareLimiter, createSharedLink);
+router.post("/create", optionalProtect, shareLimiter, createSharedLink);
 router.get("/history", protect, getSharingHistory);
 router.get("/:token", optionalProtect, getIdeaByShareToken);
 router.delete("/:id", protect, revokeSharedLink);

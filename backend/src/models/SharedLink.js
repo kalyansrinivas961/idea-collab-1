@@ -4,7 +4,7 @@ const crypto = require("crypto");
 const sharedLinkSchema = new mongoose.Schema(
   {
     idea: { type: mongoose.Schema.Types.ObjectId, ref: "Idea", required: true },
-    creator: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    creator: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Optional for guest shares
     sharedWith: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // For internal sharing
     shareToken: { type: String, unique: true, required: true },
     permissions: {

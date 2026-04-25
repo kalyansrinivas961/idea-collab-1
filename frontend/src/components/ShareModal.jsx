@@ -32,25 +32,18 @@ const ShareModal = ({ idea, isOpen, onClose }) => {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (searchTerm.length > 2) {
-      const delayDebounceFn = setTimeout(() => {
-        searchUsers();
-      }, 300);
-      return () => clearTimeout(delayDebounceFn);
-    } else {
-      setSearchResults([]);
+    if (activeTab === "internal" && searchResults.length === 0 && !isSearching) {
+      fetchAllUsers();
     }
-  }, [searchTerm]);
+  }, [activeTab]);
 
-  const searchUsers = async () => {
+  const fetchAllUsers = async () => {
     setIsSearching(true);
     try {
-      const res = await api.get(`/users/search?query=${searchTerm}`);
-      // Filter to only show verified/active users if that logic exists, 
-      // otherwise basic search is fine as it only returns existing users.
-      setSearchResults(res.data.users.filter(u => u._id !== user._id));
+      const res = await api.get("/users/search?query=");
+      setSearchResults(res.data.users.filter(u => u._id !== user?._id));
     } catch (err) {
-      console.error("Search failed", err);
+      console.error("Failed to fetch users", err);
     } finally {
       setIsSearching(false);
     }
@@ -138,30 +131,32 @@ const ShareModal = ({ idea, isOpen, onClose }) => {
             </div>
 
             {/* Tabs */}
-            <div className="flex p-1.5 mx-6 mt-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
-              <button
-                onClick={() => setActiveTab("link")}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                  activeTab === "link" 
-                    ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
-                    : "text-slate-500 hover:text-slate-700"
-                }`}
-              >
-                <LinkIcon size={14} />
-                Public Link
-              </button>
-              <button
-                onClick={() => setActiveTab("internal")}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                  activeTab === "internal" 
-                    ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
-                    : "text-slate-500 hover:text-slate-700"
-                }`}
-              >
-                <Users size={14} />
-                Internal Share
-              </button>
-            </div>
+            {user && (
+              <div className="flex p-1.5 mx-6 mt-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                <button
+                  onClick={() => setActiveTab("link")}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                    activeTab === "link" 
+                      ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  <LinkIcon size={14} />
+                  Public Link
+                </button>
+                <button
+                  onClick={() => setActiveTab("internal")}
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                    activeTab === "internal" 
+                      ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm" 
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  <Users size={14} />
+                  Internal Share
+                </button>
+              </div>
+            )}
 
             <div className="p-6">
               {activeTab === "link" ? (
@@ -271,76 +266,83 @@ const ShareModal = ({ idea, isOpen, onClose }) => {
                 >
                   <div className="relative">
                     <label className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">
-                      <Search size={10} />
-                      Search Contacts
+                      <Users size={10} />
+                      Select Contacts
                     </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Name, email, or skills..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl px-12 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all dark:text-white"
-                      />
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                        <Search size={18} />
-                      </div>
-                      {isSearching && (
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                          <div className="w-5 h-5 border-2 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" />
+                    
+                    <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-2xl overflow-hidden">
+                      {isSearching ? (
+                        <div className="p-12 flex flex-col items-center justify-center gap-3">
+                          <div className="w-8 h-8 border-4 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" />
+                          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Loading users...</p>
+                        </div>
+                      ) : searchResults.length > 0 ? (
+                        <div className="max-h-64 overflow-y-auto p-2 divide-y dark:divide-slate-700">
+                          {searchResults.map(userItem => {
+                            const isSelected = selectedUsers.some(u => u._id === userItem._id);
+                            return (
+                              <button
+                                key={userItem._id}
+                                onClick={() => {
+                                  if (isSelected) {
+                                    setSelectedUsers(selectedUsers.filter(u => u._id !== userItem._id));
+                                  } else {
+                                    setSelectedUsers([...selectedUsers, userItem]);
+                                  }
+                                }}
+                                className={`w-full p-3 flex items-center gap-4 transition-all rounded-xl text-left group ${
+                                  isSelected ? "bg-indigo-50 dark:bg-indigo-900/20" : "hover:bg-slate-100 dark:hover:bg-slate-700/50"
+                                }`}
+                              >
+                                <div className="relative">
+                                  <img src={userItem.avatarUrl || `https://ui-avatars.com/api/?name=${userItem.name}`} className="w-10 h-10 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm" alt="" />
+                                  {isSelected && (
+                                    <div className="absolute -right-1 -top-1 bg-indigo-600 text-white rounded-full p-0.5 border-2 border-white dark:border-slate-900">
+                                      <CheckCircle2 size={10} />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className={`text-sm font-black transition-colors ${isSelected ? "text-indigo-600 dark:text-indigo-400" : "dark:text-white"}`}>{userItem.name}</div>
+                                  <div className="text-[10px] text-slate-500 font-bold truncate">{userItem.headline || userItem.role}</div>
+                                </div>
+                                {!isSelected && <Plus size={16} className="text-slate-300 group-hover:text-indigo-600 transition-colors" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="p-12 text-center">
+                          <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">No users found</p>
                         </div>
                       )}
                     </div>
-
-                    <AnimatePresence>
-                      {searchResults.length > 0 && (
-                        <motion.div 
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          className="absolute z-20 w-full mt-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-2xl max-h-56 overflow-y-auto p-2"
-                        >
-                          {searchResults.map(user => (
-                            <button
-                              key={user._id}
-                              onClick={() => {
-                                if (!selectedUsers.find(u => u._id === user._id)) {
-                                  setSelectedUsers([...selectedUsers, user]);
-                                }
-                                setSearchTerm("");
-                                setSearchResults([]);
-                              }}
-                              className="w-full p-3 flex items-center gap-4 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all rounded-xl text-left group"
-                            >
-                              <img src={user.avatarUrl || `https://ui-avatars.com/api/?name=${user.name}`} className="w-10 h-10 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm" alt="" />
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-black dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{user.name}</div>
-                                <div className="text-[10px] text-slate-500 font-bold truncate">{user.headline || user.role}</div>
-                              </div>
-                              <Plus size={16} className="text-slate-300 group-hover:text-indigo-600 transition-colors" />
-                            </button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
                   </div>
 
                   {selectedUsers.length > 0 && (
                     <div className="space-y-3">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Recipients</label>
+                      <div className="flex justify-between items-center">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Selected Recipients</label>
+                        <button 
+                          onClick={() => setSelectedUsers([])}
+                          className="text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-600 transition-colors"
+                        >
+                          Clear All
+                        </button>
+                      </div>
                       <div className="flex flex-wrap gap-2">
-                        {selectedUsers.map(user => (
+                        {selectedUsers.map(u => (
                           <motion.div 
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            key={user._id} 
-                            className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 rounded-xl pl-2 pr-3 py-1.5 group"
+                            key={u._id} 
+                            className="flex items-center gap-2 bg-indigo-600 text-white rounded-xl pl-2 pr-3 py-1.5 shadow-sm"
                           >
-                            <img src={user.avatarUrl || `https://ui-avatars.com/api/?name=${user.name}`} className="w-5 h-5 rounded-full" alt="" />
-                            <span className="text-xs font-black text-indigo-700 dark:text-indigo-400">{user.name}</span>
+                            <img src={u.avatarUrl || `https://ui-avatars.com/api/?name=${u.name}`} className="w-5 h-5 rounded-full border border-white/20" alt="" />
+                            <span className="text-xs font-black">{u.name}</span>
                             <button
-                              onClick={() => setSelectedUsers(selectedUsers.filter(u => u._id !== user._id))}
-                              className="text-indigo-300 hover:text-indigo-600 transition-colors"
+                              onClick={() => setSelectedUsers(selectedUsers.filter(item => item._id !== u._id))}
+                              className="text-white/60 hover:text-white transition-colors"
                             >
                               <X size={14} />
                             </button>

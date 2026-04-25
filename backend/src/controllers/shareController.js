@@ -17,19 +17,26 @@ exports.createSharedLink = async (req, res) => {
       return res.status(404).json({ message: "Idea not found" });
     }
 
-    // Check if the user is the owner or a collaborator
-    const isOwner = idea.owner.toString() === req.user._id.toString();
-    const isCollaborator = idea.collaborators.some(
-      (id) => id.toString() === req.user._id.toString()
-    );
+    // Access control logic
+    if (req.user) {
+      // Authenticated: check if owner or collaborator
+      const isOwner = idea.owner.toString() === req.user._id.toString();
+      const isCollaborator = idea.collaborators.some(
+        (id) => id.toString() === req.user._id.toString()
+      );
 
-    if (!isOwner && !isCollaborator) {
-      return res.status(403).json({ message: "Not authorized to share this idea" });
+      if (!isOwner && !isCollaborator) {
+        return res.status(403).json({ message: "Not authorized to share this idea" });
+      }
+    } else {
+      // Guest: can only share public ideas
+      if (idea.visibility !== "public") {
+        return res.status(401).json({ message: "Only public ideas can be shared without an account" });
+      }
     }
 
     let expiresAt = null;
     if (expiresIn) {
-      // expiresIn is expected in hours
       expiresAt = new Date(Date.now() + expiresIn * 60 * 60 * 1000);
     }
 
@@ -37,10 +44,10 @@ exports.createSharedLink = async (req, res) => {
 
     const sharedLink = await SharedLink.create({
       idea: ideaId,
-      creator: req.user._id,
-      permissions: permissions || "view",
+      creator: req.user ? req.user._id : null,
+      permissions: req.user ? (permissions || "view") : "view", // Guests always create view-only
       expiresAt,
-      sharedWith: sharedWith || [],
+      sharedWith: req.user ? (sharedWith || []) : [], // Guests cannot use internal sharing
       shareToken,
     });
 

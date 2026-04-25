@@ -71,6 +71,37 @@ describe("Idea Sharing Endpoints", () => {
 
       expect(res.statusCode).toEqual(403);
     });
+
+    it("should allow guest users to create shared links for public ideas", async () => {
+      const publicIdea = await Idea.create({
+        title: "Public Idea",
+        description: "Public description",
+        category: "Technology",
+        owner: user._id,
+        visibility: "public"
+      });
+
+      const res = await request(app)
+        .post("/api/share/create")
+        .send({
+          ideaId: publicIdea._id
+        });
+
+      expect(res.statusCode).toEqual(201);
+      expect(res.body).toHaveProperty("shareToken");
+      expect(res.body.creator).toBeNull();
+      expect(res.body.permissions).toEqual("view");
+    });
+
+    it("should block guest users from sharing private ideas", async () => {
+      const res = await request(app)
+        .post("/api/share/create")
+        .send({
+          ideaId: idea._id
+        });
+
+      expect(res.statusCode).toEqual(401);
+    });
   });
 
   describe("GET /api/share/:token", () => {
